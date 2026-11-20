@@ -1,0 +1,16 @@
+{
+  "conflict_visible": true,
+  "drop_before_reconciliation": true,
+  "duplicate_idempotence": true,
+  "independent_choice_families": 8,
+  "network_transport_tested": false,
+  "out_of_order_reconciliation": true,
+  "qualified_synthetic_combinations_after": 6561,
+  "replica_orders": 6,
+  "schema": "incremental-intelligence.synthetic-convergence.v1",
+  "signatures_tested": false,
+  "stale_refused": true,
+  "typed_clarifications": 1,
+  "unobserved_unsupported": true,
+  "unrelated_complete_input_refused": true
+}
