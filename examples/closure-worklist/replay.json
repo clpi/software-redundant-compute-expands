@@ -1,0 +1,33 @@
+{
+  "chain": {
+    "cold_rule_checks": 659206,
+    "distinct_edges": 514,
+    "new_edge_checks": 514,
+    "prefixes": 514,
+    "term_pops": 514,
+    "waiter_visits": 512
+  },
+  "comparison": "operation counts only; no wall-time or compiler integration claim",
+  "random_projection_and_filter_controls": {
+    "cold_rule_checks": 12769,
+    "distinct_edges": 1211,
+    "new_edge_checks": 1211,
+    "prefixes": 1920,
+    "term_pops": 331,
+    "waiter_visits": 144
+  },
+  "schema": "canonical-closure.worklist.v1",
+  "targeted_append_deltas": [
+    [],
+    [
+      2,
+      6,
+      4
+    ],
+    [],
+    [
+      10,
+      11
+    ]
+  ]
+}
