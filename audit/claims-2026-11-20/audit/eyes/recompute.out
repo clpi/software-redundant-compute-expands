@@ -1,5 +1,5 @@
-campaign-1 cells=24 summary-mismatches-vs-raw=0 cold ratio min 184x max 319x warm ratio min 17x max 182x
-campaign-2 cells=54 summary-mismatches-vs-raw=0 cold ratio min 145x max 374x warm ratio min 14x max 188x
-campaign-3 cells=60 summary-mismatches-vs-raw=0 cold ratio min 91x max 322x warm ratio min 17x max 217x
-campaign-4 cells=66 summary-mismatches-vs-raw=0 cold ratio min 116x max 292x warm ratio min 20x max 191x
-campaign-5 cells=72 summary-mismatches-vs-raw=0 cold ratio min 103x max 332x warm ratio min 19x max 220x
+campaign-1 cells=24 cold-mismatches=0 warm-mismatches=0 warm-missing=0 cold ratio min 184x max 319x warm ratio min 17x max 182x
+campaign-2 cells=54 cold-mismatches=0 warm-mismatches=0 warm-missing=0 cold ratio min 145x max 374x warm ratio min 14x max 188x
+campaign-3 cells=60 cold-mismatches=0 warm-mismatches=0 warm-missing=0 cold ratio min 91x max 322x warm ratio min 17x max 217x
+campaign-4 cells=66 cold-mismatches=0 warm-mismatches=0 warm-missing=0 cold ratio min 116x max 292x warm ratio min 20x max 191x
+campaign-5 cells=72 cold-mismatches=0 warm-mismatches=0 warm-missing=0 cold ratio min 103x max 332x warm ratio min 19x max 220x
