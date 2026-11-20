@@ -1,0 +1,514 @@
+{
+ "validity": {
+  "ax-a/visibility": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-a/control=lookahead": -0.9991,
+    "cand:ax-a/control=firsthead": 0.0,
+    "cand:ax-a/control=lastwitness": -0.17989999999999995
+   }
+  },
+  "ax-a/work_saved": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-a/control=lookahead": -0.999621,
+    "cand:ax-a/control=firsthead": -0.00010500000000002174,
+    "cand:ax-a/control=lastwitness": -0.00010500000000002174
+   }
+  },
+  "ax-a/reversibility": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-a/control=lookahead": -1.0,
+    "cand:ax-a/control=firsthead": -1.0,
+    "cand:ax-a/control=lastwitness": -1.0
+   }
+  },
+  "ax-a/compositionality": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-a/control=lookahead": -0.242122,
+    "cand:ax-a/control=firsthead": 0.0,
+    "cand:ax-a/control=lastwitness": 0.0,
+    "cand:ax-a/engine=counter,undo=none,witness=on,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=counter,undo=none,witness=off,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=counter,undo=journal,witness=on,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=counter,undo=journal,witness=off,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=watch,undo=none,witness=on,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=watch,undo=none,witness=off,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=watch,undo=journal,witness=off,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=watch,undo=snapshot,witness=on,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=rounds,undo=none,witness=on,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=rounds,undo=none,witness=off,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=recompute (rebuild merge)": 0.0
+   }
+  },
+  "ax-a/order_invariance": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-a/control=lookahead": 0.0,
+    "cand:ax-a/control=firsthead": -5.8000000000002494e-05,
+    "cand:ax-a/control=lastwitness": -5.8000000000002494e-05
+   }
+  },
+  "ax-a/robustness": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-a/control=lookahead": -1.0,
+    "cand:ax-a/control=firsthead": 0.0,
+    "cand:ax-a/control=lastwitness": 0.0
+   }
+  },
+  "ax-b/visibility": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-b/control=allfront": -1.0
+   }
+  },
+  "ax-b/work_saved": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-b/control=allfront": -0.987011
+   }
+  },
+  "ax-b/reversibility": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-b/control=allfront": -1.0
+   }
+  },
+  "ax-b/compositionality": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-b/control=allfront": -0.506358,
+    "cand:ax-b/engine=cold,undo=recompute,witness=off (rebuild merge)": 0.0,
+    "cand:ax-b/engine=cold,undo=recompute,witness=on (rebuild merge)": 0.0,
+    "cand:ax-b/engine=cold,undo=recompute,witness=repoint (rebuild merge)": 0.0
+   }
+  },
+  "ax-b/order_invariance": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-b/control=allfront": -0.970864
+   }
+  },
+  "ax-b/robustness": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-b/control=allfront": -0.33330000000000004
+   }
+  }
+ },
+ "survivors": {
+  "ax-a": [
+   "cand:ax-a/control=firsthead",
+   "cand:ax-a/engine=counter,undo=journal,witness=off,merge=propagate",
+   "cand:ax-a/engine=counter,undo=journal,witness=on,merge=propagate",
+   "cand:ax-a/engine=counter,undo=none,witness=off,merge=propagate",
+   "cand:ax-a/engine=counter,undo=none,witness=on,merge=propagate",
+   "cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=propagate",
+   "cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=recompute",
+   "cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=propagate",
+   "cand:ax-a/engine=rounds,undo=none,witness=off,merge=propagate",
+   "cand:ax-a/engine=rounds,undo=none,witness=on,merge=propagate",
+   "cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=propagate",
+   "cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=propagate",
+   "cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate",
+   "cand:ax-a/engine=watch,undo=journal,witness=on,merge=propagate",
+   "cand:ax-a/engine=watch,undo=none,witness=off,merge=propagate",
+   "cand:ax-a/engine=watch,undo=none,witness=on,merge=propagate",
+   "cand:ax-a/engine=watch,undo=none,witness=on,merge=recompute"
+  ],
+  "ax-b": [
+   "cand:ax-b/engine=archive,undo=none,witness=off",
+   "cand:ax-b/engine=archive,undo=residual,witness=on",
+   "cand:ax-b/engine=archive,undo=residual,witness=repoint",
+   "cand:ax-b/engine=archive,undo=snapshot,witness=off",
+   "cand:ax-b/engine=archive,undo=snapshot,witness=on",
+   "cand:ax-b/engine=archive,undo=snapshot,witness=repoint"
+  ],
+  "ax-j": [
+   "cand:ax-j/compose=sequential",
+   "cand:ax-j/compose=tree"
+  ],
+  "ax-s": [
+   "cand:ax-s/rule=ach,frame=fixed",
+   "cand:ax-s/rule=ch,frame=fixed",
+   "cand:ax-s/rule=ws,frame=fixed"
+  ]
+ },
+ "dominates_current": {
+  "cand:ax-a/engine=counter,undo=none,witness=on,merge=propagate": {
+   "subsets_with_dominator": 298,
+   "of": 511,
+   "shown": {
+    "premise_ops": [
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=propagate",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=recompute"
+    ],
+    "wall_ms": [
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate"
+    ],
+    "peak_kib": [
+     "cand:ax-a/engine=counter,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=counter,undo=none,witness=off,merge=recompute",
+     "cand:ax-a/engine=counter,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=counter,undo=journal,witness=off,merge=recompute"
+    ],
+    "work_saved": [
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=propagate",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=recompute"
+    ],
+    "reversibility": [
+     "cand:ax-a/engine=counter,undo=journal,witness=on,merge=propagate",
+     "cand:ax-a/engine=counter,undo=journal,witness=on,merge=recompute",
+     "cand:ax-a/engine=counter,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=counter,undo=journal,witness=off,merge=recompute",
+     "cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=propagate",
+     "cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=recompute",
+     "cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=propagate",
+     "cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=propagate",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=recompute",
+     "cand:ax-a/engine=watch,undo=snapshot,witness=on,merge=propagate",
+     "cand:ax-a/engine=watch,undo=snapshot,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=recompute",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=recompute",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=recompute"
+    ],
+    "order_invariance": [
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=propagate",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=recompute"
+    ],
+    "visibility,work_saved,reversibility,compositionality,order_invariance,robustness": [
+     "cand:ax-a/engine=counter,undo=journal,witness=on,merge=propagate"
+    ]
+   }
+  },
+  "cand:ax-a/engine=watch,undo=none,witness=on,merge=propagate": {
+   "subsets_with_dominator": 366,
+   "of": 511,
+   "shown": {
+    "wall_ms": [
+     "cand:ax-a/engine=counter,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=propagate"
+    ],
+    "peak_kib": [
+     "cand:ax-a/engine=counter,undo=none,witness=on,merge=propagate",
+     "cand:ax-a/engine=counter,undo=none,witness=on,merge=recompute",
+     "cand:ax-a/engine=counter,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=counter,undo=none,witness=off,merge=recompute",
+     "cand:ax-a/engine=counter,undo=journal,witness=on,merge=propagate",
+     "cand:ax-a/engine=counter,undo=journal,witness=on,merge=recompute",
+     "cand:ax-a/engine=counter,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=counter,undo=journal,witness=off,merge=recompute",
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=recompute",
+     "cand:ax-a/engine=rounds,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=none,witness=off,merge=recompute",
+     "cand:ax-a/control=firsthead",
+     "cand:ax-a/control=lastwitness"
+    ],
+    "reversibility": [
+     "cand:ax-a/engine=counter,undo=journal,witness=on,merge=propagate",
+     "cand:ax-a/engine=counter,undo=journal,witness=on,merge=recompute",
+     "cand:ax-a/engine=counter,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=counter,undo=journal,witness=off,merge=recompute",
+     "cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=propagate",
+     "cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=recompute",
+     "cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=propagate",
+     "cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=propagate",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=recompute",
+     "cand:ax-a/engine=watch,undo=snapshot,witness=on,merge=propagate",
+     "cand:ax-a/engine=watch,undo=snapshot,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=recompute",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=recompute",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=recompute"
+    ],
+    "compositionality": [
+     "cand:ax-a/engine=counter,undo=none,witness=on,merge=propagate",
+     "cand:ax-a/engine=counter,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=counter,undo=journal,witness=on,merge=propagate",
+     "cand:ax-a/engine=counter,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=propagate",
+     "cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=none,witness=on,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=propagate",
+     "cand:ax-a/control=firsthead",
+     "cand:ax-a/control=lastwitness"
+    ],
+    "visibility,work_saved,reversibility,compositionality,order_invariance,robustness": [
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=propagate"
+    ]
+   }
+  },
+  "cand:ax-b/engine=archive,undo=none,witness=off": {
+   "subsets_with_dominator": 96,
+   "of": 255,
+   "shown": {
+    "visibility": [
+     "cand:ax-b/engine=archive,undo=none,witness=on",
+     "cand:ax-b/engine=archive,undo=none,witness=repoint",
+     "cand:ax-b/engine=archive,undo=residual,witness=on",
+     "cand:ax-b/engine=archive,undo=residual,witness=repoint",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=on",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=repoint",
+     "cand:ax-b/engine=archive,undo=recompute,witness=on",
+     "cand:ax-b/engine=archive,undo=recompute,witness=repoint",
+     "cand:ax-b/engine=cold,undo=none,witness=on",
+     "cand:ax-b/engine=cold,undo=none,witness=repoint",
+     "cand:ax-b/engine=cold,undo=recompute,witness=on",
+     "cand:ax-b/engine=cold,undo=recompute,witness=repoint",
+     "cand:ax-b/engine=cold,undo=snapshot,witness=on",
+     "cand:ax-b/engine=cold,undo=snapshot,witness=repoint"
+    ],
+    "reversibility": [
+     "cand:ax-b/engine=archive,undo=residual,witness=off",
+     "cand:ax-b/engine=archive,undo=residual,witness=on",
+     "cand:ax-b/engine=archive,undo=residual,witness=repoint",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=off",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=on",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=repoint",
+     "cand:ax-b/engine=cold,undo=snapshot,witness=off",
+     "cand:ax-b/engine=cold,undo=snapshot,witness=on",
+     "cand:ax-b/engine=cold,undo=snapshot,witness=repoint"
+    ],
+    "visibility,work_saved,reversibility,compositionality,order_invariance,robustness": [
+     "cand:ax-b/engine=archive,undo=none,witness=on",
+     "cand:ax-b/engine=archive,undo=residual,witness=off",
+     "cand:ax-b/engine=archive,undo=residual,witness=on"
+    ]
+   }
+  },
+  "cand:ax-b/engine=cold,undo=recompute,witness=off": {
+   "subsets_with_dominator": 254,
+   "of": 255,
+   "shown": {
+    "dominance_tests": [
+     "cand:ax-b/engine=archive,undo=none,witness=off",
+     "cand:ax-b/engine=archive,undo=none,witness=on",
+     "cand:ax-b/engine=archive,undo=none,witness=repoint",
+     "cand:ax-b/engine=archive,undo=residual,witness=off",
+     "cand:ax-b/engine=archive,undo=residual,witness=on",
+     "cand:ax-b/engine=archive,undo=residual,witness=repoint",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=off",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=on",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=repoint",
+     "cand:ax-b/engine=archive,undo=recompute,witness=off",
+     "cand:ax-b/engine=archive,undo=recompute,witness=on",
+     "cand:ax-b/engine=archive,undo=recompute,witness=repoint"
+    ],
+    "wall_ms": [
+     "cand:ax-b/engine=archive,undo=none,witness=off",
+     "cand:ax-b/engine=archive,undo=none,witness=on",
+     "cand:ax-b/engine=archive,undo=none,witness=repoint",
+     "cand:ax-b/engine=archive,undo=residual,witness=off",
+     "cand:ax-b/engine=archive,undo=residual,witness=on",
+     "cand:ax-b/engine=archive,undo=residual,witness=repoint",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=off",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=on",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=repoint",
+     "cand:ax-b/engine=archive,undo=recompute,witness=off",
+     "cand:ax-b/engine=archive,undo=recompute,witness=on",
+     "cand:ax-b/engine=archive,undo=recompute,witness=repoint"
+    ],
+    "visibility": [
+     "cand:ax-b/engine=archive,undo=none,witness=on",
+     "cand:ax-b/engine=archive,undo=none,witness=repoint",
+     "cand:ax-b/engine=archive,undo=residual,witness=on",
+     "cand:ax-b/engine=archive,undo=residual,witness=repoint",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=on",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=repoint",
+     "cand:ax-b/engine=archive,undo=recompute,witness=on",
+     "cand:ax-b/engine=archive,undo=recompute,witness=repoint",
+     "cand:ax-b/engine=cold,undo=none,witness=on",
+     "cand:ax-b/engine=cold,undo=none,witness=repoint",
+     "cand:ax-b/engine=cold,undo=recompute,witness=on",
+     "cand:ax-b/engine=cold,undo=recompute,witness=repoint",
+     "cand:ax-b/engine=cold,undo=snapshot,witness=on",
+     "cand:ax-b/engine=cold,undo=snapshot,witness=repoint"
+    ],
+    "work_saved": [
+     "cand:ax-b/engine=archive,undo=none,witness=off",
+     "cand:ax-b/engine=archive,undo=none,witness=on",
+     "cand:ax-b/engine=archive,undo=none,witness=repoint",
+     "cand:ax-b/engine=archive,undo=residual,witness=off",
+     "cand:ax-b/engine=archive,undo=residual,witness=on",
+     "cand:ax-b/engine=archive,undo=residual,witness=repoint",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=off",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=on",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=repoint",
+     "cand:ax-b/engine=archive,undo=recompute,witness=off",
+     "cand:ax-b/engine=archive,undo=recompute,witness=on",
+     "cand:ax-b/engine=archive,undo=recompute,witness=repoint"
+    ],
+    "reversibility": [
+     "cand:ax-b/engine=archive,undo=residual,witness=off",
+     "cand:ax-b/engine=archive,undo=residual,witness=on",
+     "cand:ax-b/engine=archive,undo=residual,witness=repoint",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=off",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=on",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=repoint",
+     "cand:ax-b/engine=cold,undo=snapshot,witness=off",
+     "cand:ax-b/engine=cold,undo=snapshot,witness=on",
+     "cand:ax-b/engine=cold,undo=snapshot,witness=repoint"
+    ],
+    "compositionality": [
+     "cand:ax-b/engine=archive,undo=none,witness=off",
+     "cand:ax-b/engine=archive,undo=none,witness=on",
+     "cand:ax-b/engine=archive,undo=none,witness=repoint",
+     "cand:ax-b/engine=archive,undo=residual,witness=off",
+     "cand:ax-b/engine=archive,undo=residual,witness=on",
+     "cand:ax-b/engine=archive,undo=residual,witness=repoint",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=off",
+     "cand:ax-b/engine=archive,undo=recompute,witness=off",
+     "cand:ax-b/engine=archive,undo=recompute,witness=on",
+     "cand:ax-b/engine=archive,undo=recompute,witness=repoint"
+    ],
+    "order_invariance": [
+     "cand:ax-b/engine=archive,undo=none,witness=off",
+     "cand:ax-b/engine=archive,undo=none,witness=on",
+     "cand:ax-b/engine=archive,undo=none,witness=repoint",
+     "cand:ax-b/engine=archive,undo=residual,witness=off",
+     "cand:ax-b/engine=archive,undo=residual,witness=on",
+     "cand:ax-b/engine=archive,undo=residual,witness=repoint",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=off",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=on",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=repoint",
+     "cand:ax-b/engine=archive,undo=recompute,witness=off",
+     "cand:ax-b/engine=archive,undo=recompute,witness=on",
+     "cand:ax-b/engine=archive,undo=recompute,witness=repoint"
+    ],
+    "visibility,work_saved,reversibility,compositionality,order_invariance,robustness": [
+     "cand:ax-b/engine=archive,undo=none,witness=off",
+     "cand:ax-b/engine=archive,undo=none,witness=on",
+     "cand:ax-b/engine=archive,undo=none,witness=repoint",
+     "cand:ax-b/engine=archive,undo=residual,witness=off",
+     "cand:ax-b/engine=archive,undo=residual,witness=on",
+     "cand:ax-b/engine=archive,undo=residual,witness=repoint",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=off",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=on",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=repoint",
+     "cand:ax-b/engine=cold,undo=none,witness=on",
+     "cand:ax-b/engine=cold,undo=none,witness=repoint",
+     "cand:ax-b/engine=cold,undo=recompute,witness=on",
+     "cand:ax-b/engine=cold,undo=recompute,witness=repoint",
+     "cand:ax-b/engine=cold,undo=snapshot,witness=on",
+     "cand:ax-b/engine=cold,undo=snapshot,witness=repoint"
+    ],
+    "dominance_tests,wall_ms,visibility,work_saved,reversibility,compositionality,order_invariance,robustness": [
+     "cand:ax-b/engine=archive,undo=none,witness=off",
+     "cand:ax-b/engine=archive,undo=none,witness=on",
+     "cand:ax-b/engine=archive,undo=none,witness=repoint",
+     "cand:ax-b/engine=archive,undo=residual,witness=off",
+     "cand:ax-b/engine=archive,undo=residual,witness=on",
+     "cand:ax-b/engine=archive,undo=residual,witness=repoint",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=off",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=on",
+     "cand:ax-b/engine=archive,undo=snapshot,witness=repoint",
+     "cand:ax-b/engine=cold,undo=none,witness=on"
+    ]
+   }
+  }
+ }
+}

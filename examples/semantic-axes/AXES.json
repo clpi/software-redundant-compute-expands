@@ -1,0 +1,85 @@
+{
+ "declared": "before any candidate is scored on these axes; extends examples/algorithm-search/OBJECTIVES.json (be3ac745), whose contract, Pareto rule and wall-time tie rule still hold",
+ "ask": "Chris 2026-11-20T10:45Z: find where any approach Pareto-dominates on semantic axes (visibility, work-saving, compositionality, etc.), weight that space so it is continuously searchable, implement and prove clear candidates only after empirical tests pass, all in the hypergraph, no benchmark gaming",
+ "rule_for_every_axis": "an axis is admitted for selection only if, on every dev input, the do-nothing control scores 0 and the gamed control scores no higher than the best honest candidate; otherwise it is reported and marked UNMEASURED for selection",
+ "axes": {
+  "visibility": {
+   "meaning": "every result carries a witness on the hypergraph that an independent checker accepts",
+   "closure": "valid witnesses / reference derived terms. A witness for term g is a record index w with: w <= the append at which g was emitted, record w admitted by the view, head(w) = g, and every premise of w emitted earlier by the same candidate",
+   "front": "valid witnesses / reference non-front points at the final prefix. A witness for a non-front point is a current front member that dominates it",
+   "do_nothing": "emits nothing, so 0",
+   "gamed": "closure: witness = first record with that head, premises unchecked (counter with firsthead=on)",
+   "refutation": "a candidate scoring 1 whose witness the checker rejects, or a witness accepted for a term the reference does not derive"
+  },
+  "work_saved": {
+   "meaning": "work avoided against cold recomputation, counted only when every prefix is correct",
+   "closure": "1 - premise ops / premise ops of naive scratch recomputation (PR 7 closure.Scratch) on the same trace; 0 if any prefix is wrong",
+   "front": "1 - dominance tests / dominance tests of cold sort-filter recomputation after every append; 0 if any prefix is wrong",
+   "do_nothing": "wrong at some prefix, so 0",
+   "gamed": "lookahead: handed the future, reports everything at the first append; wrong at that prefix, so 0",
+   "note": "for one family on one trace this is a monotone rescaling of ops; it adds the correctness gate and a common baseline across families",
+   "refutation": "a candidate with positive work_saved that is wrong at some prefix, or whose wall time exceeds the scratch baseline's"
+  },
+  "compositionality": {
+   "meaning": "two states built independently on two halves of a log merge into the state of the whole, reusing both",
+   "closure": "split each trace at its midpoint; correct_merge * (1 - merge ops / ops of the same engine over the whole trace from empty). correct_merge: the merged derived set equals the reference closure of the whole trace AND the merged state stays correct when the first 200 records are appended again",
+   "front": "split the run stream at its midpoint; correct * (1 - merge tests / tests of the same engine over the whole stream)",
+   "selection": "fraction of weight vectors on the denominator-10 grid for which pick(A u B) = pick({pick(A), pick(B)}), over 2 halves of each joint-plan front, for fixed versus data-normalized frames",
+   "do_nothing": "merge returns the left state: wrong, so 0",
+   "gamed": "merge = rebuild from empty over the whole log: correct but saves nothing, so 0",
+   "refutation": "a merged state that later diverges from the reference on a continued append"
+  },
+  "reversibility": {
+   "meaning": "the last append can be undone exactly, cheaper than rebuilding",
+   "closure": "at every 50th append k: append k, undo, the derived set must equal the reference set after k-1 appends, then re-append k and match the reference after k. Score = fraction undone exactly * (1 - mean undo ops / mean ops spent reaching k-1). Unsupported undo scores 0",
+   "front": "same at every 10th arrival against the exact front",
+   "do_nothing": "undo that does nothing is wrong whenever the append changed state, so it scores 0 unless no tested append changed anything (checked)",
+   "gamed": "snapshot before every append: correct, with the copy counted in the append ops axis",
+   "prior_work": "Bennett 1989 (reversible time/space trade-offs), Griewank and Walther 2000 (Revolve checkpointing), O'Callahan et al. 2017 (rr)",
+   "refutation": "an undo accepted here whose next append diverges from the reference"
+  },
+  "order_invariance": {
+   "meaning": "the answer and the work do not depend on arrival order",
+   "closure_front": "on the reversed order and three fixed-seed shuffles of each dev trace: all final answers correct * (1 - (max ops - min ops) / mean ops)",
+   "do_nothing": "wrong answer, so 0",
+   "gamed": "none constructed beyond lookahead (wrong at prefixes)",
+   "refutation": "two orders with different correct answers"
+  },
+  "robustness": {
+   "meaning": "correct on adversarial variants of the dev traces",
+   "closure": "fraction of {dup-records, dup-premises, filtered} variants of each dev trace answered correctly at every prefix",
+   "front": "fraction of {duplicated points, all-equal points, Chris's (0,4),(4,0),(3,3)} answered exactly",
+   "do_nothing": "0",
+   "refutation": "a pass on a variant the reference disagrees with"
+  },
+  "classic": {
+   "premise_ops_or_tests": "min",
+   "wall_ms_median_of_5": "min",
+   "peak_kib": "min"
+  }
+ },
+ "families_covered": {
+  "a_closure": "all six axes",
+  "b1_d_front": "all six axes",
+  "b2_joint": "compositionality of the fold over factor blocks",
+  "b3_e_selection": "compositionality of picks under fixed versus data-normalized frames",
+  "c_stop": "visibility is the certified flag already measured in PR 7; no new axis",
+  "f_binding": "UNMEASURED on every axis: no compiler-resolved bindings exist here to check a witness against"
+ },
+ "unmeasured_by_design": [
+  "any axis named by Chris with 'etc.' that has no operational measure here: e.g. semantic coherence, intent fidelity, generality to pages not written for the test"
+ ],
+ "data": {
+  "dev": "estate, v2 (closure); idol-eyes campaigns 1-4 (fronts, joint plans, selection)",
+  "heldout": "refs, v2-rr (closure); campaigns 5-6, built or opened only after the dev down-select record"
+ },
+ "current_approach": "PR 7 survivors: counter worklist, watched-premise closure, online archive, cold sort-filter, pruned fold, solved Chebyshev weights",
+ "amendments_after_smoke_run": {
+  "when": "after one single-repeat smoke run of every candidate, before the contract run; disclosed in CLAIMS.md",
+  "why": "the smoke run showed three axes could be raised by padding work: each divided by the candidate's own cost, so a slower engine scored higher",
+  "compositionality": "merge cost is now divided by a common baseline: one naive fixpoint over the whole log (closure) or one sort-filter over the whole stream (front)",
+  "reversibility": "undo cost is now divided by a common baseline: the plain counter's ops to reach k-1 (closure) or one sort-filter of the prefix (front)",
+  "order_invariance": "spread is now (max ops - min ops) / the cold-recompute baseline of the forward order, not / the candidate's own mean",
+  "visibility": "added a second gamed control, lastwitness (witness = the record just appended), because firsthead coincides with the true witness when every head has one record"
+ }
+}

@@ -1,0 +1,169 @@
+dev estate cand:ax-a/engine=counter,undo=none,witness=on,merge=propagate True 4299 4.45 315.4 vis 1.0 ws 0.9995 rev 0.0 comp 0.797 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=counter,undo=none,witness=on,merge=recompute True 4299 4.46 315.4 vis 1.0 ws 0.9995 rev 0.0 comp 0.426 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=counter,undo=none,witness=off,merge=propagate True 4299 4.3 279.3 vis 0.0 ws 0.9995 rev 0.0 comp 0.797 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=counter,undo=none,witness=off,merge=recompute True 4299 4.25 279.3 vis 0.0 ws 0.9995 rev 0.0 comp 0.426 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=counter,undo=journal,witness=on,merge=propagate True 4299 5.09 329.1 vis 1.0 ws 0.9995 rev 0.997 comp 0.797 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=counter,undo=journal,witness=on,merge=recompute True 4299 4.81 329.1 vis 1.0 ws 0.9995 rev 0.997 comp 0.426 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=counter,undo=journal,witness=off,merge=propagate True 4299 4.42 291.1 vis 0.0 ws 0.9995 rev 0.998 comp 0.797 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=counter,undo=journal,witness=off,merge=recompute True 4299 4.56 291.1 vis 0.0 ws 0.9995 rev 0.998 comp 0.426 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=propagate True 5870654 52.19 642.7 vis 1.0 ws 0.2512 rev 1.0 comp 0.797 ord 0.88 rob 1.0
+dev estate cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=recompute True 5870654 51.82 642.7 vis 1.0 ws 0.2512 rev 1.0 comp 0.426 ord 0.88 rob 1.0
+dev estate cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=propagate True 4887882 71.96 534.6 vis 0.0 ws 0.3766 rev 1.0 comp 0.797 ord 0.867 rob 1.0
+dev estate cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=recompute True 4887882 44.62 534.6 vis 0.0 ws 0.3766 rev 1.0 comp 0.426 ord 0.867 rob 1.0
+dev estate cand:ax-a/engine=watch,undo=none,witness=on,merge=propagate True 2652 4.19 422.7 vis 1.0 ws 0.9997 rev 0.0 comp 0.845 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=watch,undo=none,witness=on,merge=recompute True 2652 4.29 422.6 vis 1.0 ws 0.9997 rev 0.0 comp 0.646 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=watch,undo=none,witness=off,merge=propagate True 2652 3.8 386.6 vis 0.0 ws 0.9997 rev 0.0 comp 0.845 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=watch,undo=none,witness=off,merge=recompute True 2652 5.75 386.6 vis 0.0 ws 0.9997 rev 0.0 comp 0.646 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=watch,undo=journal,witness=on,merge=propagate True 2652 4.46 429.4 vis 1.0 ws 0.9997 rev 0.998 comp 0.845 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute True 2652 4.3 429.4 vis 1.0 ws 0.9997 rev 0.998 comp 0.646 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate True 2652 4.03 392.4 vis 0.0 ws 0.9997 rev 0.998 comp 0.845 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=watch,undo=journal,witness=off,merge=recompute True 2652 4.22 392.4 vis 0.0 ws 0.9997 rev 0.998 comp 0.646 ord 1.0 rob 1.0
+dev estate cand:ax-a/engine=watch,undo=snapshot,witness=on,merge=propagate True 8893434 147.19 971.8 vis 1.0 ws -0.1343 rev 1.0 comp 0.845 ord 0.839 rob 1.0
+dev estate cand:ax-a/engine=watch,undo=snapshot,witness=on,merge=recompute True 8893434 148.82 971.8 vis 1.0 ws -0.1343 rev 1.0 comp 0.646 ord 0.839 rob 1.0
+dev estate cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=propagate True 7910662 165.18 863.7 vis 0.0 ws -0.009 rev 1.0 comp 0.845 ord 0.829 rob 1.0
+dev estate cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=recompute True 7910662 145.02 863.7 vis 0.0 ws -0.009 rev 1.0 comp 0.646 ord 0.829 rob 1.0
+dev estate cand:ax-a/engine=rounds,undo=none,witness=on,merge=propagate True 395952 337.21 447.9 vis 1.0 ws 0.9495 rev 0.0 comp 0.802 ord 0.946 rob 1.0
+dev estate cand:ax-a/engine=rounds,undo=none,witness=on,merge=recompute True 395952 345.57 447.7 vis 1.0 ws 0.9495 rev 0.0 comp 0.0 ord 0.946 rob 1.0
+dev estate cand:ax-a/engine=rounds,undo=none,witness=off,merge=propagate True 395952 343.31 411.7 vis 0.0 ws 0.9495 rev 0.0 comp 0.802 ord 0.946 rob 1.0
+dev estate cand:ax-a/engine=rounds,undo=none,witness=off,merge=recompute True 395952 404.32 411.7 vis 0.0 ws 0.9495 rev 0.0 comp 0.0 ord 0.946 rob 1.0
+dev estate cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=propagate True 3525599 359.56 678.6 vis 1.0 ws 0.5503 rev 1.0 comp 0.802 ord 0.945 rob 1.0
+dev estate cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=recompute True 3525599 416.14 678.6 vis 1.0 ws 0.5503 rev 1.0 comp 0.0 ord 0.945 rob 1.0
+dev estate cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=propagate True 2542827 351.51 570.5 vis 0.0 ws 0.6757 rev 1.0 comp 0.802 ord 0.939 rob 1.0
+dev estate cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=recompute True 2542827 407.54 570.5 vis 0.0 ws 0.6757 rev 1.0 comp 0.0 ord 0.939 rob 1.0
+dev estate cand:ax-a/control=null False 0 0.17 15.3 vis 0.0 ws 1.0 rev 0.0 comp 0.0 ord 0.0 rob 0.0
+dev estate cand:ax-a/control=lookahead False 0 4.45 321.4 vis 0.001 ws 1.0 rev 0.0 comp 0.426 ord 1.0 rob 0.0
+dev estate cand:ax-a/control=firsthead True 4299 4.61 315.4 vis 1.0 ws 0.9995 rev 0.0 comp 0.797 ord 1.0 rob 1.0
+dev estate cand:ax-a/control=lastwitness True 4299 4.42 315.4 vis 0.681 ws 0.9995 rev 0.0 comp 0.797 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=counter,undo=none,witness=on,merge=propagate True 6280 9.93 1026.2 vis 1.0 ws 0.9995 rev 0.0 comp 0.242 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=counter,undo=none,witness=on,merge=recompute True 6280 9.99 1026.2 vis 1.0 ws 0.9995 rev 0.0 comp 0.0 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=counter,undo=none,witness=off,merge=propagate True 6280 9.26 882.2 vis 0.0 ws 0.9995 rev 0.0 comp 0.242 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=counter,undo=none,witness=off,merge=recompute True 6280 13.85 882.2 vis 0.0 ws 0.9995 rev 0.0 comp 0.0 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=counter,undo=journal,witness=on,merge=propagate True 6280 10.65 1026.4 vis 1.0 ws 0.9995 rev 0.996 comp 0.242 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=counter,undo=journal,witness=on,merge=recompute True 6280 11.02 1026.4 vis 1.0 ws 0.9995 rev 0.996 comp 0.0 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=counter,undo=journal,witness=off,merge=propagate True 6280 10.11 882.4 vis 0.0 ws 0.9995 rev 0.997 comp 0.242 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=counter,undo=journal,witness=off,merge=recompute True 6280 11.61 882.4 vis 0.0 ws 0.9995 rev 0.997 comp 0.0 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=propagate True 33033836 244.61 1754.0 vis 1.0 ws -1.5463 rev 1.0 comp 0.242 ord 0.97 rob 1.0
+dev v2 cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=recompute True 33033836 242.87 1754.0 vis 1.0 ws -1.5463 rev 1.0 comp 0.0 ord 0.97 rob 1.0
+dev v2 cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=propagate True 26815802 211.58 1321.9 vis 0.0 ws -1.067 rev 1.0 comp 0.242 ord 0.939 rob 1.0
+dev v2 cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=recompute True 26815802 206.26 1321.9 vis 0.0 ws -1.067 rev 1.0 comp 0.0 ord 0.939 rob 1.0
+dev v2 cand:ax-a/engine=watch,undo=none,witness=on,merge=propagate True 4914 10.21 1281.0 vis 1.0 ws 0.9996 rev 0.0 comp 0.367 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=watch,undo=none,witness=on,merge=recompute True 4914 9.87 1281.0 vis 1.0 ws 0.9996 rev 0.0 comp 0.21 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=watch,undo=none,witness=off,merge=propagate True 4914 9.22 1137.0 vis 0.0 ws 0.9996 rev 0.0 comp 0.367 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=watch,undo=none,witness=off,merge=recompute True 4914 9.28 1137.0 vis 0.0 ws 0.9996 rev 0.0 comp 0.21 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=watch,undo=journal,witness=on,merge=propagate True 4914 10.72 1281.3 vis 1.0 ws 0.9996 rev 0.996 comp 0.367 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute True 4914 10.52 1281.3 vis 1.0 ws 0.9996 rev 0.996 comp 0.21 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate True 4914 10.08 1137.2 vis 0.0 ws 0.9996 rev 0.997 comp 0.367 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=watch,undo=journal,witness=off,merge=recompute True 4914 9.7 1137.2 vis 0.0 ws 0.9996 rev 0.997 comp 0.21 ord 1.0 rob 1.0
+dev v2 cand:ax-a/engine=watch,undo=snapshot,witness=on,merge=propagate True 42234025 1289.34 2590.9 vis 1.0 ws -2.2555 rev 1.0 comp 0.367 ord 0.956 rob 1.0
+dev v2 cand:ax-a/engine=watch,undo=snapshot,witness=on,merge=recompute True 42234025 1331.54 2590.9 vis 1.0 ws -2.2555 rev 1.0 comp 0.21 ord 0.956 rob 1.0
+dev v2 cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=propagate True 36015991 1273.8 2158.8 vis 0.0 ws -1.7762 rev 1.0 comp 0.367 ord 0.936 rob 1.0
+dev v2 cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=recompute True 36015991 1183.03 2158.8 vis 0.0 ws -1.7762 rev 1.0 comp 0.21 ord 0.936 rob 1.0
+dev v2 cand:ax-a/engine=rounds,undo=none,witness=on,merge=propagate True 1481062 2323.64 1323.1 vis 1.0 ws 0.8858 rev 0.0 comp 0.227 ord 0.767 rob 1.0
+dev v2 cand:ax-a/engine=rounds,undo=none,witness=on,merge=recompute True 1481062 2392.56 1323.1 vis 1.0 ws 0.8858 rev 0.0 comp 0.0 ord 0.767 rob 1.0
+dev v2 cand:ax-a/engine=rounds,undo=none,witness=off,merge=propagate True 1481062 2356.54 1179.0 vis 0.0 ws 0.8858 rev 0.0 comp 0.227 ord 0.767 rob 1.0
+dev v2 cand:ax-a/engine=rounds,undo=none,witness=off,merge=recompute True 1481062 2279.45 1179.0 vis 0.0 ws 0.8858 rev 0.0 comp 0.0 ord 0.767 rob 1.0
+dev v2 cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=propagate True 20503765 2507.42 1934.0 vis 1.0 ws -0.5805 rev 1.0 comp 0.227 ord 0.803 rob 1.0
+dev v2 cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=recompute True 20503765 2624.1 1934.0 vis 1.0 ws -0.5805 rev 1.0 comp 0.0 ord 0.803 rob 1.0
+dev v2 cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=propagate True 14285731 2905.81 1501.8 vis 0.0 ws -0.1012 rev 1.0 comp 0.227 ord 0.785 rob 1.0
+dev v2 cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=recompute True 14285731 2434.5 1501.8 vis 0.0 ws -0.1012 rev 1.0 comp 0.0 ord 0.785 rob 1.0
+dev v2 cand:ax-a/control=null False 0 0.37 29.8 vis 0.0 ws 1.0 rev 0.0 comp 0.0 ord 0.0 rob 0.0
+dev v2 cand:ax-a/control=lookahead False 0 9.85 938.1 vis 0.0 ws 1.0 rev 0.0 comp 0.0 ord 1.0 rob 0.0
+dev v2 cand:ax-a/control=firsthead True 6280 9.92 1026.2 vis 1.0 ws 0.9995 rev 0.0 comp 0.242 ord 1.0 rob 1.0
+dev v2 cand:ax-a/control=lastwitness True 6280 14.47 1026.2 vis 0.82 ws 0.9995 rev 0.0 comp 0.242 ord 1.0 rob 1.0
+dev ax/campaign-1 cand:ax-b/engine=archive,undo=none,witness=off True 614 vis 0.0 rev 0.0 comp 0.622 ord 0.986
+dev ax/campaign-1 cand:ax-b/engine=archive,undo=none,witness=on True 614 vis 0.767 rev 0.0 comp 0.622 ord 0.986
+dev ax/campaign-1 cand:ax-b/engine=archive,undo=none,witness=repoint True 676 vis 1.0 rev 0.0 comp 0.622 ord 0.985
+dev ax/campaign-1 cand:ax-b/engine=archive,undo=residual,witness=off True 614 vis 0.0 rev 0.999 comp 0.622 ord 0.986
+dev ax/campaign-1 cand:ax-b/engine=archive,undo=residual,witness=on True 614 vis 0.767 rev 0.999 comp 0.622 ord 0.986
+dev ax/campaign-1 cand:ax-b/engine=archive,undo=residual,witness=repoint True 676 vis 1.0 rev 0.999 comp 0.622 ord 0.985
+dev ax/campaign-1 cand:ax-b/engine=archive,undo=snapshot,witness=off True 2554 vis 0.0 rev 1.0 comp 0.389 ord 0.986
+dev ax/campaign-1 cand:ax-b/engine=archive,undo=snapshot,witness=on True 26949 vis 0.767 rev 1.0 comp 0.0 ord 0.986
+dev ax/campaign-1 cand:ax-b/engine=archive,undo=snapshot,witness=repoint True 27011 vis 1.0 rev 1.0 comp 0.0 ord 0.985
+dev ax/campaign-1 cand:ax-b/engine=archive,undo=recompute,witness=off True 614 vis 0.0 rev -0.597 comp 0.622 ord 0.986
+dev ax/campaign-1 cand:ax-b/engine=archive,undo=recompute,witness=on True 614 vis 0.767 rev -0.597 comp 0.622 ord 0.986
+dev ax/campaign-1 cand:ax-b/engine=archive,undo=recompute,witness=repoint True 676 vis 1.0 rev -0.935 comp 0.622 ord 0.985
+dev ax/campaign-1 cand:ax-b/engine=cold,undo=none,witness=off True 47270 vis 0.0 rev 0.0 comp 0.0 ord 0.857
+dev ax/campaign-1 cand:ax-b/engine=cold,undo=none,witness=on True 47270 vis 1.0 rev 0.0 comp 0.0 ord 0.857
+dev ax/campaign-1 cand:ax-b/engine=cold,undo=none,witness=repoint True 47270 vis 1.0 rev 0.0 comp 0.0 ord 0.857
+dev ax/campaign-1 cand:ax-b/engine=cold,undo=recompute,witness=off True 47270 vis 0.0 rev 0.0 comp 0.0 ord 0.857
+dev ax/campaign-1 cand:ax-b/engine=cold,undo=recompute,witness=on True 47270 vis 1.0 rev 0.0 comp 0.0 ord 0.857
+dev ax/campaign-1 cand:ax-b/engine=cold,undo=recompute,witness=repoint True 47270 vis 1.0 rev 0.0 comp 0.0 ord 0.857
+dev ax/campaign-1 cand:ax-b/engine=cold,undo=snapshot,witness=off True 49210 vis 0.0 rev 1.0 comp 0.0 ord 0.849
+dev ax/campaign-1 cand:ax-b/engine=cold,undo=snapshot,witness=on True 73605 vis 1.0 rev 1.0 comp 0.0 ord 0.857
+dev ax/campaign-1 cand:ax-b/engine=cold,undo=snapshot,witness=repoint True 73605 vis 1.0 rev 1.0 comp 0.0 ord 0.857
+dev ax/campaign-1 cand:ax-b/control=null False 0 vis 0.0 rev 0.0 comp 0.0 ord 0.0
+dev ax/campaign-1 cand:ax-b/control=allfront False 0 vis 0.0 rev 0.0 comp 0.0 ord 0.0
+dev ax/campaign-2 cand:ax-b/engine=archive,undo=none,witness=off True 1883 vis 0.0 rev 0.0 comp 0.506 ord 0.983
+dev ax/campaign-2 cand:ax-b/engine=archive,undo=none,witness=on True 1883 vis 0.979 rev 0.0 comp 0.506 ord 0.983
+dev ax/campaign-2 cand:ax-b/engine=archive,undo=none,witness=repoint True 1893 vis 1.0 rev 0.0 comp 0.506 ord 0.982
+dev ax/campaign-2 cand:ax-b/engine=archive,undo=residual,witness=off True 1883 vis 0.0 rev 0.997 comp 0.506 ord 0.983
+dev ax/campaign-2 cand:ax-b/engine=archive,undo=residual,witness=on True 1883 vis 0.979 rev 0.997 comp 0.506 ord 0.983
+dev ax/campaign-2 cand:ax-b/engine=archive,undo=residual,witness=repoint True 1893 vis 1.0 rev 0.997 comp 0.506 ord 0.982
+dev ax/campaign-2 cand:ax-b/engine=archive,undo=snapshot,witness=off True 9034 vis 0.0 rev 1.0 comp 0.025 ord 0.98
+dev ax/campaign-2 cand:ax-b/engine=archive,undo=snapshot,witness=on True 85728 vis 0.979 rev 1.0 comp 0.0 ord 0.983
+dev ax/campaign-2 cand:ax-b/engine=archive,undo=snapshot,witness=repoint True 85738 vis 1.0 rev 1.0 comp 0.0 ord 0.982
+dev ax/campaign-2 cand:ax-b/engine=archive,undo=recompute,witness=off True 1883 vis 0.0 rev -0.719 comp 0.506 ord 0.983
+dev ax/campaign-2 cand:ax-b/engine=archive,undo=recompute,witness=on True 1883 vis 0.979 rev -0.719 comp 0.506 ord 0.983
+dev ax/campaign-2 cand:ax-b/engine=archive,undo=recompute,witness=repoint True 1893 vis 1.0 rev -0.775 comp 0.506 ord 0.982
+dev ax/campaign-2 cand:ax-b/engine=cold,undo=none,witness=off True 191074 vis 0.0 rev 0.0 comp 0.0 ord 0.946
+dev ax/campaign-2 cand:ax-b/engine=cold,undo=none,witness=on True 191074 vis 1.0 rev 0.0 comp 0.0 ord 0.946
+dev ax/campaign-2 cand:ax-b/engine=cold,undo=none,witness=repoint True 191074 vis 1.0 rev 0.0 comp 0.0 ord 0.946
+dev ax/campaign-2 cand:ax-b/engine=cold,undo=recompute,witness=off True 191074 vis 0.0 rev 0.0 comp 0.0 ord 0.946
+dev ax/campaign-2 cand:ax-b/engine=cold,undo=recompute,witness=on True 191074 vis 1.0 rev 0.0 comp 0.0 ord 0.946
+dev ax/campaign-2 cand:ax-b/engine=cold,undo=recompute,witness=repoint True 191074 vis 1.0 rev 0.0 comp 0.0 ord 0.946
+dev ax/campaign-2 cand:ax-b/engine=cold,undo=snapshot,witness=off True 198225 vis 0.0 rev 1.0 comp 0.0 ord 0.941
+dev ax/campaign-2 cand:ax-b/engine=cold,undo=snapshot,witness=on True 274919 vis 1.0 rev 1.0 comp 0.0 ord 0.946
+dev ax/campaign-2 cand:ax-b/engine=cold,undo=snapshot,witness=repoint True 274919 vis 1.0 rev 1.0 comp 0.0 ord 0.946
+dev ax/campaign-2 cand:ax-b/control=null False 0 vis 0.0 rev 0.0 comp 0.0 ord 0.0
+dev ax/campaign-2 cand:ax-b/control=allfront False 0 vis 0.0 rev 0.0 comp 0.0 ord 0.0
+dev ax/campaign-3 cand:ax-b/engine=archive,undo=none,witness=off True 337 vis 0.0 rev 0.0 comp 0.789 ord 0.971
+dev ax/campaign-3 cand:ax-b/engine=archive,undo=none,witness=on True 337 vis 1.0 rev 0.0 comp 0.789 ord 0.971
+dev ax/campaign-3 cand:ax-b/engine=archive,undo=none,witness=repoint True 337 vis 1.0 rev 0.0 comp 0.789 ord 0.966
+dev ax/campaign-3 cand:ax-b/engine=archive,undo=residual,witness=off True 337 vis 0.0 rev 1.0 comp 0.789 ord 0.971
+dev ax/campaign-3 cand:ax-b/engine=archive,undo=residual,witness=on True 337 vis 1.0 rev 1.0 comp 0.789 ord 0.971
+dev ax/campaign-3 cand:ax-b/engine=archive,undo=residual,witness=repoint True 337 vis 1.0 rev 1.0 comp 0.789 ord 0.966
+dev ax/campaign-3 cand:ax-b/engine=archive,undo=snapshot,witness=off True 1659 vis 0.0 rev 1.0 comp 0.48 ord 0.947
+dev ax/campaign-3 cand:ax-b/engine=archive,undo=snapshot,witness=on True 25537 vis 1.0 rev 1.0 comp 0.0 ord 0.971
+dev ax/campaign-3 cand:ax-b/engine=archive,undo=snapshot,witness=repoint True 25537 vis 1.0 rev 1.0 comp 0.0 ord 0.966
+dev ax/campaign-3 cand:ax-b/engine=archive,undo=recompute,witness=off True 337 vis 0.0 rev -0.01 comp 0.789 ord 0.971
+dev ax/campaign-3 cand:ax-b/engine=archive,undo=recompute,witness=on True 337 vis 1.0 rev -0.01 comp 0.789 ord 0.971
+dev ax/campaign-3 cand:ax-b/engine=archive,undo=recompute,witness=repoint True 337 vis 1.0 rev -0.01 comp 0.789 ord 0.966
+dev ax/campaign-3 cand:ax-b/engine=cold,undo=none,witness=off True 37754 vis 0.0 rev 0.0 comp 0.0 ord 0.754
+dev ax/campaign-3 cand:ax-b/engine=cold,undo=none,witness=on True 37754 vis 1.0 rev 0.0 comp 0.0 ord 0.754
+dev ax/campaign-3 cand:ax-b/engine=cold,undo=none,witness=repoint True 37754 vis 1.0 rev 0.0 comp 0.0 ord 0.754
+dev ax/campaign-3 cand:ax-b/engine=cold,undo=recompute,witness=off True 37754 vis 0.0 rev 0.0 comp 0.0 ord 0.754
+dev ax/campaign-3 cand:ax-b/engine=cold,undo=recompute,witness=on True 37754 vis 1.0 rev 0.0 comp 0.0 ord 0.754
+dev ax/campaign-3 cand:ax-b/engine=cold,undo=recompute,witness=repoint True 37754 vis 1.0 rev 0.0 comp 0.0 ord 0.754
+dev ax/campaign-3 cand:ax-b/engine=cold,undo=snapshot,witness=off True 39076 vis 0.0 rev 1.0 comp 0.0 ord 0.73
+dev ax/campaign-3 cand:ax-b/engine=cold,undo=snapshot,witness=on True 62954 vis 1.0 rev 1.0 comp 0.0 ord 0.754
+dev ax/campaign-3 cand:ax-b/engine=cold,undo=snapshot,witness=repoint True 62954 vis 1.0 rev 1.0 comp 0.0 ord 0.754
+dev ax/campaign-3 cand:ax-b/control=null False 0 vis 0.0 rev 0.0 comp 0.0 ord 0.0
+dev ax/campaign-3 cand:ax-b/control=allfront False 0 vis 0.0 rev 0.0 comp 0.0 ord 0.0
+dev ax/campaign-4 cand:ax-b/engine=archive,undo=none,witness=off True 457 vis 0.0 rev 0.0 comp 0.618 ord 0.972
+dev ax/campaign-4 cand:ax-b/engine=archive,undo=none,witness=on True 457 vis 1.0 rev 0.0 comp 0.618 ord 0.972
+dev ax/campaign-4 cand:ax-b/engine=archive,undo=none,witness=repoint True 457 vis 1.0 rev 0.0 comp 0.618 ord 0.967
+dev ax/campaign-4 cand:ax-b/engine=archive,undo=residual,witness=off True 457 vis 0.0 rev 1.0 comp 0.618 ord 0.972
+dev ax/campaign-4 cand:ax-b/engine=archive,undo=residual,witness=on True 457 vis 1.0 rev 1.0 comp 0.618 ord 0.972
+dev ax/campaign-4 cand:ax-b/engine=archive,undo=residual,witness=repoint True 457 vis 1.0 rev 1.0 comp 0.618 ord 0.967
+dev ax/campaign-4 cand:ax-b/engine=archive,undo=snapshot,witness=off True 2260 vis 0.0 rev 1.0 comp 0.311 ord 0.948
+dev ax/campaign-4 cand:ax-b/engine=archive,undo=snapshot,witness=on True 30347 vis 1.0 rev 1.0 comp 0.0 ord 0.972
+dev ax/campaign-4 cand:ax-b/engine=archive,undo=snapshot,witness=repoint True 30347 vis 1.0 rev 1.0 comp 0.0 ord 0.967
+dev ax/campaign-4 cand:ax-b/engine=archive,undo=recompute,witness=off True 457 vis 0.0 rev -0.279 comp 0.618 ord 0.972
+dev ax/campaign-4 cand:ax-b/engine=archive,undo=recompute,witness=on True 457 vis 1.0 rev -0.279 comp 0.618 ord 0.972
+dev ax/campaign-4 cand:ax-b/engine=archive,undo=recompute,witness=repoint True 457 vis 1.0 rev -0.279 comp 0.618 ord 0.967
+dev ax/campaign-4 cand:ax-b/engine=cold,undo=none,witness=off True 38086 vis 0.0 rev 0.0 comp 0.0 ord 0.562
+dev ax/campaign-4 cand:ax-b/engine=cold,undo=none,witness=on True 38086 vis 1.0 rev 0.0 comp 0.0 ord 0.562
+dev ax/campaign-4 cand:ax-b/engine=cold,undo=none,witness=repoint True 38086 vis 1.0 rev 0.0 comp 0.0 ord 0.562
+dev ax/campaign-4 cand:ax-b/engine=cold,undo=recompute,witness=off True 38086 vis 0.0 rev 0.0 comp 0.0 ord 0.562
+dev ax/campaign-4 cand:ax-b/engine=cold,undo=recompute,witness=on True 38086 vis 1.0 rev 0.0 comp 0.0 ord 0.562
+dev ax/campaign-4 cand:ax-b/engine=cold,undo=recompute,witness=repoint True 38086 vis 1.0 rev 0.0 comp 0.0 ord 0.562
+dev ax/campaign-4 cand:ax-b/engine=cold,undo=snapshot,witness=off True 39889 vis 0.0 rev 1.0 comp 0.0 ord 0.547
+dev ax/campaign-4 cand:ax-b/engine=cold,undo=snapshot,witness=on True 67976 vis 1.0 rev 1.0 comp 0.0 ord 0.562
+dev ax/campaign-4 cand:ax-b/engine=cold,undo=snapshot,witness=repoint True 67976 vis 1.0 rev 1.0 comp 0.0 ord 0.562
+dev ax/campaign-4 cand:ax-b/control=null False 0 vis 0.0 rev 0.0 comp 0.0 ord 0.0
+dev ax/campaign-4 cand:ax-b/control=allfront False 0 vis 0.0 rev 0.0 comp 0.0 ord 0.0
+dev joint/select campaign 1
+dev joint/select campaign 2
+dev joint/select campaign 3
+dev joint/select campaign 4
+records 1873 head 8461d4f9b741b80d6adc6e8948add63d309524311e04dbb73e772d4a6649019f

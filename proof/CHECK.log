@@ -6,6 +6,14 @@ Lean (version 4.19.0, x86_64-unknown-linux-gnu, commit 6caaee842e94, Release)
 'AlgoSearch.cheb_target' depends on axioms: [propext, Classical.choice, Quot.sound]
 'AlgoSearch.chris_unsupported_reached' does not depend on any axioms
 'AlgoSearch.chris_ws_miss' depends on axioms: [propext, Quot.sound]
+'Axes.dom_ext_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Axes.front_ext' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Axes.front_union' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Axes.undo_residual' depends on axioms: [propext]
+'Axes.ins_accept' depends on axioms: [propext]
+'Axes.ins_reject' depends on axioms: [propext]
+'Axes.seeded_eq' does not depend on any axioms
+'Axes.merge_spec' does not depend on any axioms
 'Canon.Derives.least' does not depend on any axioms
 'Canon.Derives.mono' does not depend on any axioms
 'Canon.Derives.roots_as_edges' depends on axioms: [propext]
