@@ -1,0 +1,69 @@
+{
+  "controlled_synthetic": true,
+  "disjoint_append_rule_evaluations": 1,
+  "family_slots_before_shared_witness": 24,
+  "schema": "candidate-space.coalitions.v1",
+  "shared_witness_minimal_plans": 6562,
+  "stages": [
+    {
+      "minimal_plans": 3,
+      "requirements": 1,
+      "support_rule_evaluations_for_projection": 0,
+      "witness_actions": 3
+    },
+    {
+      "minimal_plans": 9,
+      "requirements": 2,
+      "support_rule_evaluations_for_projection": 0,
+      "witness_actions": 6
+    },
+    {
+      "minimal_plans": 27,
+      "requirements": 3,
+      "support_rule_evaluations_for_projection": 0,
+      "witness_actions": 9
+    },
+    {
+      "minimal_plans": 81,
+      "requirements": 4,
+      "support_rule_evaluations_for_projection": 0,
+      "witness_actions": 12
+    },
+    {
+      "minimal_plans": 243,
+      "requirements": 5,
+      "support_rule_evaluations_for_projection": 0,
+      "witness_actions": 15
+    },
+    {
+      "minimal_plans": 729,
+      "requirements": 6,
+      "support_rule_evaluations_for_projection": 0,
+      "witness_actions": 18
+    },
+    {
+      "minimal_plans": 2187,
+      "requirements": 7,
+      "support_rule_evaluations_for_projection": 0,
+      "witness_actions": 21
+    },
+    {
+      "minimal_plans": 6561,
+      "requirements": 8,
+      "support_rule_evaluations_for_projection": 0,
+      "witness_actions": 24
+    }
+  ],
+  "unsupported_weighted_point": {
+    "pareto_size": 3,
+    "weight_pairs_checked": 1024,
+    "weighted_winners": [
+      [
+        "a"
+      ],
+      [
+        "c"
+      ]
+    ]
+  }
+}

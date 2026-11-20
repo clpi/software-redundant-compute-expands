@@ -1,0 +1,5637 @@
+{
+  "cases": [
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 82,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 155,
+        "exhaustive_goal_paths": 44,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 45,
+        "incremental_states": 20,
+        "multiple_hybrid_pareto_points": 4,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                79,
+                15,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 15,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                36,
+                8,
+                3
+              ],
+              [
+                "nav0",
+                "route01-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                42,
+                3,
+                4
+              ],
+              [
+                "route00-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                49,
+                6,
+                3
+              ],
+              [
+                "route00-06",
+                "route06-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 10
+        },
+        {
+          "cold_relaxations": 20,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                36,
+                8,
+                3
+              ],
+              [
+                "nav0",
+                "route01-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                42,
+                3,
+                4
+              ],
+              [
+                "route00-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                49,
+                6,
+                3
+              ],
+              [
+                "route00-06",
+                "route06-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 12
+        },
+        {
+          "cold_relaxations": 18,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                36,
+                8,
+                3
+              ],
+              [
+                "nav0",
+                "route01-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                42,
+                3,
+                4
+              ],
+              [
+                "route00-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 6
+        },
+        {
+          "cold_relaxations": 20,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                36,
+                8,
+                3
+              ],
+              [
+                "nav0",
+                "route01-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                42,
+                3,
+                4
+              ],
+              [
+                "route00-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                49,
+                6,
+                3
+              ],
+              [
+                "route00-06",
+                "route06-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 8
+        }
+      ],
+      "seed": 0
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 90,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 169,
+        "exhaustive_goal_paths": 35,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 63,
+        "incremental_states": 28,
+        "multiple_hybrid_pareto_points": 4,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                85,
+                13,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 17,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                53,
+                12,
+                5
+              ],
+              [
+                "route00-05",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                55,
+                11,
+                6
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-07",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 14
+        },
+        {
+          "cold_relaxations": 22,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                20,
+                7,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                28,
+                5,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 20
+        },
+        {
+          "cold_relaxations": 20,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                20,
+                7,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                28,
+                5,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 22,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                20,
+                7,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                28,
+                5,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 11
+        }
+      ],
+      "seed": 1
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 4,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 67,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 82,
+        "exhaustive_goal_paths": 15,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 45,
+        "incremental_states": 28,
+        "multiple_hybrid_pareto_points": 0,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                67,
+                14,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 17,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                14,
+                1,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 15
+        },
+        {
+          "cold_relaxations": 15,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                14,
+                1,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 7
+        },
+        {
+          "cold_relaxations": 11,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                14,
+                1,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 5
+        },
+        {
+          "cold_relaxations": 15,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                14,
+                1,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        }
+      ],
+      "seed": 2
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 65,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 139,
+        "exhaustive_goal_paths": 31,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 37,
+        "incremental_states": 24,
+        "multiple_hybrid_pareto_points": 0,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                86,
+                12,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 12,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                42,
+                2,
+                4
+              ],
+              [
+                "nav0",
+                "route01-07",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 8
+        },
+        {
+          "cold_relaxations": 15,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                38,
+                2,
+                3
+              ],
+              [
+                "nav0",
+                "route01-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 11
+        },
+        {
+          "cold_relaxations": 14,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                38,
+                2,
+                3
+              ],
+              [
+                "nav0",
+                "route01-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 4
+        },
+        {
+          "cold_relaxations": 15,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                38,
+                2,
+                3
+              ],
+              [
+                "nav0",
+                "route01-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 5
+        }
+      ],
+      "seed": 3
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 74,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 121,
+        "exhaustive_goal_paths": 34,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 39,
+        "incremental_states": 20,
+        "multiple_hybrid_pareto_points": 3,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                69,
+                14,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 13,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                28,
+                5,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 8
+        },
+        {
+          "cold_relaxations": 18,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                28,
+                5,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                29,
+                8,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 14
+        },
+        {
+          "cold_relaxations": 16,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                28,
+                5,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                29,
+                8,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 3
+        },
+        {
+          "cold_relaxations": 18,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                28,
+                5,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                29,
+                8,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 5
+        }
+      ],
+      "seed": 4
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 4,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 111,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 236,
+        "exhaustive_goal_paths": 70,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 52,
+        "incremental_states": 24,
+        "multiple_hybrid_pareto_points": 0,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                69,
+                15,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 20,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                9,
+                2,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 19
+        },
+        {
+          "cold_relaxations": 28,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                9,
+                2,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 20
+        },
+        {
+          "cold_relaxations": 26,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                9,
+                2,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 1
+        },
+        {
+          "cold_relaxations": 28,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                9,
+                2,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 3
+        }
+      ],
+      "seed": 5
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 89,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 140,
+        "exhaustive_goal_paths": 37,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 67,
+        "incremental_states": 30,
+        "multiple_hybrid_pareto_points": 4,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                74,
+                13,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 16,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                46,
+                13,
+                5
+              ],
+              [
+                "nav0",
+                "route01-03",
+                "route03-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                55,
+                10,
+                6
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-07",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 14
+        },
+        {
+          "cold_relaxations": 20,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                23,
+                9,
+                3
+              ],
+              [
+                "nav0",
+                "route01-03",
+                "route03-09"
+              ]
+            ],
+            [
+              [
+                28,
+                8,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ],
+            [
+              [
+                32,
+                6,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 8
+        },
+        {
+          "cold_relaxations": 24,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                23,
+                9,
+                3
+              ],
+              [
+                "nav0",
+                "route01-03",
+                "route03-09"
+              ]
+            ],
+            [
+              [
+                28,
+                8,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ],
+            [
+              [
+                32,
+                6,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 20
+        },
+        {
+          "cold_relaxations": 20,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                23,
+                9,
+                3
+              ],
+              [
+                "nav0",
+                "route01-03",
+                "route03-09"
+              ]
+            ],
+            [
+              [
+                28,
+                8,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ],
+            [
+              [
+                32,
+                6,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 16
+        }
+      ],
+      "seed": 6
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 4,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 100,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 102,
+        "exhaustive_goal_paths": 41,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 82,
+        "incremental_states": 32,
+        "multiple_hybrid_pareto_points": 4,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                81,
+                4,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 20,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                8,
+                2,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ],
+            [
+              [
+                38,
+                1,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 18
+        },
+        {
+          "cold_relaxations": 27,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                8,
+                2,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ],
+            [
+              [
+                38,
+                1,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 15
+        },
+        {
+          "cold_relaxations": 17,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                8,
+                2,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ],
+            [
+              [
+                38,
+                1,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 15
+        },
+        {
+          "cold_relaxations": 27,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                8,
+                2,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ],
+            [
+              [
+                38,
+                1,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 25
+        }
+      ],
+      "seed": 7
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 64,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 76,
+        "exhaustive_goal_paths": 18,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 30,
+        "incremental_states": 17,
+        "multiple_hybrid_pareto_points": 3,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                88,
+                12,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 11,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                25,
+                7,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                56,
+                4,
+                5
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "route04-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 3
+        },
+        {
+          "cold_relaxations": 15,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                25,
+                7,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                56,
+                4,
+                5
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "route04-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 11
+        },
+        {
+          "cold_relaxations": 14,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                25,
+                7,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 3
+        },
+        {
+          "cold_relaxations": 15,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                25,
+                7,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                56,
+                4,
+                5
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "route04-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 4
+        }
+      ],
+      "seed": 8
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 3,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 147,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 582,
+        "exhaustive_goal_paths": 243,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 90,
+        "incremental_states": 26,
+        "multiple_hybrid_pareto_points": 3,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                74,
+                16,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 23,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                31,
+                3,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 22
+        },
+        {
+          "cold_relaxations": 39,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                12,
+                4,
+                2
+              ],
+              [
+                "route00-02",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                25,
+                3,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                29,
+                2,
+                2
+              ],
+              [
+                "route00-07",
+                "route07-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 29
+        },
+        {
+          "cold_relaxations": 37,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                12,
+                4,
+                2
+              ],
+              [
+                "route00-02",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                25,
+                3,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                29,
+                2,
+                2
+              ],
+              [
+                "route00-07",
+                "route07-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 14
+        },
+        {
+          "cold_relaxations": 39,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                12,
+                4,
+                2
+              ],
+              [
+                "route00-02",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                25,
+                3,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                29,
+                2,
+                2
+              ],
+              [
+                "route00-07",
+                "route07-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 16
+        }
+      ],
+      "seed": 9
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 4,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 95,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 255,
+        "exhaustive_goal_paths": 94,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 47,
+        "incremental_states": 22,
+        "multiple_hybrid_pareto_points": 0,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                83,
+                12,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 15,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                11,
+                3,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 12
+        },
+        {
+          "cold_relaxations": 24,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                11,
+                3,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 19
+        },
+        {
+          "cold_relaxations": 23,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                11,
+                3,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 3
+        },
+        {
+          "cold_relaxations": 24,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                11,
+                3,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 4
+        }
+      ],
+      "seed": 10
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 4,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 132,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 468,
+        "exhaustive_goal_paths": 189,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 86,
+        "incremental_states": 27,
+        "multiple_hybrid_pareto_points": 0,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                79,
+                13,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 24,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                6,
+                3,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 21
+        },
+        {
+          "cold_relaxations": 34,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                6,
+                3,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 33
+        },
+        {
+          "cold_relaxations": 31,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                6,
+                3,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 10
+        },
+        {
+          "cold_relaxations": 34,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                6,
+                3,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 13
+        }
+      ],
+      "seed": 11
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 3,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 76,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 211,
+        "exhaustive_goal_paths": 66,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 52,
+        "incremental_states": 29,
+        "multiple_hybrid_pareto_points": 3,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                87,
+                14,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 17,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                25,
+                8,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 15
+        },
+        {
+          "cold_relaxations": 17,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                25,
+                8,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                40,
+                5,
+                3
+              ],
+              [
+                "nav0",
+                "route01-04",
+                "route04-09"
+              ]
+            ],
+            [
+              [
+                50,
+                3,
+                3
+              ],
+              [
+                "route00-02",
+                "route02-06",
+                "route06-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 15
+        },
+        {
+          "cold_relaxations": 16,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                40,
+                5,
+                3
+              ],
+              [
+                "nav0",
+                "route01-04",
+                "route04-09"
+              ]
+            ],
+            [
+              [
+                50,
+                3,
+                3
+              ],
+              [
+                "route00-02",
+                "route02-06",
+                "route06-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 6
+        },
+        {
+          "cold_relaxations": 17,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                25,
+                8,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                40,
+                5,
+                3
+              ],
+              [
+                "nav0",
+                "route01-04",
+                "route04-09"
+              ]
+            ],
+            [
+              [
+                50,
+                3,
+                3
+              ],
+              [
+                "route00-02",
+                "route02-06",
+                "route06-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 7
+        }
+      ],
+      "seed": 12
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 72,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 72,
+        "exhaustive_goal_paths": 11,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 0,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 51,
+        "incremental_states": 26,
+        "multiple_hybrid_pareto_points": 4,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                68,
+                9,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 13,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                68,
+                9,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                68,
+                10,
+                8
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "route04-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 8
+        },
+        {
+          "cold_relaxations": 18,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                68,
+                9,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                68,
+                10,
+                8
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "route04-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                71,
+                12,
+                7
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-05",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 14
+        },
+        {
+          "cold_relaxations": 14,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                68,
+                9,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                71,
+                12,
+                7
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-05",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 8
+        },
+        {
+          "cold_relaxations": 18,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                68,
+                9,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                68,
+                10,
+                8
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "route04-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                71,
+                12,
+                7
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-05",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 12
+        }
+      ],
+      "seed": 13
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 90,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 168,
+        "exhaustive_goal_paths": 45,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 49,
+        "incremental_states": 22,
+        "multiple_hybrid_pareto_points": 4,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                87,
+                13,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 15,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                33,
+                4,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                41,
+                3,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 12
+        },
+        {
+          "cold_relaxations": 22,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                19,
+                8,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                28,
+                6,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ],
+            [
+              [
+                33,
+                4,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                41,
+                3,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 12
+        },
+        {
+          "cold_relaxations": 22,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                19,
+                8,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                28,
+                6,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ],
+            [
+              [
+                33,
+                4,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                41,
+                3,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 8
+        },
+        {
+          "cold_relaxations": 22,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                19,
+                8,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                28,
+                6,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ],
+            [
+              [
+                33,
+                4,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                41,
+                3,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 8
+        }
+      ],
+      "seed": 14
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 85,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 131,
+        "exhaustive_goal_paths": 37,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 59,
+        "incremental_states": 25,
+        "multiple_hybrid_pareto_points": 3,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                72,
+                12,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 14,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                39,
+                4,
+                5
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "route04-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 10
+        },
+        {
+          "cold_relaxations": 22,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                21,
+                5,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                39,
+                4,
+                5
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "route04-09"
+              ]
+            ],
+            [
+              [
+                42,
+                3,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 18
+        },
+        {
+          "cold_relaxations": 18,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                21,
+                5,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                39,
+                4,
+                5
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "route04-09"
+              ]
+            ],
+            [
+              [
+                42,
+                3,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 22,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                21,
+                5,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                39,
+                4,
+                5
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "route04-09"
+              ]
+            ],
+            [
+              [
+                42,
+                3,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 13
+        }
+      ],
+      "seed": 15
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 78,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 167,
+        "exhaustive_goal_paths": 49,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 49,
+        "incremental_states": 24,
+        "multiple_hybrid_pareto_points": 3,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                85,
+                15,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 13,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                34,
+                8,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 7
+        },
+        {
+          "cold_relaxations": 19,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                32,
+                17,
+                4
+              ],
+              [
+                "route00-02",
+                "route02-06",
+                "route06-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                33,
+                7,
+                3
+              ],
+              [
+                "route00-02",
+                "route02-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 18
+        },
+        {
+          "cold_relaxations": 18,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                32,
+                17,
+                4
+              ],
+              [
+                "route00-02",
+                "route02-06",
+                "route06-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                34,
+                8,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 7
+        },
+        {
+          "cold_relaxations": 19,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                32,
+                17,
+                4
+              ],
+              [
+                "route00-02",
+                "route02-06",
+                "route06-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                33,
+                7,
+                3
+              ],
+              [
+                "route00-02",
+                "route02-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 8
+        }
+      ],
+      "seed": 16
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 97,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 297,
+        "exhaustive_goal_paths": 78,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 73,
+        "incremental_states": 29,
+        "multiple_hybrid_pareto_points": 3,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                77,
+                15,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 16,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                26,
+                6,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                48,
+                4,
+                4
+              ],
+              [
+                "route00-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 11
+        },
+        {
+          "cold_relaxations": 25,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                26,
+                6,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                48,
+                4,
+                4
+              ],
+              [
+                "route00-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 24
+        },
+        {
+          "cold_relaxations": 22,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                26,
+                6,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 13
+        },
+        {
+          "cold_relaxations": 25,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                26,
+                6,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                48,
+                4,
+                4
+              ],
+              [
+                "route00-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 16
+        }
+      ],
+      "seed": 17
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 60,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 73,
+        "exhaustive_goal_paths": 18,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 32,
+        "incremental_states": 19,
+        "multiple_hybrid_pareto_points": 0,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                83,
+                14,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 11,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                51,
+                8,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 5
+        },
+        {
+          "cold_relaxations": 14,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                29,
+                2,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 8
+        },
+        {
+          "cold_relaxations": 12,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                29,
+                2,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 4
+        },
+        {
+          "cold_relaxations": 14,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                29,
+                2,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 6
+        }
+      ],
+      "seed": 18
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 3,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 79,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 132,
+        "exhaustive_goal_paths": 38,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 56,
+        "incremental_states": 29,
+        "multiple_hybrid_pareto_points": 4,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                71,
+                14,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 13,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                27,
+                5,
+                3
+              ],
+              [
+                "route00-04",
+                "route04-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                36,
+                6,
+                2
+              ],
+              [
+                "route00-04",
+                "route04-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 10
+        },
+        {
+          "cold_relaxations": 19,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                27,
+                5,
+                3
+              ],
+              [
+                "route00-04",
+                "route04-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                36,
+                4,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                36,
+                6,
+                2
+              ],
+              [
+                "route00-04",
+                "route04-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 13
+        },
+        {
+          "cold_relaxations": 19,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                31,
+                6,
+                4
+              ],
+              [
+                "route00-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                36,
+                4,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                37,
+                8,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 12
+        },
+        {
+          "cold_relaxations": 19,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                27,
+                5,
+                3
+              ],
+              [
+                "route00-04",
+                "route04-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                36,
+                4,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                36,
+                6,
+                2
+              ],
+              [
+                "route00-04",
+                "route04-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 12
+        }
+      ],
+      "seed": 19
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 3,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 82,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 134,
+        "exhaustive_goal_paths": 45,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 42,
+        "incremental_states": 20,
+        "multiple_hybrid_pareto_points": 0,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                75,
+                15,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 14,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                6,
+                1,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 10
+        },
+        {
+          "cold_relaxations": 20,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                6,
+                1,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 14
+        },
+        {
+          "cold_relaxations": 19,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                19,
+                2,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 4
+        },
+        {
+          "cold_relaxations": 20,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                6,
+                1,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 5
+        }
+      ],
+      "seed": 20
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 80,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 124,
+        "exhaustive_goal_paths": 35,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 38,
+        "incremental_states": 20,
+        "multiple_hybrid_pareto_points": 3,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                81,
+                10,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 15,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                32,
+                3,
+                3
+              ],
+              [
+                "nav0",
+                "route01-05",
+                "route05-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 12
+        },
+        {
+          "cold_relaxations": 19,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                31,
+                8,
+                4
+              ],
+              [
+                "nav0",
+                "route01-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                32,
+                3,
+                3
+              ],
+              [
+                "nav0",
+                "route01-05",
+                "route05-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 10
+        },
+        {
+          "cold_relaxations": 18,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                31,
+                8,
+                4
+              ],
+              [
+                "nav0",
+                "route01-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                39,
+                8,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                44,
+                6,
+                6
+              ],
+              [
+                "nav0",
+                "route01-05",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 3
+        },
+        {
+          "cold_relaxations": 19,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                31,
+                8,
+                4
+              ],
+              [
+                "nav0",
+                "route01-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                32,
+                3,
+                3
+              ],
+              [
+                "nav0",
+                "route01-05",
+                "route05-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 4
+        }
+      ],
+      "seed": 21
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 4,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 107,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 173,
+        "exhaustive_goal_paths": 55,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 54,
+        "incremental_states": 21,
+        "multiple_hybrid_pareto_points": 4,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                63,
+                13,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 22,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                29,
+                6,
+                2
+              ],
+              [
+                "route00-03",
+                "route03-09"
+              ]
+            ],
+            [
+              [
+                45,
+                5,
+                3
+              ],
+              [
+                "nav0",
+                "route01-03",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 20
+        },
+        {
+          "cold_relaxations": 26,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                23,
+                6,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                45,
+                5,
+                3
+              ],
+              [
+                "nav0",
+                "route01-03",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 15
+        },
+        {
+          "cold_relaxations": 24,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                23,
+                6,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                45,
+                5,
+                3
+              ],
+              [
+                "nav0",
+                "route01-03",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 4
+        },
+        {
+          "cold_relaxations": 26,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                23,
+                6,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                45,
+                5,
+                3
+              ],
+              [
+                "nav0",
+                "route01-03",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 6
+        }
+      ],
+      "seed": 22
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 78,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 138,
+        "exhaustive_goal_paths": 37,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 41,
+        "incremental_states": 19,
+        "multiple_hybrid_pareto_points": 4,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                74,
+                14,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 16,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                18,
+                12,
+                3
+              ],
+              [
+                "route00-06",
+                "route06-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                24,
+                10,
+                4
+              ],
+              [
+                "route00-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                34,
+                9,
+                5
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-07",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 11
+        },
+        {
+          "cold_relaxations": 18,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                16,
+                8,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                34,
+                4,
+                3
+              ],
+              [
+                "nav0",
+                "route01-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 12
+        },
+        {
+          "cold_relaxations": 17,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                16,
+                8,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                34,
+                4,
+                3
+              ],
+              [
+                "nav0",
+                "route01-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 4
+        },
+        {
+          "cold_relaxations": 18,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                16,
+                8,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                34,
+                4,
+                3
+              ],
+              [
+                "nav0",
+                "route01-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 5
+        }
+      ],
+      "seed": 23
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 4,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 68,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 112,
+        "exhaustive_goal_paths": 25,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 36,
+        "incremental_states": 21,
+        "multiple_hybrid_pareto_points": 0,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                79,
+                12,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 12,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                24,
+                2,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 16,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                24,
+                2,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 11
+        },
+        {
+          "cold_relaxations": 15,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                24,
+                2,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 3
+        },
+        {
+          "cold_relaxations": 16,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                24,
+                2,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 4
+        }
+      ],
+      "seed": 24
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 92,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 154,
+        "exhaustive_goal_paths": 55,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 78,
+        "incremental_states": 32,
+        "multiple_hybrid_pareto_points": 0,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                82,
+                9,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 22,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                45,
+                1,
+                3
+              ],
+              [
+                "nav0",
+                "route01-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 20
+        },
+        {
+          "cold_relaxations": 22,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                45,
+                1,
+                3
+              ],
+              [
+                "nav0",
+                "route01-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 18
+        },
+        {
+          "cold_relaxations": 17,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                45,
+                1,
+                3
+              ],
+              [
+                "nav0",
+                "route01-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 13
+        },
+        {
+          "cold_relaxations": 22,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                45,
+                1,
+                3
+              ],
+              [
+                "nav0",
+                "route01-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 18
+        }
+      ],
+      "seed": 25
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 4,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 90,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 134,
+        "exhaustive_goal_paths": 42,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 57,
+        "incremental_states": 22,
+        "multiple_hybrid_pareto_points": 3,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                73,
+                12,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 14,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                13,
+                8,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                23,
+                5,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 23,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                13,
+                8,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                23,
+                5,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 19
+        },
+        {
+          "cold_relaxations": 21,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                23,
+                5,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 23,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                13,
+                8,
+                2
+              ],
+              [
+                "route00-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                23,
+                5,
+                1
+              ],
+              [
+                "route00-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 11
+        }
+      ],
+      "seed": 26
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 4,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 102,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 196,
+        "exhaustive_goal_paths": 77,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 47,
+        "incremental_states": 20,
+        "multiple_hybrid_pareto_points": 4,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                82,
+                12,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 17,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                36,
+                9,
+                2
+              ],
+              [
+                "route00-06",
+                "route06-09"
+              ]
+            ],
+            [
+              [
+                50,
+                7,
+                4
+              ],
+              [
+                "route00-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                51,
+                6,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 12
+        },
+        {
+          "cold_relaxations": 26,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                36,
+                9,
+                2
+              ],
+              [
+                "route00-06",
+                "route06-09"
+              ]
+            ],
+            [
+              [
+                50,
+                7,
+                4
+              ],
+              [
+                "route00-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                51,
+                6,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 22
+        },
+        {
+          "cold_relaxations": 24,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                36,
+                9,
+                2
+              ],
+              [
+                "route00-06",
+                "route06-09"
+              ]
+            ],
+            [
+              [
+                50,
+                7,
+                4
+              ],
+              [
+                "route00-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                51,
+                6,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 1
+        },
+        {
+          "cold_relaxations": 26,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                36,
+                9,
+                2
+              ],
+              [
+                "route00-06",
+                "route06-09"
+              ]
+            ],
+            [
+              [
+                50,
+                7,
+                4
+              ],
+              [
+                "route00-06",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                51,
+                6,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 3
+        }
+      ],
+      "seed": 27
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 4,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 139,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 218,
+        "exhaustive_goal_paths": 57,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 114,
+        "incremental_states": 32,
+        "multiple_hybrid_pareto_points": 4,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                76,
+                10,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 25,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                25,
+                8,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                29,
+                8,
+                2
+              ],
+              [
+                "route00-02",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                57,
+                7,
+                5
+              ],
+              [
+                "route00-05",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 24
+        },
+        {
+          "cold_relaxations": 37,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                24,
+                9,
+                3
+              ],
+              [
+                "nav0",
+                "route01-04",
+                "route04-09"
+              ]
+            ],
+            [
+              [
+                25,
+                8,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                29,
+                8,
+                2
+              ],
+              [
+                "route00-02",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                46,
+                4,
+                4
+              ],
+              [
+                "nav0",
+                "route01-07",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 29
+        },
+        {
+          "cold_relaxations": 31,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                25,
+                8,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                29,
+                8,
+                2
+              ],
+              [
+                "route00-02",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                46,
+                4,
+                4
+              ],
+              [
+                "nav0",
+                "route01-07",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 23
+        },
+        {
+          "cold_relaxations": 37,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                24,
+                9,
+                3
+              ],
+              [
+                "nav0",
+                "route01-04",
+                "route04-09"
+              ]
+            ],
+            [
+              [
+                25,
+                8,
+                3
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                29,
+                8,
+                2
+              ],
+              [
+                "route00-02",
+                "route02-09"
+              ]
+            ],
+            [
+              [
+                46,
+                4,
+                4
+              ],
+              [
+                "nav0",
+                "route01-07",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 29
+        }
+      ],
+      "seed": 28
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 3,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 102,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 124,
+        "exhaustive_goal_paths": 37,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 73,
+        "incremental_states": 27,
+        "multiple_hybrid_pareto_points": 4,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                86,
+                9,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 22,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                52,
+                11,
+                3
+              ],
+              [
+                "route00-03",
+                "nav3",
+                "route04-09"
+              ]
+            ],
+            [
+              [
+                60,
+                10,
+                5
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "route04-09"
+              ]
+            ],
+            [
+              [
+                86,
+                9,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 20
+        },
+        {
+          "cold_relaxations": 25,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                34,
+                12,
+                4
+              ],
+              [
+                "nav0",
+                "route01-06",
+                "route06-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                40,
+                5,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                41,
+                11,
+                2
+              ],
+              [
+                "route00-03",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 14
+        },
+        {
+          "cold_relaxations": 21,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                40,
+                5,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                41,
+                11,
+                2
+              ],
+              [
+                "route00-03",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 13
+        },
+        {
+          "cold_relaxations": 25,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                34,
+                12,
+                4
+              ],
+              [
+                "nav0",
+                "route01-06",
+                "route06-08",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                40,
+                5,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                41,
+                11,
+                2
+              ],
+              [
+                "route00-03",
+                "route03-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 17
+        }
+      ],
+      "seed": 29
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 72,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 95,
+        "exhaustive_goal_paths": 22,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 48,
+        "incremental_states": 23,
+        "multiple_hybrid_pareto_points": 4,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                66,
+                13,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 13,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                29,
+                8,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                51,
+                4,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 7
+        },
+        {
+          "cold_relaxations": 17,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                29,
+                8,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                49,
+                6,
+                6
+              ],
+              [
+                "nav0",
+                "route01-05",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                51,
+                4,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 13
+        },
+        {
+          "cold_relaxations": 16,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                37,
+                8,
+                4
+              ],
+              [
+                "nav0",
+                "route01-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                49,
+                6,
+                6
+              ],
+              [
+                "nav0",
+                "route01-05",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                51,
+                4,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 17,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                29,
+                8,
+                3
+              ],
+              [
+                "route00-07",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                49,
+                6,
+                6
+              ],
+              [
+                "nav0",
+                "route01-05",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ],
+            [
+              [
+                51,
+                4,
+                4
+              ],
+              [
+                "nav0",
+                "nav1",
+                "route02-08",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 10
+        }
+      ],
+      "seed": 30
+    },
+    {
+      "metrics": {
+        "checked_proposed_feasible_epochs": 0,
+        "checked_proposed_illegal_labels": 0,
+        "cold_dynamic_relaxations": 70,
+        "cold_dynamic_states": 45,
+        "epochs": 5,
+        "exhaustive_edge_visits": 128,
+        "exhaustive_goal_paths": 30,
+        "explicit_feasible_epochs": 5,
+        "hybrid_feasible_epochs": 5,
+        "hybrid_has_strict_latency_win": 4,
+        "hybrid_unsafe_labels": 0,
+        "incremental_relaxation_loss_epochs": 0,
+        "incremental_relaxation_tie_epochs": 1,
+        "incremental_relaxation_win_epochs": 4,
+        "incremental_relaxations": 39,
+        "incremental_states": 24,
+        "multiple_hybrid_pareto_points": 0,
+        "proposed_unsafe_epochs": 5,
+        "wrong_proposed_frontier_labels": 5
+      },
+      "results": [
+        {
+          "cold_relaxations": 9,
+          "epoch": 0,
+          "frontier": [
+            [
+              [
+                64,
+                12,
+                9
+              ],
+              [
+                "nav0",
+                "nav1",
+                "nav2",
+                "nav3",
+                "nav4",
+                "nav5",
+                "nav6",
+                "nav7",
+                "nav8"
+              ]
+            ]
+          ],
+          "retained_relaxations": 9
+        },
+        {
+          "cold_relaxations": 17,
+          "epoch": 1,
+          "frontier": [
+            [
+              [
+                21,
+                3,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 14
+        },
+        {
+          "cold_relaxations": 15,
+          "epoch": 2,
+          "frontier": [
+            [
+              [
+                21,
+                3,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 13
+        },
+        {
+          "cold_relaxations": 14,
+          "epoch": 3,
+          "frontier": [
+            [
+              [
+                21,
+                3,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 1
+        },
+        {
+          "cold_relaxations": 15,
+          "epoch": 4,
+          "frontier": [
+            [
+              [
+                21,
+                3,
+                2
+              ],
+              [
+                "nav0",
+                "route01-09"
+              ]
+            ]
+          ],
+          "retained_relaxations": 2
+        }
+      ],
+      "seed": 31
+    }
+  ],
+  "controls": {
+    "certified_minimum_latency": 2,
+    "first_candidate_latency": 9,
+    "full_pareto": [
+      [
+        [
+          2,
+          0,
+          2
+        ],
+        [
+          "partial",
+          "complete"
+        ]
+      ],
+      [
+        [
+          9,
+          0,
+          1
+        ],
+        [
+          "direct"
+        ]
+      ]
+    ],
+    "pending_latency_lower_bound": 1,
+    "threshold": 10,
+    "unqualified_updates_refused_atomically": 3,
+    "unsupported_note": "The middle point is not even a tied optimum for nonnegative latency and risk weights unless both are zero.",
+    "unsupported_pareto_vectors": [
+      [
+        0,
+        4,
+        1
+      ],
+      [
+        2,
+        3,
+        1
+      ],
+      [
+        4,
+        0,
+        1
+      ]
+    ],
+    "unsupported_vector": [
+      2,
+      3,
+      1
+    ]
+  },
+  "kind": "synthetic no-browser action fixtures",
+  "measured_totals": {
+    "checked_proposed_feasible_epochs": 55,
+    "checked_proposed_illegal_labels": 0,
+    "cold_dynamic_relaxations": 2835,
+    "cold_dynamic_states": 1440,
+    "epochs": 160,
+    "exhaustive_edge_visits": 5506,
+    "exhaustive_goal_paths": 1710,
+    "explicit_feasible_epochs": 160,
+    "hybrid_feasible_epochs": 160,
+    "hybrid_has_strict_latency_win": 124,
+    "hybrid_unsafe_labels": 0,
+    "incremental_relaxation_loss_epochs": 0,
+    "incremental_relaxation_tie_epochs": 32,
+    "incremental_relaxation_win_epochs": 128,
+    "incremental_relaxations": 1771,
+    "incremental_states": 782,
+    "multiple_hybrid_pareto_points": 79,
+    "proposed_unsafe_epochs": 160,
+    "wrong_proposed_frontier_labels": 160
+  },
+  "trials": 32
+}
