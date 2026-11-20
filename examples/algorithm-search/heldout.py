@@ -64,6 +64,21 @@ def decision_controls(S, surv):
                 frame = decide.normalize([v for _, v in items])
                 fitems = [(i, v) for i, v in items if i in ref]
                 d = len(items[0][1])
+                if fam == "b3":
+                    import itertools
+                    spec = dict(x.split("=") for x in k[len("cand:b3/"):].split(","))
+                    rule, pool = spec["select"], (fitems if spec["scope"] == "frontfirst" else items)
+                    params = (decide.eps_grid(d, 10) if rule == "eps" else
+                              list(itertools.permutations(range(d))) if rule == "lex" else decide.simplex(d, 10))
+                    reached = set()
+                    for w in params:
+                        p = decide.pick(rule, pool, w, ops, frame)
+                        if p is not None and p in ref: reached.add(p)
+                    vals = dict(items)
+                    R.meas(S, k, "control/" + name, "coverage", round(len(reached) / len(fitems), 4), "control",
+                           {"reached": sorted(reached), "front": sorted(ref),
+                            "distinct_vectors_reached": len({vals[i] for i in reached}),
+                            "distinct_front_vectors": len({v for _, v in fitems})})
                 if fam == "e":
                     rule, par = k[len("cand:e/"):].split(",params=")
                     reached = set()
@@ -83,8 +98,8 @@ def decision_controls(S, surv):
 def main():
     out, idol_lib = sys.argv[1], sys.argv[2]
     S = Space(os.path.join(out, "space.jsonl"))
-    frozen = S.with_color("downselect")
-    assert frozen and frozen[-1]["head"] == "downselect:dev", "run the dev phase and select.py first"
+    frozen = [r for r in S.with_color("downselect") if r["head"] == "downselect:dev"]
+    assert frozen, "run the dev phase and downselect.py first"
     surv = frozen[-1]["receipt"]["survivors"]
     made = {}
     for r in S.with_color("candidate"):

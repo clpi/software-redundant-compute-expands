@@ -1,4 +1,4 @@
-log records 3739 chain head ceec0b630a4d41dfeb12c4dba1e40cd6575fe1a87afe91a0a6370d5ceff0ddf9
+log records 4477 chain head 87bb0c45040f1e0cfef453741be276f969866d0905371fcbed8413470c0d174c
 candidate terms 57 {'product': 54, 'parameter': 3} measured 56
 seeds that are also generated (one term, two derivations): ['cand:a/trigger=counter,dedup=on,check=-', 'cand:b2/joint=fold,prune=on', 'cand:b3/select=ch,scope=frontfirst', 'cand:c/stop=exhaustive', 'cand:c/stop=threshold']
 
@@ -118,19 +118,19 @@ dominated  cand:f/resolver=visible  <- cand:f/resolver=nearest, cand:f/resolver=
 
 == verdicts, phase heldout
 dominated  cand:a/trigger=counter,dedup=off,check=-  <- cand:a/trigger=counter,dedup=on,check=-
-            correct_every_prefix 2/2; peak_kib sum 1186.3 [165.2..1021.1] n=2; premise_ops sum 7787 [1507..6280] n=2; wall_ms sum 5.181 [0.934..4.247] n=2
+            correct_every_prefix 2/2; peak_kib sum 1186.3 [165.2..1021.1] n=2; premise_ops sum 7787 [1507..6280] n=2; wall_ms sum 5.403 [0.732..4.671] n=2
 survivor   cand:a/trigger=counter,dedup=on,check=-
-            correct_every_prefix 2/2; peak_kib sum 1183.3 [162.2..1021.1] n=2; premise_ops sum 7787 [1507..6280] n=2; wall_ms sum 5.427 [0.81..4.617] n=2
+            correct_every_prefix 2/2; peak_kib sum 1183.3 [162.2..1021.1] n=2; premise_ops sum 7787 [1507..6280] n=2; wall_ms sum 6.235 [0.925..5.31] n=2
 survivor   cand:a/trigger=watch,dedup=off,check=-
-            correct_every_prefix 2/2; peak_kib sum 1471.6 [190.8..1280.8] n=2; premise_ops sum 5576 [662..4914] n=2; wall_ms sum 9.046 [0.669..8.377] n=2
+            correct_every_prefix 2/2; peak_kib sum 1471.6 [190.8..1280.8] n=2; premise_ops sum 5576 [662..4914] n=2; wall_ms sum 6.158 [0.703..5.455] n=2
 survivor   cand:b1/front=archive
-            correct 2/2; dominance_tests sum 896 [434..462] n=2; wall_ms sum 0.62 [0.297..0.323] n=2
+            correct 2/2; dominance_tests sum 896 [434..462] n=2; wall_ms sum 0.691 [0.341..0.35] n=2
 survivor   cand:b1/front=sortfilter
-            correct 2/2; dominance_tests sum 769 [351..418] n=2; wall_ms sum 0.799 [0.399..0.4] n=2
+            correct 2/2; dominance_tests sum 769 [351..418] n=2; wall_ms sum 0.935 [0.431..0.504] n=2
 survivor   cand:b2/joint=brute,prune=on
-            correct 12/12; ops sum 294 [9..41] n=12; peak_kib sum 37.9 [2.9..5.0] n=10; wall_ms sum 1.09 [0.056..0.189] n=12
+            correct 12/12; ops sum 294 [9..41] n=12; peak_kib sum 37.9 [2.9..5.0] n=10; wall_ms sum 1.085 [0.046..0.162] n=12
 survivor   cand:b2/joint=fold,prune=on
-            correct 22/22; ops sum 914 [10..76] n=22; peak_kib sum 36.5 [3.2..4.2] n=10; wall_ms sum 2.596 [0.058..0.197] n=22
+            correct 22/22; ops sum 914 [10..76] n=22; peak_kib sum 36.5 [3.2..4.2] n=10; wall_ms sum 2.767 [0.05..0.209] n=22
 survivor   cand:b3/select=lex,scope=frontfirst
             evaluations sum 9280 [48..3796] n=8; front_coverage_on_grid sum 8.0 [1.0..1.0] n=8; pick_on_front_rate sum 8.0 [1.0..1.0] n=8
 survivor   cand:c/stop=bestfirst
@@ -142,7 +142,35 @@ survivor   cand:c/stop=threshold/delta=0.1
 survivor   cand:c/stop=threshold/delta=0.2
             certified 0/8; examined_ops sum 98 [2..33] n=8; regret sum 1.241 [0.102..0.192] n=8
 survivor   cand:d/rescoring=archive
-            correct_every_prefix 2/2; dominance_tests sum 896 [434..462] n=2; wall_ms sum 0.809 [0.383..0.426] n=2
+            correct_every_prefix 2/2; dominance_tests sum 896 [434..462] n=2; wall_ms sum 0.861 [0.418..0.443] n=2
+survivor   cand:e/ch,params=solved
+            coverage sum 8.0 [1.0..1.0] n=8; evaluations sum 14 [1..4] n=8; unsupported_reached sum 2 [0..1] n=8; unsupported_reached_nonneg_reported_only sum 0 [0..0] n=8
+survivor   cand:a/trigger=counter,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 1186.3 [165.2..1021.1] n=2; premise_ops sum 7787 [1507..6280] n=2; wall_ms sum 5.403 [0.732..4.671] n=2
+survivor   cand:a/trigger=counter,dedup=on,check=-
+            correct_every_prefix 2/2; peak_kib sum 1183.3 [162.2..1021.1] n=2; premise_ops sum 7787 [1507..6280] n=2; wall_ms sum 6.235 [0.925..5.31] n=2
+survivor   cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 1471.6 [190.8..1280.8] n=2; premise_ops sum 5576 [662..4914] n=2; wall_ms sum 6.158 [0.703..5.455] n=2
+survivor   cand:b1/front=archive
+            correct 2/2; dominance_tests sum 896 [434..462] n=2; wall_ms sum 0.691 [0.341..0.35] n=2
+survivor   cand:b1/front=sortfilter
+            correct 2/2; dominance_tests sum 769 [351..418] n=2; wall_ms sum 0.935 [0.431..0.504] n=2
+survivor   cand:b2/joint=brute,prune=on
+            correct 12/12; ops sum 294 [9..41] n=12; peak_kib sum 37.9 [2.9..5.0] n=10; wall_ms sum 1.085 [0.046..0.162] n=12
+survivor   cand:b2/joint=fold,prune=on
+            correct 22/22; ops sum 914 [10..76] n=22; peak_kib sum 36.5 [3.2..4.2] n=10; wall_ms sum 2.767 [0.05..0.209] n=22
+survivor   cand:b3/select=lex,scope=frontfirst
+            evaluations sum 9280 [48..3796] n=8; front_coverage_on_grid sum 8.0 [1.0..1.0] n=8; pick_on_front_rate sum 8.0 [1.0..1.0] n=8
+survivor   cand:c/stop=bestfirst
+            certified 8/8; examined_ops sum 140 [10..25] n=8; regret sum 0.0 [0.0..0.0] n=8
+survivor   cand:c/stop=threshold/delta=0.05
+            certified 0/8; examined_ops sum 1958 [7..783] n=8; regret sum 0.0 [0.0..0.0] n=8
+survivor   cand:c/stop=threshold/delta=0.1
+            certified 0/8; examined_ops sum 458 [7..158] n=8; regret sum 0.306 [0.0..0.085] n=8
+survivor   cand:c/stop=threshold/delta=0.2
+            certified 0/8; examined_ops sum 98 [2..33] n=8; regret sum 1.241 [0.102..0.192] n=8
+survivor   cand:d/rescoring=archive
+            correct_every_prefix 2/2; dominance_tests sum 896 [434..462] n=2; wall_ms sum 0.861 [0.418..0.443] n=2
 survivor   cand:e/ch,params=solved
             coverage sum 8.0 [1.0..1.0] n=8; evaluations sum 14 [1..4] n=8; unsupported_reached sum 2 [0..1] n=8; unsupported_reached_nonneg_reported_only sum 0 [0..0] n=8
 
@@ -152,6 +180,7 @@ coverage cand:e/ch,params=solved control/all-equal 0.1667
 coverage cand:e/ch,params=solved control/duplicates 0.6
 coverage cand:b3/select=lex,scope=frontfirst control/chris-(0,4)(4,0)(3,3) 0.6667
 coverage cand:b3/select=lex,scope=frontfirst control/duplicates 0.4
+coverage cand:b3/select=lex,scope=frontfirst control/all-equal 0.1667
 correct 28/28 cand:a/trigger=counter,dedup=off,check=-
 correct 28/28 cand:a/trigger=counter,dedup=on,check=-
 correct 28/28 cand:a/trigger=watch,dedup=off,check=-
@@ -161,6 +190,21 @@ correct 6/6 cand:d/rescoring=archive
 
 == validation
 lost-on-heldout            cand:a/trigger=counter,dedup=off,check=-
+held                       cand:a/trigger=counter,dedup=on,check=-
+held                       cand:a/trigger=watch,dedup=off,check=-
+held                       cand:b1/front=archive
+held                       cand:b1/front=sortfilter
+held                       cand:b2/joint=brute,prune=on
+held                       cand:b2/joint=fold,prune=on
+held                       cand:b3/select=lex,scope=frontfirst
+held                       cand:c/stop=bestfirst
+held                       cand:c/stop=threshold/delta=0.05
+held                       cand:c/stop=threshold/delta=0.1
+held                       cand:c/stop=threshold/delta=0.2
+held                       cand:d/rescoring=archive
+held                       cand:e/ch,params=solved
+not-applicable-on-heldout  cand:f/resolver=enclosing
+held                       cand:a/trigger=counter,dedup=off,check=-
 held                       cand:a/trigger=counter,dedup=on,check=-
 held                       cand:a/trigger=watch,dedup=off,check=-
 held                       cand:b1/front=archive

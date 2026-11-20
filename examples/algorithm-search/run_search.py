@@ -249,12 +249,15 @@ def run_decisions(S, made, camps, phase, repeats=REPEATS, only=None):
                 pk = peak(once) if size <= 20000 else None
                 results[k] = (f, nops, w, pk)
             refset = results.get("cand:b2/joint=brute,prune=off", (None,))[0]
+            basis = "brute"
             if refset is None:
-                vals = [r[0] for r in results.values()]
-                refset = vals[0] if all(v == vals[0] for v in vals) else None
-                basis = "cross-agreement"
-            else:
-                basis = "brute"
+                # independent of every candidate that ran: brute force where it fits,
+                # else the unpruned fold computed here (shares the merge code, not the pruning)
+                if brute_ok:
+                    refset = decide.plans_brute(fs, decide.Ops(), prune=False)
+                else:
+                    refset = decide.plans_fold(fs, decide.Ops(), prune=False)
+                    basis = "unpruned-fold (shares merge code)"
             for k, (f, nops, w, pk) in results.items():
                 meas(S, k, inp, "correct", f == refset, phase, {"basis": basis, "plans": size, "front": len(f)})
                 meas(S, k, inp, "ops", nops, phase)
