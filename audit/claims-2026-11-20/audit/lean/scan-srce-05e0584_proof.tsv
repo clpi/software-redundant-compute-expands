@@ -1,0 +1,201 @@
+srce-05e0584/proof/CandidateImpact.lean	17	reachable_left	0	31	DATA	Incidence jointRule 0 2
+srce-05e0584/proof/CandidateImpact.lean	20	reachable_right	0	31	DATA	Incidence jointRule 1 2
+srce-05e0584/proof/CandidateImpact.lean	23	seed_necessary	1	92		under seeds a → a ∈ seeds
+srce-05e0584/proof/CandidateImpact.lean	32	qualifies_iff	1	424		under seeds 2 ↔ 2 ∈ seeds ∨ (0 ∈ seeds ∧ 1 ∈ seeds)
+srce-05e0584/proof/CandidateImpact.lean	52	complementarity	0	23		¬ under [0] 2 ∧ ¬ under [1] 2 ∧ under ([0] ++ [1]) 2
+srce-05e0584/proof/CandidateImpact.lean	63	canonical_log_agrees	2	810		derives (view level (log seeds) 0) a ↔ under seeds a
+srce-05e0584/proof/CandidateImpact.lean	85	append_has_joint_consequence	0	120		¬ derives (view level (log [0]) 0) 2 ∧ ¬ derives (view level (log [1]) 0) 2 ∧ derives (view level (log [0] ++ 
+srce-05e0584/proof/Canon.lean	58	least	2	91		∀ a, Derives B R a → X a
+srce-05e0584/proof/Canon.lean	66	mono	2	73		∀ a, Derives B R a → Derives C S a
+srce-05e0584/proof/Canon.lean	73	roots_as_edges	3	298		Derives B R a ↔ Derives (fun _ => False) (fun ps x => R ps x ∨ (ps = [] ∧ B x)) a
+srce-05e0584/proof/Canon.lean	142	zero	2	3	DEFN	lift ch r 0 c = c
+srce-05e0584/proof/Canon.lean	145	add	2	199		∀ k c, lift ch r (j + k) c = lift ch (r + j) k (lift ch r j c)
+srce-05e0584/proof/Canon.lean	157	key_lift	2	58		key ch (r + k) t = lift ch r k (key ch r t)
+srce-05e0584/proof/Canon.lean	163	floor	2	7	DEFN	Eqv ch 0 t u ↔ t = u
+srce-05e0584/proof/Canon.lean	167	nest	3	40		Eqv ch (r + k) t u
+srce-05e0584/proof/Canon.lean	171	eqv_refl	2	3	DEFN	Eqv ch r t t
+srce-05e0584/proof/Canon.lean	172	eqv_symm	3	6		Eqv ch r u t
+srce-05e0584/proof/Canon.lean	173	eqv_trans	4	11		Eqv ch r t v
+srce-05e0584/proof/Canon.lean	181	proj_lift	4	368		proj ch (r + k) e = ((proj ch r e).1.map (lift ch r k), lift ch r k (proj ch r e).2)
+srce-05e0584/proof/Canon.lean	199	perm	4	167		viewC ch L r q = viewC ch L' r q
+srce-05e0584/proof/Canon.lean	210	grow	7	71		(viewC ch (L ++ M) r q).edges ps a
+srce-05e0584/proof/Canon.lean	216	derives_grow	6	70		derives (viewC ch (L ++ M) r q) a
+srce-05e0584/proof/Canon.lean	221	join	6	259		(viewC ch (L ++ M) r q).edges ps a ↔ (viewC ch L r q).edges ps a ∨ (viewC ch M r q).edges ps a
+srce-05e0584/proof/Canon.lean	233	absorb	5	236		viewC ch (L ++ M) r q = viewC ch L r q
+srce-05e0584/proof/Canon.lean	248	colors_grow	6	71		colorsOf ch (L ++ M) r ps a c
+srce-05e0584/proof/Canon.lean	254	filter_nest	8	65		(viewC ch L r q').edges ps a
+srce-05e0584/proof/Canon.lean	262	edge_proj	7	98		(viewC ch L (r + k) q).edges (ps.map (lift ch r k)) (lift ch r k a)
+srce-05e0584/proof/Canon.lean	272	derives_proj	6	193		derives (viewC ch L (r + k) q) (lift ch r k a)
+srce-05e0584/proof/Canon.lean	284	refine_append	7	67		(viewC ch (L ++ [e]) r q).edges (proj ch r e).1 (proj ch r e).2 ∧ ∀ ps a, (viewC ch L r q).edges ps a → (viewC
+srce-05e0584/proof/Canon.lean	298	merge	0	144		¬ Eqv chain2 0 10 11 ∧ Eqv chain2 1 10 11
+srce-05e0584/proof/Canon.lean	309	coarse_only	0	75		¬ (view chain2 [⟨0, 1, [], [], 5⟩] 0).edges [] 5
+srce-05e0584/proof/Cases.lean	45	root_mem	1	90		rootCase ∈ reg
+srce-05e0584/proof/Cases.lean	51	total	2	27		∃ c ∈ reg, c.test e = true
+srce-05e0584/proof/Cases.lean	54	ids_unique	1	436		∀ a ∈ reg, ∀ b ∈ reg, a.id = b.id → a = b
+srce-05e0584/proof/Cases.lean	70	parent_exists	1	382		∀ c ∈ reg, ∃ p ∈ reg, p.id = c.parent ∧ ∀ e, c.test e = true → p.test e = true
+srce-05e0584/proof/Cases.lean	87	parent_impl	4	133		∀ e, c.test e = true → p.test e = true
+srce-05e0584/proof/Cases.lean	96	inherit	5	129		∀ e, c.test e = true → Q e
+srce-05e0584/proof/Cases.lean	107	refine	3	77		matched (reg ++ [c]) e = matched reg e ++ (if c.test e then [c] else [])
+srce-05e0584/proof/Cases.lean	113	up_closed	5	64		a.test e = true
+srce-05e0584/proof/Cases.lean	123	fresh	0	176		¬ WF ([rootCase] ++ [⟨0, 0, fun _ => false⟩])
+srce-05e0584/proof/Color.lean	61	unit	0	105		∀ (seen l : List Nat), wa (fun _ => 1) seen l = aux seen l
+srce-05e0584/proof/Color.lean	68	unit_red	1	9		wred (fun _ => 1) l = red l
+srce-05e0584/proof/Color.lean	70	append	2	160		wa w seen (a ++ b) = wa w seen a + wa w (a.reverse ++ seen) b
+srce-05e0584/proof/Color.lean	79	mono	3	423		wa w s l ≤ wa w s' l
+srce-05e0584/proof/Color.lean	97	congr	3	90		wa w s l = wa w s' l
+srce-05e0584/proof/Color.lean	104	add	1	147		∀ (seen l : List Nat), wa (fun x => w x + v x) seen l = wa w seen l + wa v seen l
+srce-05e0584/proof/Color.lean	115	scale	2	156		∀ (seen l : List Nat), wa (fun x => c * w x) seen l = c * wa w seen l
+srce-05e0584/proof/Color.lean	125	wmono	1	197		∀ (seen l : List Nat), wa w seen l ≤ wa v seen l
+srce-05e0584/proof/Color.lean	138	perm	2	596		∀ seen, wa w seen l₁ = wa w seen l₂
+srce-05e0584/proof/Color.lean	165	pos	1	269		∀ (seen l : List Nat), x ∈ seen → x ∈ l → w x ≤ wa w seen l
+srce-05e0584/proof/Color.lean	180	left	2	37		wred w a ≤ wred w (a ++ b)
+srce-05e0584/proof/Color.lean	186	sum	2	116		wred w a + wred w b ≤ wred w (a ++ b)
+srce-05e0584/proof/Color.lean	195	strict	3	684		wred w a + wred w b + w x ≤ wred w (a ++ b)
+srce-05e0584/proof/Color.lean	218	split	1	2606		List Nat, wred w l + wsum w (uniq l) = wsum w l
+srce-05e0584/proof/Color.lean	295	wsum_erase	1	334		List Nat, x ∈ l → wsum w l = w x + wsum w (l.erase x)
+srce-05e0584/proof/Color.lean	311	cover	1	479		∀ (a b : List Nat), a.Nodup → (∀ x ∈ a, x ∈ b) → wsum w a ≤ wsum w b
+srce-05e0584/proof/Color.lean	332	optimal	3	73		wsum w (uniq l) ≤ wsum w r
+srce-05e0584/proof/Color.lean	340	saving	3	57		wsum w l ≤ wred w l + wsum w r
+srce-05e0584/proof/Color.lean	348	paint_append	0	178		∀ (seen a b : List Nat), paint seen (a ++ b) = paint seen a ++ paint (a.reverse ++ seen) b
+srce-05e0584/proof/Color.lean	359	paint_colors	0	98		∀ (seen l : List Nat), (paint seen l).map Prod.fst = l
+srce-05e0584/proof/Color.lean	367	witness_unique	1	339		∀ (seen l : List Nat), ((paint seen l).filter (fun p => decide (p.1 = c) && p.2)).length = if c ∈ l ∧ c ∉ seen
+srce-05e0584/proof/Color.lean	384	marks	1	162		∀ (seen l : List Nat), wa w seen l = (((paint seen l).filter (fun p => !p.2)).map (fun p => w p.1)).sum
+srce-05e0584/proof/Color.lean	394	witnesses	1	737		((paint [] l).filter (fun p => p.2)).length = card l
+srce-05e0584/proof/Color.lean	426	run_eq	1	195		∀ (l seen : List Nat) (r : Nat), run w (seen, r) l = (l.reverse ++ seen, r + wa w seen l)
+srce-05e0584/proof/Color.lean	441	incremental	2	84		run w (run w ([], 0) a) b = run w ([], 0) (a ++ b) ∧ (run w ([], 0) (a ++ b)).2 = wred w (a ++ b)
+srce-05e0584/proof/Color.lean	460	grow	3	98		colorRed w key g ≤ colorRed w key h
+srce-05e0584/proof/Color.lean	468	sum_join	3	78		colorRed w key g + colorRed w key h ≤ colorRed w key (Redundant.join g h)
+srce-05e0584/proof/Color.lean	473	strict_join	5	207		colorRed w key g + colorRed w key h + w (key e) ≤ colorRed w key (Redundant.join g h)
+srce-05e0584/proof/Color.lean	482	relist	3	27		colorRed w key g = colorRed w key h
+srce-05e0584/proof/Color.lean	488	premises	3	75		es.map key = es'.map key
+srce-05e0584/proof/Color.lean	503	weight	0	54	DATA	paint [] [1, 1, 2] = [(1, true), (1, false), (2, true)] ∧ wred (fun _ => 1) [1, 1, 2] = 1 ∧ wred (fun x => if 
+srce-05e0584/proof/Color.lean	511	allwit	0	9	DATA	paint [] [3, 1, 2] = [(3, true), (1, true), (2, true)]
+srce-05e0584/proof/Controls.lean	37	zero	0	130		measure Example.zero = 0 ∧ ¬ Witnessed Example.zero
+srce-05e0584/proof/Controls.lean	49	universal	0	32		Graph, Witnessed g
+srce-05e0584/proof/Controls.lean	57	shrink	0	25	DATA	red [1, 1] = 1 ∧ red [1] = 0
+srce-05e0584/proof/Controls.lean	65	free	0	25	DATA	measure (join ⟨[1], []⟩ ⟨[2], []⟩) = 0 ∧ ¬ (measure ⟨[1], []⟩ + measure ⟨[2], []⟩ + 1 ≤ measure (join ⟨[1], []
+srce-05e0584/proof/Controls.lean	76	exact	0	25	DATA	(touched Example.span [1]).length = 1 ∧ (inside Example.span [1]).length = 0
+srce-05e0584/proof/Controls.lean	85	sample	0	9	DATA	(touched Example.span []).length = 0
+srce-05e0584/proof/Core.lean	55	append	2	162		aux seen (a ++ b) = aux seen a + aux (a.reverse ++ seen) b
+srce-05e0584/proof/Core.lean	66	mono	2	447		aux s l ≤ aux s' l
+srce-05e0584/proof/Core.lean	90	pos	0	293		∀ (seen l : List Nat), x ∈ seen → x ∈ l → 1 ≤ aux seen l
+srce-05e0584/proof/Core.lean	111	witness	0	710		t ∧ x ∈ seen ++ s
+srce-05e0584/proof/Core.lean	148	first	0	392		t ∧ x ∉ s
+srce-05e0584/proof/Core.lean	175	append	1	87		red (a ++ b) = red a + aux (a.reverse) b
+srce-05e0584/proof/Core.lean	182	left	1	41		red a ≤ red (a ++ b)
+srce-05e0584/proof/Core.lean	189	right	1	126		red b ≤ red (a ++ b)
+srce-05e0584/proof/Core.lean	199	sum	1	126		red a + red b ≤ red (a ++ b)
+srce-05e0584/proof/Core.lean	209	strict	2	1030		red a + red b + 1 ≤ red (a ++ b)
+srce-05e0584/proof/Core.lean	244	appear	2	31		1 ≤ red (a ++ b)
+srce-05e0584/proof/Core.lean	251	witness	1	339		1 ≤ red l ↔ Repeat l
+srce-05e0584/proof/Core.lean	286	store	2	112		Deriv edges base' c
+srce-05e0584/proof/Core.lean	296	edges	2	112		Deriv edges' base c
+srce-05e0584/proof/Core.lean	338	grow	1	149		measure g ≤ measure h
+srce-05e0584/proof/Core.lean	348	witness	2	27		Witnessed h
+srce-05e0584/proof/Core.lean	354	trans	2	172		Expands g i
+srce-05e0584/proof/Core.lean	365	chain	2	32		measure g ≤ measure i
+srce-05e0584/proof/Core.lean	372	deriv	2	244		Deriv h.edges h.nodes c
+srce-05e0584/proof/Intent.lean	31	extends_	7	35		(viewC ch (compose L [i]) r q).edges (proj ch r i).1 (proj ch r i).2 ∧ ∀ ps a, (viewC ch L r q).edges ps a → (
+srce-05e0584/proof/Intent.lean	40	overlap	7	225		(viewC ch (compose L I) r q).edges ps a ↔ (viewC ch L r q).edges ps a
+srce-05e0584/proof/Intent.lean	53	overlap_color	7	35		colorsOf ch (compose L [i]) r (proj ch r i).1 (proj ch r i).2 c
+srce-05e0584/proof/Intent.lean	59	no_fork	4	18		viewC ch (compose L I) r q = viewC ch (compose L' I') r q
+srce-05e0584/proof/Intent.lean	63	comm	4	38		viewC ch (compose L I) r q = viewC ch (compose I L) r q
+srce-05e0584/proof/Intent.lean	67	assoc	1	23		compose (compose L I) J = compose L (compose I J)
+srce-05e0584/proof/Intent.lean	70	idem	4	37		viewC ch (compose L L) r q = viewC ch L r q
+srce-05e0584/proof/Intent.lean	75	carries	6	138		derives (viewC ch (compose L I) r q) a
+srce-05e0584/proof/Intent.lean	95	mixed	0	387		derives (view idch (compose [⟨0, 0, [], [], 1⟩] [⟨1, 0, [], [], 2⟩, ⟨2, 0, [], [1, 2], 3⟩]) 0) 3
+srce-05e0584/proof/Intent.lean	106	mixed_apart	0	697		¬ derives (view idch [⟨1, 0, [], [], 2⟩, ⟨2, 0, [], [1, 2], 3⟩] 0) 3
+srce-05e0584/proof/Join.lean	38	inc	1	46		incidence (join g h) = incidence g ++ incidence h
+srce-05e0584/proof/Join.lean	43	eq	1	92		measure (join g h) = red (g.nodes ++ h.nodes) + red (incidence g ++ incidence h)
+srce-05e0584/proof/Join.lean	54	left	1	61		measure g ≤ measure (join g h)
+srce-05e0584/proof/Join.lean	60	right	1	63		measure h ≤ measure (join g h)
+srce-05e0584/proof/Join.lean	68	sum	1	212		measure g + measure h ≤ measure (join g h)
+srce-05e0584/proof/Join.lean	81	strict	2	221		measure g + measure h + 1 ≤ measure (join g h)
+srce-05e0584/proof/Join.lean	95	edge	2	221		measure g + measure h + 1 ≤ measure (join g h)
+srce-05e0584/proof/Join.lean	113	mono	1	264		List (List Nat × Nat), (l.filter p).length ≤ (l.filter q).length
+srce-05e0584/proof/Join.lean	152	mono	1	225		(touched g s).length ≤ (touched g s').length
+srce-05e0584/proof/Join.lean	167	grow	2	129		(touched g s).length ≤ (touched h s).length
+srce-05e0584/proof/Join.lean	176	bound	2	236		(inside g s).length ≤ (touched g s).length
+srce-05e0584/proof/Rebase.lean	62	impls_append	4	35		impls ch (L ++ M) r q = impls ch L r q ++ impls ch M r q
+srce-05e0584/proof/Rebase.lean	66	grow	5	73		parallel ch L r q enc ≤ parallel ch (L ++ M) r q enc
+srce-05e0584/proof/Rebase.lean	71	order	5	74		parallel ch L r q enc = parallel ch L' r q enc
+srce-05e0584/proof/Rebase.lean	76	join	5	75		parallel ch (L ++ M) r q enc = parallel ch L r q enc + parallel ch M r q enc + shared ((impls ch L r q).map en
+srce-05e0584/proof/Rebase.lean	83	witness	5	13		1 ≤ parallel ch L r q enc ↔ Repeat ((impls ch L r q).map enc)
+srce-05e0584/proof/Rebase.lean	87	enc_indep	7	188		parallel ch L r q enc = parallel ch L r q enc'
+srce-05e0584/proof/Rebase.lean	99	impls_lift	5	417		impls ch L (r + k) q = (impls ch L r q).map (liftPair ch r k)
+srce-05e0584/proof/Rebase.lean	117	coarser	7	168		parallel ch L r q enc ≤ parallel ch L (r + k) q enc
+srce-05e0584/proof/Rebase.lean	128	resolved_least	11	200		parallel ch L r q enc ≤ parallel ch L s q enc
+srce-05e0584/proof/Rebase.lean	142	weighted	6	119		parallelW w ch L r q enc ≤ parallelW w ch (L ++ M) r q enc ∧ parallelW (fun x => w x + v x) ch L r q enc = par
+srce-05e0584/proof/Rebase.lean	152	weighted_order	6	88		parallelW w ch L r q enc = parallelW w ch L' r q enc
+srce-05e0584/proof/Rebase.lean	170	lift0	2	3	DEFN	lift ch r 0 c = c
+srce-05e0584/proof/Rebase.lean	172	impls_toLog	1	317		impls idChain (toLog g) 0 (fun _ => true) = g.nodes.map (fun n => ([], n)) ++ g.edges
+srce-05e0584/proof/Rebase.lean	187	nodes	3	98		red ((g.nodes.map (fun n => (([] : List Nat), n))).map enc) = red g.nodes
+srce-05e0584/proof/Rebase.lean	198	edges_le	3	60		red (g.edges.map enc) ≤ red (incidence g)
+srce-05e0584/proof/Rebase.lean	205	whole	2	71		red ((g.nodes.map (fun n => (([] : List Nat), n))).map enc) + red (g.edges.map enc) ≤ parallel idChain (toLog 
+srce-05e0584/proof/Rebase.lean	219	sharing	0	25	DATA	red (incidence ⟨[], [([1], 3), ([2], 3)]⟩) = 1 ∧ parallel idChain (toLog ⟨[], [([1], 3), ([2], 3)]⟩) 0 (fun _ 
+srce-05e0584/proof/Rebase.lean	227	parallel_pos	0	9	DATA	parallel idChain [⟨10, 0, [], [0, 1], 2⟩, ⟨11, 0, [], [0, 1], 2⟩] 0 (fun _ => true) (fun x => x.1.sum * 1000 +
+srce-05e0584/proof/Relist.lean	35	congr	2	86		aux s l = aux s' l
+srce-05e0584/proof/Relist.lean	42	perm	1	591		∀ seen, aux seen l₁ = aux seen l₂
+srce-05e0584/proof/Relist.lean	75	sublist	1	306		∀ seen, aux seen l₁ ≤ aux seen l₂
+srce-05e0584/proof/Relist.lean	96	map_le	1	823		∀ (l s : List α), (∀ a ∈ s ++ l, ∀ b ∈ s ++ l, f a = f b → g a = g b) → aux (s.map f) (l.map f) ≤ aux (s.map g
+srce-05e0584/proof/Relist.lean	133	perm	1	13		red l₁ = red l₂
+srce-05e0584/proof/Relist.lean	137	sublist	1	16		red l₁ ≤ red l₂
+srce-05e0584/proof/Relist.lean	142	key_le	3	73		red (l.map f) ≤ red (l.map g)
+srce-05e0584/proof/Relist.lean	150	relabel_ge	2	86		red l ≤ red (l.map f)
+srce-05e0584/proof/Relist.lean	157	relabel_inj	3	80		red (l.map f) = red l
+srce-05e0584/proof/Relist.lean	182	mem	0	318		List Nat, a ∈ uniq l ↔ a ∈ l
+srce-05e0584/proof/Relist.lean	199	nodup	0	208		List Nat, (uniq l).Nodup
+srce-05e0584/proof/Relist.lean	211	filt_false	0	85		List Nat, l.filter (fun _ => false) = []
+srce-05e0584/proof/Relist.lean	219	filt_cons	2	1070		List Nat, U.Nodup → (U.filter (fun u => decide (u ∈ x :: seen))).length = (U.filter (fun u => decide (u ∈ seen
+srce-05e0584/proof/Relist.lean	262	aux_eq	0	769		∀ (l seen : List Nat), aux seen l = red l + ((uniq l).filter (fun v => decide (v ∈ seen))).length
+srce-05e0584/proof/Relist.lean	291	red_add_card	0	443		List Nat, red l + card l = l.length
+srce-05e0584/proof/Relist.lean	310	join	1	81		red (a ++ b) = red a + red b + shared a b
+srce-05e0584/proof/Relist.lean	318	shared_le	1	59		shared a b ≤ card b
+srce-05e0584/proof/Relist.lean	344	measure_eq	1	54		measure g = measure h
+srce-05e0584/proof/Relist.lean	348	refl	1	36		Relist g g
+srce-05e0584/proof/Relist.lean	350	trans	2	34		Relist g k
+srce-05e0584/proof/Relist.lean	354	edges	2	75		Relist g h
+srce-05e0584/proof/Relist.lean	361	premises	1	166		(es.flatMap (fun e => e.1 ++ [e.2])).Perm (es'.flatMap (fun e => e.1 ++ [e.2]))
+srce-05e0584/proof/Relist.lean	371	grow	1	68		measure g ≤ measure h
+srce-05e0584/proof/Relist.lean	377	growR_trans	2	32		measure g ≤ measure i
+srce-05e0584/proof/Relist.lean	383	deriv	3	90		Deriv h.edges h.nodes c
+srce-05e0584/proof/Relist.lean	396	relabel	0	25	DATA	red [1, 2] = 0 ∧ red ([1, 2].map (fun _ => 0)) = 1
+srce-05e0584/proof/Relist.lean	402	order	0	25	DATA	red [1, 2, 1] = red [1, 1, 2] ∧ red [1, 1, 2] = 1
+srce-05e0584/proof/Resolve.lean	62	scan_some	2	419		∀ n i r, scan cost avail i n = some r → i ≤ r ∧ r < i + n ∧ cost r ≤ avail ∧ ∀ s, i ≤ s → s < r → avail < cost
+srce-05e0584/proof/Resolve.lean	82	scan_none	2	284		∀ n i, scan cost avail i n = none → ∀ s, i ≤ s → s < i + n → avail < cost s
+srce-05e0584/proof/Resolve.lean	99	feasible	4	77		r ≤ ch.sym ∧ cost r ≤ avail
+srce-05e0584/proof/Resolve.lean	105	finest	4	97		∀ s, s < r → avail < cost s
+srce-05e0584/proof/Resolve.lean	112	unmeasured_iff	4	248		resolveLevel ch cost avail = none ↔ avail < cost ch.sym
+srce-05e0584/proof/Resolve.lean	126	budget_mono	5	273		∃ r', resolveLevel ch cost a' = some r' ∧ r' ≤ r
+srce-05e0584/proof/Resolve.lean	144	pareto	4	214		∀ s, s ≤ ch.sym → cost s ≤ avail → ¬ (s ≤ r ∧ cost s ≤ cost r ∧ (s < r ∨ cost s < cost r))
+srce-05e0584/proof/Resolve.lean	158	order	5	112		resolve ch cost avail L q = resolve ch cost avail L' q
+srce-05e0584/proof/Resolve.lean	168	retains	8	35		derives (viewC ch log (r + k) q) (lift ch r k a)
+srce-05e0584/proof/Resolve.lean	175	append	9	67		derives (viewC ch (L ++ M) r q) a ∧ (resolve ch cost avail (L ++ M) q).map Prod.fst = some r
+srce-05e0584/proof/Resolve.lean	188	budget	0	43	DATA	resolveLevel ⟨fun _ c => c, 2, 3, by decide⟩ (fun r => 10 - r) 7 = none ∧ resolveLevel ⟨fun _ c => c, 2, 3, by
+srce-05e0584/proof/Resolve.lean	197	antitone	0	9	DATA	resolveLevel ⟨fun _ c => c, 1, 1, by decide⟩ (fun r => if r = 0 then 1 else 9) 5 = some 0
+srce-05e0584/proof/Sample.lean	33	exact	5	361		derives (restrict g C) a ↔ derives g a
+srce-05e0584/proof/Sample.lean	49	union	4	119		PremClosed g (fun a => C a ∨ D a)
+srce-05e0584/proof/Sample.lean	59	shrink_log	5	69		PremClosed (viewC ch L r q) C
+srce-05e0584/proof/Sample.lean	72	open_sample	0	387		derives openG 3 ∧ ¬ derives (restrict openG (fun a => a = 3)) 3
+srce-05e0584/proof/Synthesis.lean	37	joined	12	174		measure g ≤ measure i ∧ (Witnessed g → Witnessed i) ∧ Deriv i.edges i.nodes c ∧ measure g + measure h ≤ measur
+srce-05e0584/proof/Units.lean	45	concl_sublist	0	249		List (List Nat × Nat), (es.map Prod.snd).Sublist (es.flatMap (fun e => e.1 ++ [e.2]))
+srce-05e0584/proof/Units.lean	63	grow	2	90		sigRed key g ≤ sigRed key h
+srce-05e0584/proof/Units.lean	71	join	2	75		sigRed key (Redundant.join g h) = sigRed key g + sigRed key h + shared (g.edges.map key) (h.edges.map key)
+srce-05e0584/proof/Units.lean	77	witness	2	13		1 ≤ sigRed key g ↔ Repeat (g.edges.map key)
+srce-05e0584/proof/Units.lean	80	relist	2	20		sigRed key g = sigRed key h
+srce-05e0584/proof/Units.lean	87	resolve	3	31		sigRed raw g ≤ sigRed res g
+srce-05e0584/proof/Units.lean	95	le_incidence	3	87		sigRed key g ≤ red (incidence g)
+srce-05e0584/proof/Units.lean	101	le_measure	3	58		sigRed key g ≤ measure g
+srce-05e0584/proof/Units.lean	121	aux_le	2	1248		∀ (l S : List α), (∀ a ∈ S ++ l, ∀ b ∈ S ++ l, k a = k b → d a = d b) → (∀ a ∈ S ++ l, d a ≠ []) → aux (S.map 
+srce-05e0584/proof/Units.lean	168	le	5	91		red (l.map k) ≤ red (l.flatMap d)
+srce-05e0584/proof/Units.lean	177	floor	1	60		l.flatMap (fun a => [a]) = l
+srce-05e0584/proof/Units.lean	184	bound	1	37		red l ≤ l.length
+srce-05e0584/proof/Units.lean	191	chain	9	190		red (l.map k) ≤ red ((l.flatMap d₁).map k₁) ∧ red ((l.flatMap d₁).map k₁) ≤ red ((l.flatMap d₁).flatMap d₂) ∧ 
+srce-05e0584/proof/Units.lean	209	layer	2	103		Expands g ⟨g.nodes ++ fine, g.edges⟩ ∧ measure g ≤ measure ⟨g.nodes ++ fine, g.edges⟩
+srce-05e0584/proof/Units.lean	219	grow	1	61		recRed store ≤ recRed (store ++ more)
+srce-05e0584/proof/Units.lean	223	join	1	63		recRed (a ++ b) = recRed a + recRed b + shared a.flatten b.flatten
+srce-05e0584/proof/Units.lean	231	file_le	4	93		fileRed hf store ≤ recRed store
+srce-05e0584/proof/Units.lean	244	records	0	25	DATA	red ([[1, 2], [2, 3]].map (fun f => f.sum * 100 + f.length)) = 0 ∧ recRed [[1, 2], [2, 3]] = 1
+srce-05e0584/proof/Units.lean	252	empty	0	25	DATA	red ([5, 5].map id) = 1 ∧ red ([5, 5].flatMap (fun _ => ([] : List Nat))) = 0
+srce-05e0584/proof/Units.lean	259	signature	0	25	DATA	sigRed (fun e => e.1.sum * 1000 + e.2) ⟨[], [([1], 3), ([2], 3)]⟩ = 0 ∧ red (incidence ⟨[], [([1], 3), ([2], 3
+srce-05e0584/proof/Units.lean	267	projection	0	25	DATA	red [10, 11] = 0 ∧ red ([10, 11].map (fun x => x / 10)) = 1

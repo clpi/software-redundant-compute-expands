@@ -1,0 +1,30 @@
+'Certify.admitB_iff' depends on axioms: [propext, Quot.sound]
+'Certify.admit_perm' depends on axioms: [propext, Quot.sound]
+'Certify.regression_final' depends on axioms: [propext, Quot.sound]
+'Certify.regression_final_append' depends on axioms: [propext, Quot.sound]
+'Certify.admit_sublist' depends on axioms: [propext, Quot.sound]
+'Certify.unmeasured_refuses' does not depend on any axioms
+'Certify.admit_witness' depends on axioms: [propext, Quot.sound]
+'Certify.witness_in_view' does not depend on any axioms
+'Certify.admit_trans' depends on axioms: [propext, Quot.sound]
+'Certify.steps_pairwise' depends on axioms: [propext, Quot.sound]
+'Certify.steps_endpoints' depends on axioms: [propext, Quot.sound]
+'Certify.dims_antitone' does not depend on any axioms
+'Certify.beat_admit' does not depend on any axioms
+'Certify.tie_not_beat' depends on axioms: [propext, Quot.sound]
+'Certify.loss_not_beat' depends on axioms: [propext, Quot.sound]
+'Certify.beat_succ' depends on axioms: [propext, Quot.sound]
+'Union.meetsB_iff' depends on axioms: [propext, Quot.sound]
+'Union.meets_iff_admit_each' does not depend on any axioms
+'Union.meets_iff_pooled' depends on axioms: [propext, Quot.sound]
+'Union.unmeasured_incumbent_refuses' does not depend on any axioms
+'Union.beatsB_iff' depends on axioms: [propext, Quot.sound]
+'Union.ceilbeat_admit' depends on axioms: [propext, Quot.sound]
+'Union.beat_ceilbeat' does not depend on any axioms
+'Union.ceilbeat_strict_below' depends on axioms: [propext, Quot.sound]
+'Union.ceilbeat_beat_of_below' depends on axioms: [propext, Quot.sound]
+'Union.beatsUnion_each' does not depend on any axioms
+'Union.beatsUnion_meets' depends on axioms: [propext, Quot.sound]
+'Union.beatsUnion_succ' depends on axioms: [propext, Quot.sound]
+'Union.union_regression_final' depends on axioms: [propext, Quot.sound]
+exit=0 wall=1.544146577

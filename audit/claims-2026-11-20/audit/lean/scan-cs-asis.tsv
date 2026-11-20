@@ -1,0 +1,138 @@
+cs-asis/Canon.lean	58	least	2	91		∀ a, Derives B R a → X a
+cs-asis/Canon.lean	66	mono	2	73		∀ a, Derives B R a → Derives C S a
+cs-asis/Canon.lean	73	roots_as_edges	3	298		Derives B R a ↔ Derives (fun _ => False) (fun ps x => R ps x ∨ (ps = [] ∧ B x)) a
+cs-asis/Canon.lean	142	zero	2	3	DEFN	lift ch r 0 c = c
+cs-asis/Canon.lean	145	add	2	199		∀ k c, lift ch r (j + k) c = lift ch (r + j) k (lift ch r j c)
+cs-asis/Canon.lean	157	key_lift	2	58		key ch (r + k) t = lift ch r k (key ch r t)
+cs-asis/Canon.lean	163	floor	2	7	DEFN	Eqv ch 0 t u ↔ t = u
+cs-asis/Canon.lean	167	nest	3	40		Eqv ch (r + k) t u
+cs-asis/Canon.lean	171	eqv_refl	2	3	DEFN	Eqv ch r t t
+cs-asis/Canon.lean	172	eqv_symm	3	6		Eqv ch r u t
+cs-asis/Canon.lean	173	eqv_trans	4	11		Eqv ch r t v
+cs-asis/Canon.lean	181	proj_lift	4	368		proj ch (r + k) e = ((proj ch r e).1.map (lift ch r k), lift ch r k (proj ch r e).2)
+cs-asis/Canon.lean	199	perm	4	167		viewC ch L r q = viewC ch L' r q
+cs-asis/Canon.lean	210	grow	7	71		(viewC ch (L ++ M) r q).edges ps a
+cs-asis/Canon.lean	216	derives_grow	6	70		derives (viewC ch (L ++ M) r q) a
+cs-asis/Canon.lean	221	join	6	259		(viewC ch (L ++ M) r q).edges ps a ↔ (viewC ch L r q).edges ps a ∨ (viewC ch M r q).edges ps a
+cs-asis/Canon.lean	233	absorb	5	236		viewC ch (L ++ M) r q = viewC ch L r q
+cs-asis/Canon.lean	248	colors_grow	6	71		colorsOf ch (L ++ M) r ps a c
+cs-asis/Canon.lean	254	filter_nest	8	65		(viewC ch L r q').edges ps a
+cs-asis/Canon.lean	262	edge_proj	7	98		(viewC ch L (r + k) q).edges (ps.map (lift ch r k)) (lift ch r k a)
+cs-asis/Canon.lean	272	derives_proj	6	193		derives (viewC ch L (r + k) q) (lift ch r k a)
+cs-asis/Canon.lean	284	refine_append	7	67		(viewC ch (L ++ [e]) r q).edges (proj ch r e).1 (proj ch r e).2 ∧ ∀ ps a, (viewC ch L r q).edges ps a → (viewC
+cs-asis/Canon.lean	298	merge	0	144		¬ Eqv chain2 0 10 11 ∧ Eqv chain2 1 10 11
+cs-asis/Canon.lean	309	coarse_only	0	75		¬ (view chain2 [⟨0, 1, [], [], 5⟩] 0).edges [] 5
+cs-asis/Cases.lean	45	root_mem	1	90		rootCase ∈ reg
+cs-asis/Cases.lean	51	total	2	27		∃ c ∈ reg, c.test e = true
+cs-asis/Cases.lean	54	ids_unique	1	436		∀ a ∈ reg, ∀ b ∈ reg, a.id = b.id → a = b
+cs-asis/Cases.lean	70	parent_exists	1	382		∀ c ∈ reg, ∃ p ∈ reg, p.id = c.parent ∧ ∀ e, c.test e = true → p.test e = true
+cs-asis/Cases.lean	87	parent_impl	4	133		∀ e, c.test e = true → p.test e = true
+cs-asis/Cases.lean	96	inherit	5	129		∀ e, c.test e = true → Q e
+cs-asis/Cases.lean	107	refine	3	77		matched (reg ++ [c]) e = matched reg e ++ (if c.test e then [c] else [])
+cs-asis/Cases.lean	113	up_closed	5	64		a.test e = true
+cs-asis/Cases.lean	123	fresh	0	176		¬ WF ([rootCase] ++ [⟨0, 0, fun _ => false⟩])
+cs-asis/Closure.lean	51	mem_ins	2	89		x ∈ ins acc a ↔ x ∈ acc ∨ x = a
+cs-asis/Closure.lean	59	mem_foldl_ins	0	333		∀ (l acc : List Nat) (x : Nat), x ∈ l.foldl ins acc ↔ x ∈ acc ∨ x ∈ l
+cs-asis/Closure.lean	76	nodup_ins	3	186		(ins acc a).Nodup
+cs-asis/Closure.lean	89	nodup_foldl_ins	0	118		∀ (l acc : List Nat), acc.Nodup → (l.foldl ins acc).Nodup
+cs-asis/Closure.lean	95	prefix_foldl_ins	0	221		∀ (l acc : List Nat), ∃ t, l.foldl ins acc = acc ++ t
+cs-asis/Closure.lean	108	mem_fire	6	218		a ∈ fire ch L r q S ↔ ∃ e, e ∈ L ∧ ready ch r q S e = true ∧ (proj ch r e).2 = a
+cs-asis/Closure.lean	120	mem_stepS	6	19		a ∈ stepS ch L r q S ↔ a ∈ S ∨ a ∈ fire ch L r q S
+cs-asis/Closure.lean	126	stepS_sound	6	344		∀ a ∈ stepS ch L r q S, derives (V ch L r q) a
+cs-asis/Closure.lean	138	iter_sound	4	120		∀ n S, (∀ a ∈ S, derives (V ch L r q) a) → ∀ a ∈ iter ch L r q n S, derives (V ch L r q) a
+cs-asis/Closure.lean	146	complete_of_stable	6	393		∀ a, derives (V ch L r q) a → a ∈ S
+cs-asis/Closure.lean	165	filter_len_mono	0	365		∀ (l : List α) (p p' : α → Bool), (∀ x ∈ l, p x = true → p' x = true) → (l.filter p).length ≤ (l.filter p').le
+cs-asis/Closure.lean	180	filter_len_lt	0	592		∀ (l : List α) (p p' : α → Bool), (∀ x ∈ l, p x = true → p' x = true) → (∃ x ∈ l, p' x = true ∧ p x = false) →
+cs-asis/Closure.lean	199	pot_le	5	25		pot ch L r q S ≤ L.length
+cs-asis/Closure.lean	202	stepS_sub	5	50		∀ a ∈ S, a ∈ stepS ch L r q S
+cs-asis/Closure.lean	205	pot_grow	6	494		pot ch L r q S < pot ch L r q (stepS ch L r q S)
+cs-asis/Closure.lean	221	stepS_of_stable	6	323		stepS ch L r q S = S
+cs-asis/Closure.lean	234	iter_of_stable	6	108		∀ n, iter ch L r q n S = S
+cs-asis/Closure.lean	242	iterE_eq	4	175		∀ n S, iterE ch L r q n S = iter ch L r q n S
+cs-asis/Closure.lean	255	iter_stable	4	355		∀ n S, L.length ≤ n + pot ch L r q S → stable ch L r q (iter ch L r q n S) = true
+cs-asis/Closure.lean	274	mem_closFrom	7	159		a ∈ closFrom ch L r q S ↔ derives (V ch L r q) a
+cs-asis/Closure.lean	284	mem_clos	5	52		a ∈ clos ch L r q ↔ derives (V ch L r q) a
+cs-asis/Closure.lean	288	nodup_iter	4	117		∀ n S, S.Nodup → (iter ch L r q n S).Nodup
+cs-asis/Closure.lean	295	prefix_iter	4	322		∀ n S, ∃ t, iter ch L r q n S = S ++ t
+cs-asis/Closure.lean	309	nodup_clos	4	85		(clos ch L r q).Nodup
+cs-asis/Closure.lean	313	nodup_closFrom	6	66		(closFrom ch L r q S).Nodup
+cs-asis/Closure.lean	319	incremental_eq_scratch	5	108		a ∈ closFrom ch (L ++ M) r q (clos ch L r q) ↔ a ∈ clos ch (L ++ M) r q
+cs-asis/Controls.lean	12	both_on_front	0	9	DATA	front [fa, fb] [0, 1] = [0, 1]
+cs-asis/Controls.lean	17	reorder	0	9	DATA	score [3, 1] [fa, fb] 1 < score [3, 1] [fa, fb] 0 ∧ score [1, 3] [fa, fb] 0 < score [1, 3] [fa, fb] 1
+cs-asis/Controls.lean	23	dominated_out	0	9	DATA	front [fa2, fb2] [0, 1, 2] = [0, 1]
+cs-asis/Intent.lean	31	extends_	7	35		(viewC ch (compose L [i]) r q).edges (proj ch r i).1 (proj ch r i).2 ∧ ∀ ps a, (viewC ch L r q).edges ps a → (
+cs-asis/Intent.lean	40	overlap	7	225		(viewC ch (compose L I) r q).edges ps a ↔ (viewC ch L r q).edges ps a
+cs-asis/Intent.lean	53	overlap_color	7	35		colorsOf ch (compose L [i]) r (proj ch r i).1 (proj ch r i).2 c
+cs-asis/Intent.lean	59	no_fork	4	18		viewC ch (compose L I) r q = viewC ch (compose L' I') r q
+cs-asis/Intent.lean	63	comm	4	38		viewC ch (compose L I) r q = viewC ch (compose I L) r q
+cs-asis/Intent.lean	67	assoc	1	23		compose (compose L I) J = compose L (compose I J)
+cs-asis/Intent.lean	70	idem	4	37		viewC ch (compose L L) r q = viewC ch L r q
+cs-asis/Intent.lean	75	carries	6	138		derives (viewC ch (compose L I) r q) a
+cs-asis/Intent.lean	95	mixed	0	387		derives (view idch (compose [⟨0, 0, [], [], 1⟩] [⟨1, 0, [], [], 2⟩, ⟨2, 0, [], [1, 2], 3⟩]) 0) 3
+cs-asis/Intent.lean	106	mixed_apart	0	697		¬ derives (view idch [⟨1, 0, [], [], 2⟩, ⟨2, 0, [], [1, 2], 3⟩] 0) 3
+cs-asis/Resolve.lean	62	scan_some	2	419		∀ n i r, scan cost avail i n = some r → i ≤ r ∧ r < i + n ∧ cost r ≤ avail ∧ ∀ s, i ≤ s → s < r → avail < cost
+cs-asis/Resolve.lean	82	scan_none	2	284		∀ n i, scan cost avail i n = none → ∀ s, i ≤ s → s < i + n → avail < cost s
+cs-asis/Resolve.lean	99	feasible	4	77		r ≤ ch.sym ∧ cost r ≤ avail
+cs-asis/Resolve.lean	105	finest	4	97		∀ s, s < r → avail < cost s
+cs-asis/Resolve.lean	112	unmeasured_iff	4	248		resolveLevel ch cost avail = none ↔ avail < cost ch.sym
+cs-asis/Resolve.lean	126	budget_mono	5	273		∃ r', resolveLevel ch cost a' = some r' ∧ r' ≤ r
+cs-asis/Resolve.lean	144	pareto	4	214		∀ s, s ≤ ch.sym → cost s ≤ avail → ¬ (s ≤ r ∧ cost s ≤ cost r ∧ (s < r ∨ cost s < cost r))
+cs-asis/Resolve.lean	158	order	5	112		resolve ch cost avail L q = resolve ch cost avail L' q
+cs-asis/Resolve.lean	168	retains	8	35		derives (viewC ch log (r + k) q) (lift ch r k a)
+cs-asis/Resolve.lean	175	append	9	67		derives (viewC ch (L ++ M) r q) a ∧ (resolve ch cost avail (L ++ M) q).map Prod.fst = some r
+cs-asis/Resolve.lean	188	budget	0	43	DATA	resolveLevel ⟨fun _ c => c, 2, 3, by decide⟩ (fun r => 10 - r) 7 = none ∧ resolveLevel ⟨fun _ c => c, 2, 3, by
+cs-asis/Resolve.lean	197	antitone	0	9	DATA	resolveLevel ⟨fun _ c => c, 1, 1, by decide⟩ (fun r => if r = 0 then 1 else 9) 5 = some 0
+cs-asis/Sample.lean	33	exact	5	361		derives (restrict g C) a ↔ derives g a
+cs-asis/Sample.lean	49	union	4	119		PremClosed g (fun a => C a ∨ D a)
+cs-asis/Sample.lean	59	shrink_log	5	69		PremClosed (viewC ch L r q) C
+cs-asis/Sample.lean	72	open_sample	0	387		derives openG 3 ∧ ¬ derives (restrict openG (fun a => a = 3)) 3
+cs-asis/Search.lean	43	front_sound	4	129		a ∈ pool ∧ ∀ b ∈ pool, dom ms b a = false
+cs-asis/Search.lean	48	front_complete	5	116		a ∈ front ms pool
+cs-asis/Search.lean	53	mem_front	3	66		a ∈ front ms pool ↔ a ∈ pool ∧ ∀ b ∈ pool, dom ms b a = false
+cs-asis/Search.lean	59	score_lt_of_dom	0	1223		∀ (ms : List (α → Nat)) (w : List Nat) (a b : α), w.length = ms.length → (∀ x ∈ w, 1 ≤ x) → dom ms b a = true 
+cs-asis/Search.lean	100	best_on_front	8	143		a ∈ front ms pool
+cs-asis/Search.lean	111	exists_max	1	458		∀ (l : List α), l ≠ [] → ∃ a ∈ l, ∀ b ∈ l, f b ≤ f a
+cs-asis/Search.lean	133	front_nonempty	3	185		front ms pool ≠ []
+cs-asis/Search.lean	138	lexLe_trans	3	85		lexLe a c = true
+cs-asis/Search.lean	143	lexLe_total	1	80		(lexLe a b || lexLe b a) = true
+cs-asis/Search.lean	147	le_trans	6	299		le w ms key a c = true
+cs-asis/Search.lean	157	le_total	4	258		(le w ms key a b || le w ms key b a) = true
+cs-asis/Search.lean	168	rank_perm	4	23		(rank w ms key pool).Perm (front ms pool)
+cs-asis/Search.lean	172	reweight	4	63		(rank w ms key pool).Perm (rank w' ms key pool)
+cs-asis/Search.lean	176	reweight_mem	5	35		a ∈ rank w ms key pool ↔ a ∈ rank w' ms key pool
+cs-asis/Search.lean	179	rank_sorted	4	63		(rank w ms key pool).Pairwise (fun a b => le w ms key a b = true)
+cs-asis/Search.lean	185	head_best	9	599		∀ b ∈ pool, score w ms b ≤ score w ms t
+cs-asis/Search.lean	210	memo_eq	2	309		memo m pool = m
+cs-asis/Search.lean	234	idx_tag	1	202		(idx ms.length).map (fun f => fun a => f (tag ms a)) = ms
+cs-asis/Search.lean	244	dom_tag	2	108		dom (idx ms.length) (tag ms a) (tag ms b) = dom ms a b
+cs-asis/Search.lean	250	score_tag	3	480		score w (idx ms.length) (tag ms a) = score w ms a
+cs-asis/Search.lean	270	front_tag	2	79		front (idx ms.length) (pool.map (tag ms)) = (front ms pool).map (tag ms)
+cs-asis/Search.lean	274	le_tag	4	47		le w (idx ms.length) (keyT key) (tag ms a) (tag ms b) = le w ms key a b
+cs-asis/Search.lean	282	rank_tag	4	686		((rank w (idx ms.length) (keyT key) (pool.map (tag ms))).map Prod.fst).Perm (front ms pool) ∧ ((rank w (idx ms
+cs-asis/Space.lean	128	spaceFast_eq	3	3	DEFN	spaceFast ch L r = space ch L r
+cs-asis/Space.lean	211	measuresFast_eq	3	3	DEFN	measuresFast ch L r = measures ch L r
+cs-asis/Space.lean	223	searchMemo_eq	5	52		searchMemo ch L r axes w = search ch L r axes w
+cs-asis/Space.lean	237	searchTagged_spec	5	116		((searchTagged ch L r axes w).map Prod.fst).Perm (search ch L r axes w) ∧ ((searchTagged ch L r axes w).map Pr
+cs-asis/Space.lean	244	searchFast_eq	5	3	DEFN	searchFast ch L r axes w = search ch L r axes w
+cs-asis/Space.lean	249	supp_iff	5	212		supp ch L r (ps, a) = true ↔ (viewC ch L r live).edges ps a
+cs-asis/Space.lean	256	clos0_sound_after	4	76		∀ a ∈ clos0 ch L r, derives (viewC ch (L ++ recs ch r c) r live) a
+cs-asis/Space.lean	260	mem_after	5	57		a ∈ after ch L r c ↔ derives (viewC ch (L ++ recs ch r c) r live) a
+cs-asis/Space.lean	265	mem_newTerms	5	136		a ∈ newTerms ch L r c ↔ derives (viewC ch (L ++ recs ch r c) r live) a ∧ ¬ derives (viewC ch L r live) a
+cs-asis/Space.lean	271	nodup_newTerms	4	143		(newTerms ch L r c).Nodup
+cs-asis/Space.lean	274	mem_gaps	4	354		g ∈ gaps ch L r ↔ (∃ e ∈ L, e.level ≤ r ∧ e.colors.contains demanded = true ∧ (proj ch r e).2 = g) ∧ ¬ derives
+cs-asis/Space.lean	286	retire_lossless	8	459		(viewC ch (L.erase e) r live).edges ps a ↔ (viewC ch L r live).edges ps a
+cs-asis/Space.lean	302	gen_append	2	19		gen r (L ++ M) = gen r L ++ gen r M
+cs-asis/Space.lean	306	gen_mono	4	50		c ∈ gen r (L ++ M)
+cs-asis/Space.lean	309	supp_append	4	31		supp ch (L ++ M) r x = (supp ch L r x || supp ch M r x)
+cs-asis/Space.lean	312	disq_append	4	31		disq ch (L ++ M) r x = (disq ch L r x || disq ch M r x)
+cs-asis/Space.lean	315	hasEarlier_append	4	37		hasEarlier ch (L ++ M) r e = (hasEarlier ch L r e || hasEarlier ch M r e)
+cs-asis/Space.lean	319	clos0_mono	5	77		a ∈ clos0 ch (L ++ M) r
+cs-asis/Space.lean	335	recolor	6	1447		Witness ch L M r c
+cs-asis/Space.lean	395	no_reopen	6	495		status ch (L ++ M) r c ≠ .open
+cs-asis/Space.lean	420	retire_stays	5	104		status ch (L ++ M) r (.retire e) = .open
+cs-asis/Space.lean	429	space_append	5	277		c ∈ gen r (L ++ M) ∧ (c ∈ space ch (L ++ M) r ∨ Witness ch L M r c)
+cs-asis/Space.lean	439	search_mem	6	119		c ∈ search ch L r axes w ↔ (c ∈ gen r L ∧ status ch L r c = .open) ∧ ∀ b ∈ space ch L r, dom (measures ch L r 
+cs-asis/Space.lean	447	search_reweight	5	18		(search ch L r axes w).Perm (search ch L r axes w')
+cs-asis/Space.lean	450	search_head_best	10	35		∀ b ∈ space ch L r, score w (measures ch L r ++ axes) b ≤ score w (measures ch L r ++ axes) t
+cs-asis/Space.lean	456	search_nonempty	6	224		search ch L r axes w ≠ []
+cs-asis/Space.lean	466	space_order	5	808		status ch L r c = status ch L' r c
