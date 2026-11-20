@@ -1,0 +1,42 @@
+estate-forward: records 1641, admitted 1316, derived 1150, prefixes 1641
+  agree with naive at every prefix: true; final = naive scratch: true; final = Closure.clos: true
+  worklist: raw 2818, scans 2818, visits 1481, pops 1150, total premise ops 7117
+  naive incremental over all prefixes: rounds 2560, exams 1861061, checks 4605032
+  naive scratch on final log only: rounds 17, exams 22372, checks 37478
+  bounds: visits ≤ distinct premises true; pops = derived true
+JSON {"trace": "estate-forward", "records": 1641, "admitted": 1316, "derived": 1150, "agree_every_prefix": true, "wl_raw": 2818, "wl_scans": 2818, "wl_visits": 1481, "wl_pops": 1150, "wl_total": 7117, "naive_inc_rounds": 2560, "naive_inc_exams": 1861061, "naive_inc_checks": 4605032, "naive_scratch_rounds": 17, "naive_scratch_exams": 22372, "naive_scratch_checks": 37478}
+estate-reverse: records 1641, admitted 1316, derived 1150, prefixes 1641
+  agree with naive at every prefix: true; final = naive scratch: true; final = Closure.clos: true
+  worklist: raw 2818, scans 2818, visits 1896, pops 1150, total premise ops 7532
+  naive incremental over all prefixes: rounds 2454, exams 1573493, checks 1636524
+  naive scratch on final log only: rounds 17, exams 22372, checks 37478
+  bounds: visits ≤ distinct premises true; pops = derived true
+JSON {"trace": "estate-reverse", "records": 1641, "admitted": 1316, "derived": 1150, "agree_every_prefix": true, "wl_raw": 2818, "wl_scans": 2818, "wl_visits": 1896, "wl_pops": 1150, "wl_total": 7532, "naive_inc_rounds": 2454, "naive_inc_exams": 1573493, "naive_inc_checks": 1636524, "naive_scratch_rounds": 17, "naive_scratch_exams": 22372, "naive_scratch_checks": 37478}
+estate-shuffled: records 1641, admitted 1316, derived 1150, prefixes 1641
+  agree with naive at every prefix: true; final = naive scratch: true; final = Closure.clos: true
+  worklist: raw 2818, scans 2818, visits 1796, pops 1150, total premise ops 7432
+  naive incremental over all prefixes: rounds 2535, exams 1851782, checks 1845426
+  naive scratch on final log only: rounds 17, exams 22372, checks 37478
+  bounds: visits ≤ distinct premises true; pops = derived true
+JSON {"trace": "estate-shuffled", "records": 1641, "admitted": 1316, "derived": 1150, "agree_every_prefix": true, "wl_raw": 2818, "wl_scans": 2818, "wl_visits": 1796, "wl_pops": 1150, "wl_total": 7432, "naive_inc_rounds": 2535, "naive_inc_exams": 1851782, "naive_inc_checks": 1845426, "naive_scratch_rounds": 17, "naive_scratch_exams": 22372, "naive_scratch_checks": 37478}
+idol-lib-v2-forward: records 3630, admitted 3630, derived 3630, prefixes 3630
+  agree with naive at every prefix: true; final = naive scratch: true; final = Closure.clos: true
+  worklist: raw 4914, scans 4914, visits 1366, pops 3630, total premise ops 11194
+  naive incremental over all prefixes: rounds 7260, exams 13549131, checks 19031994
+  naive scratch on final log only: rounds 4, exams 14520, checks 17577
+  bounds: visits ≤ distinct premises true; pops = derived true
+JSON {"trace": "idol-lib-v2-forward", "records": 3630, "admitted": 3630, "derived": 3630, "agree_every_prefix": true, "wl_raw": 4914, "wl_scans": 4914, "wl_visits": 1366, "wl_pops": 3630, "wl_total": 11194, "naive_inc_rounds": 7260, "naive_inc_exams": 13549131, "naive_inc_checks": 19031994, "naive_scratch_rounds": 4, "naive_scratch_exams": 14520, "naive_scratch_checks": 17577}
+idol-lib-v2-reverse: records 3630, admitted 3630, derived 3630, prefixes 3630
+  agree with naive at every prefix: true; final = naive scratch: true; final = Closure.clos: true
+  worklist: raw 4914, scans 4914, visits 4914, pops 3630, total premise ops 14742
+  naive incremental over all prefixes: rounds 3794, exams 6884506, checks 7962880
+  naive scratch on final log only: rounds 4, exams 14520, checks 17577
+  bounds: visits ≤ distinct premises true; pops = derived true
+JSON {"trace": "idol-lib-v2-reverse", "records": 3630, "admitted": 3630, "derived": 3630, "agree_every_prefix": true, "wl_raw": 4914, "wl_scans": 4914, "wl_visits": 4914, "wl_pops": 3630, "wl_total": 14742, "naive_inc_rounds": 3794, "naive_inc_exams": 6884506, "naive_inc_checks": 7962880, "naive_scratch_rounds": 4, "naive_scratch_exams": 14520, "naive_scratch_checks": 17577}
+idol-lib-v2-shuffled: records 3630, admitted 3630, derived 3630, prefixes 3630
+  agree with naive at every prefix: true; final = naive scratch: true; final = Closure.clos: true
+  worklist: raw 4914, scans 4914, visits 2080, pops 3630, total premise ops 11908
+  naive incremental over all prefixes: rounds 6182, exams 12893667, checks 16214009
+  naive scratch on final log only: rounds 4, exams 14520, checks 17577
+  bounds: visits ≤ distinct premises true; pops = derived true
+JSON {"trace": "idol-lib-v2-shuffled", "records": 3630, "admitted": 3630, "derived": 3630, "agree_every_prefix": true, "wl_raw": 4914, "wl_scans": 4914, "wl_visits": 2080, "wl_pops": 3630, "wl_total": 11908, "naive_inc_rounds": 6182, "naive_inc_exams": 12893667, "naive_inc_checks": 16214009, "naive_scratch_rounds": 4, "naive_scratch_exams": 14520, "naive_scratch_checks": 17577}
