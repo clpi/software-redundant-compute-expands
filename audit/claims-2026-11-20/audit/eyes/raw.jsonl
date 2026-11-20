@@ -1,0 +1,261 @@
+{"driver": "pw-task", "task": "table", "rep": 4, "wall_ms": 596.725317999983, "cpu_ms": 704.337, "maxrss_kib": 116280, "answer": "69.50", "correct": true, "launch_ms": 408.8563679999879, "task_ms": 56.9146020000062}
+{"driver": "stdlib", "task": "search", "rep": 3, "wall_ms": 86.26635899997837, "cpu_ms": 83.56, "maxrss_kib": 21768, "answer": "Result 2: lattice", "correct": true}
+{"driver": "python-floor", "task": "chain", "rep": 3, "wall_ms": 10.13873199997306, "cpu_ms": 9.822, "maxrss_kib": 13272, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "login", "rep": 9, "wall_ms": 12.996154000006754, "cpu_ms": 12.655999999999999, "maxrss_kib": 13272, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "table", "rep": 8, "wall_ms": 62.68200400000978, "cpu_ms": 61.565, "maxrss_kib": 21800, "answer": "69.50", "correct": true}
+{"driver": "python-floor", "task": "table", "rep": 6, "wall_ms": 19.941904000006616, "cpu_ms": 15.029999999999998, "maxrss_kib": 13272, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "search", "rep": 0, "wall_ms": 65.65501099998983, "cpu_ms": 63.175999999999995, "maxrss_kib": 21896, "answer": "Result 2: lattice", "correct": true}
+{"driver": "pw-launch", "task": "prefs", "rep": 4, "wall_ms": 397.52401099997314, "cpu_ms": 477.77099999999996, "maxrss_kib": 98772, "answer": null, "correct": null, "launch_ms": 308.8229159999969, "task_ms": null}
+{"driver": "pw-import", "task": "chain", "rep": 2, "wall_ms": 89.75729499996987, "cpu_ms": 89.15899999999999, "maxrss_kib": 26840, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "prefs", "rep": 3, "wall_ms": 91.92120499994871, "cpu_ms": 90.321, "maxrss_kib": 21920, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true}
+{"driver": "python-floor", "task": "search", "rep": 1, "wall_ms": 12.071003000016844, "cpu_ms": 11.844, "maxrss_kib": 13272, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "chain", "rep": 3, "wall_ms": 414.8121300000298, "cpu_ms": 486.7, "maxrss_kib": 98796, "answer": null, "correct": null, "launch_ms": 325.2635899999632, "task_ms": null}
+{"driver": "pw-task", "task": "search", "rep": 2, "wall_ms": 601.6307930000266, "cpu_ms": 638.2099999999999, "maxrss_kib": 105312, "answer": "Result 2: lattice", "correct": true, "launch_ms": 328.86850500000264, "task_ms": 164.43803800001433}
+{"driver": "pw-import", "task": "chain", "rep": 8, "wall_ms": 90.55699800001094, "cpu_ms": 89.625, "maxrss_kib": 26796, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "login", "rep": 5, "wall_ms": 10.513099999968745, "cpu_ms": 10.155, "maxrss_kib": 13272, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "search", "rep": 7, "wall_ms": 87.07719099999167, "cpu_ms": 86.973, "maxrss_kib": 26704, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "prefs", "rep": 6, "wall_ms": 10.644014999968476, "cpu_ms": 10.459, "maxrss_kib": 13272, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "chain", "rep": 3, "wall_ms": 83.72600999996394, "cpu_ms": 83.538, "maxrss_kib": 26776, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "search", "rep": 5, "wall_ms": 10.448483999994096, "cpu_ms": 10.177999999999999, "maxrss_kib": 13272, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "table", "rep": 6, "wall_ms": 61.135423999985505, "cpu_ms": 60.168, "maxrss_kib": 21724, "answer": "69.50", "correct": true}
+{"driver": "pw-launch", "task": "login", "rep": 5, "wall_ms": 416.27854099999695, "cpu_ms": 518.818, "maxrss_kib": 97872, "answer": null, "correct": null, "launch_ms": 340.33680200002436, "task_ms": null}
+{"driver": "pw-task", "task": "chain", "rep": 4, "wall_ms": 606.5364390000241, "cpu_ms": 641.1569999999999, "maxrss_kib": 116640, "answer": "42", "correct": true, "launch_ms": 308.7993659999597, "task_ms": 180.80166100003225}
+{"driver": "stdlib", "task": "table", "rep": 0, "wall_ms": 93.87102400000913, "cpu_ms": 92.97, "maxrss_kib": 21904, "answer": "69.50", "correct": true}
+{"driver": "pw-import", "task": "chain", "rep": 5, "wall_ms": 143.98346600000878, "cpu_ms": 143.73199999999997, "maxrss_kib": 26688, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "table", "rep": 1, "wall_ms": 477.229541999975, "cpu_ms": 556.9929999999999, "maxrss_kib": 115848, "answer": "69.50", "correct": true, "launch_ms": 314.48877299999367, "task_ms": 46.58055400000194}
+{"driver": "stdlib", "task": "chain", "rep": 0, "wall_ms": 69.10931800001663, "cpu_ms": 67.1, "maxrss_kib": 21824, "answer": "42", "correct": true}
+{"driver": "python-floor", "task": "chain", "rep": 7, "wall_ms": 10.85605499997655, "cpu_ms": 10.428999999999998, "maxrss_kib": 13272, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "chain", "rep": 9, "wall_ms": 85.69742899999255, "cpu_ms": 85.51899999999999, "maxrss_kib": 26812, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "search", "rep": 2, "wall_ms": 368.44056000001046, "cpu_ms": 450.774, "maxrss_kib": 96916, "answer": null, "correct": null, "launch_ms": 286.297310000009, "task_ms": null}
+{"driver": "python-floor", "task": "prefs", "rep": 5, "wall_ms": 10.674338000001171, "cpu_ms": 10.491999999999999, "maxrss_kib": 13272, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "chain", "rep": 7, "wall_ms": 88.51463099995271, "cpu_ms": 88.36099999999999, "maxrss_kib": 26788, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "search", "rep": 6, "wall_ms": 582.926174000022, "cpu_ms": 617.5409999999999, "maxrss_kib": 115944, "answer": "Result 2: lattice", "correct": true, "launch_ms": 290.47528000000966, "task_ms": 178.47427100002733}
+{"driver": "python-floor", "task": "table", "rep": 2, "wall_ms": 10.65923499999144, "cpu_ms": 10.475999999999999, "maxrss_kib": 13272, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "search", "rep": 8, "wall_ms": 110.60798000005434, "cpu_ms": 110.46499999999999, "maxrss_kib": 26768, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "chain", "rep": 4, "wall_ms": 360.69687200000544, "cpu_ms": 436.31399999999996, "maxrss_kib": 97152, "answer": null, "correct": null, "launch_ms": 292.4461000000065, "task_ms": null}
+{"driver": "stdlib", "task": "login", "rep": 9, "wall_ms": 74.85074199996689, "cpu_ms": 73.40299999999999, "maxrss_kib": 21860, "answer": "Welcome chris", "correct": true}
+{"driver": "pw-task", "task": "login", "rep": 4, "wall_ms": 588.3532999999943, "cpu_ms": 611.8589999999999, "maxrss_kib": 117128, "answer": "Welcome chris", "correct": true, "launch_ms": 299.7291949999976, "task_ms": 166.6322849999915}
+{"driver": "python-floor", "task": "chain", "rep": 2, "wall_ms": 13.679116999981034, "cpu_ms": 13.469999999999999, "maxrss_kib": 13272, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "search", "rep": 3, "wall_ms": 85.35412899999528, "cpu_ms": 85.12899999999999, "maxrss_kib": 26796, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "login", "rep": 7, "wall_ms": 98.00658799997564, "cpu_ms": 97.526, "maxrss_kib": 26784, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "login", "rep": 2, "wall_ms": 638.2700240000077, "cpu_ms": 668.1479999999999, "maxrss_kib": 117112, "answer": "Welcome chris", "correct": true, "launch_ms": 314.2991859999711, "task_ms": 187.47674900004085}
+{"driver": "stdlib", "task": "login", "rep": 5, "wall_ms": 75.74179799996728, "cpu_ms": 74.00699999999999, "maxrss_kib": 21864, "answer": "Welcome chris", "correct": true}
+{"driver": "python-floor", "task": "prefs", "rep": 7, "wall_ms": 21.765863000041463, "cpu_ms": 21.532999999999998, "maxrss_kib": 13272, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "search", "rep": 6, "wall_ms": 12.094265000030191, "cpu_ms": 11.889999999999999, "maxrss_kib": 13272, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "search", "rep": 5, "wall_ms": 75.3542820000348, "cpu_ms": 72.957, "maxrss_kib": 21824, "answer": "Result 2: lattice", "correct": true}
+{"driver": "pw-task", "task": "login", "rep": 3, "wall_ms": 653.7502529999983, "cpu_ms": 679.29, "maxrss_kib": 116956, "answer": "Welcome chris", "correct": true, "launch_ms": 362.88944599999695, "task_ms": 158.20088200001692}
+{"driver": "pw-import", "task": "login", "rep": 3, "wall_ms": 114.20156900004486, "cpu_ms": 113.81099999999999, "maxrss_kib": 26816, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "login", "rep": 9, "wall_ms": 585.4189610000162, "cpu_ms": 607.453, "maxrss_kib": 116788, "answer": "Welcome chris", "correct": true, "launch_ms": 325.6988100000058, "task_ms": 153.29401399998233}
+{"driver": "stdlib", "task": "login", "rep": 0, "wall_ms": 74.5816020000234, "cpu_ms": 72.39999999999999, "maxrss_kib": 21876, "answer": "Welcome chris", "correct": true}
+{"driver": "stdlib", "task": "table", "rep": 2, "wall_ms": 70.37693400002354, "cpu_ms": 69.605, "maxrss_kib": 21936, "answer": "69.50", "correct": true}
+{"driver": "stdlib", "task": "prefs", "rep": 2, "wall_ms": 64.0256309999927, "cpu_ms": 62.19799999999999, "maxrss_kib": 21680, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true}
+{"driver": "pw-launch", "task": "search", "rep": 0, "wall_ms": 356.98705900000505, "cpu_ms": 423.348, "maxrss_kib": 97764, "answer": null, "correct": null, "launch_ms": 282.56181300002936, "task_ms": null}
+{"driver": "stdlib", "task": "prefs", "rep": 9, "wall_ms": 63.26170400001274, "cpu_ms": 61.858, "maxrss_kib": 21832, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true}
+{"driver": "python-floor", "task": "table", "rep": 4, "wall_ms": 15.490959999965526, "cpu_ms": 15.307999999999998, "maxrss_kib": 13272, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "table", "rep": 8, "wall_ms": 93.32136800003354, "cpu_ms": 93.11299999999999, "maxrss_kib": 26744, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "prefs", "rep": 2, "wall_ms": 93.54113000000552, "cpu_ms": 93.257, "maxrss_kib": 26888, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "search", "rep": 9, "wall_ms": 10.784840000042095, "cpu_ms": 10.539, "maxrss_kib": 13400, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "chain", "rep": 1, "wall_ms": 64.4242459999873, "cpu_ms": 62.175999999999995, "maxrss_kib": 21864, "answer": "42", "correct": true}
+{"driver": "stdlib", "task": "prefs", "rep": 4, "wall_ms": 80.15505100001974, "cpu_ms": 78.398, "maxrss_kib": 21800, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true}
+{"driver": "stdlib", "task": "login", "rep": 8, "wall_ms": 89.96934900000042, "cpu_ms": 88.55399999999999, "maxrss_kib": 21808, "answer": "Welcome chris", "correct": true}
+{"driver": "pw-task", "task": "search", "rep": 1, "wall_ms": 556.0743180000145, "cpu_ms": 586.785, "maxrss_kib": 117596, "answer": "Result 2: lattice", "correct": true, "launch_ms": 285.8069949999731, "task_ms": 164.41794299998946}
+{"driver": "pw-launch", "task": "login", "rep": 9, "wall_ms": 410.0177099999769, "cpu_ms": 494.834, "maxrss_kib": 99624, "answer": null, "correct": null, "launch_ms": 312.27573799998254, "task_ms": null}
+{"driver": "pw-task", "task": "table", "rep": 2, "wall_ms": 436.48670199996786, "cpu_ms": 524.085, "maxrss_kib": 115212, "answer": "69.50", "correct": true, "launch_ms": 285.3612329999464, "task_ms": 46.645389000048}
+{"driver": "python-floor", "task": "login", "rep": 2, "wall_ms": 10.67720499997904, "cpu_ms": 10.440999999999999, "maxrss_kib": 13400, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "table", "rep": 0, "wall_ms": 87.94140400004835, "cpu_ms": 87.714, "maxrss_kib": 26820, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "prefs", "rep": 4, "wall_ms": 10.363714999982676, "cpu_ms": 10.167, "maxrss_kib": 13400, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "chain", "rep": 7, "wall_ms": 562.7209829999629, "cpu_ms": 588.05, "maxrss_kib": 117004, "answer": "42", "correct": true, "launch_ms": 272.60730699998703, "task_ms": 187.56879800002935}
+{"driver": "pw-launch", "task": "search", "rep": 5, "wall_ms": 373.8961070000073, "cpu_ms": 452.081, "maxrss_kib": 98148, "answer": null, "correct": null, "launch_ms": 288.652409000008, "task_ms": null}
+{"driver": "stdlib", "task": "table", "rep": 3, "wall_ms": 63.139847999991616, "cpu_ms": 62.162, "maxrss_kib": 21860, "answer": "69.50", "correct": true}
+{"driver": "python-floor", "task": "search", "rep": 8, "wall_ms": 11.020759000018643, "cpu_ms": 10.884, "maxrss_kib": 13400, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "prefs", "rep": 7, "wall_ms": 63.07236100002456, "cpu_ms": 61.943, "maxrss_kib": 21864, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true}
+{"driver": "stdlib", "task": "prefs", "rep": 6, "wall_ms": 66.74852700001566, "cpu_ms": 65.6, "maxrss_kib": 21876, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true}
+{"driver": "pw-launch", "task": "login", "rep": 4, "wall_ms": 387.3224430000164, "cpu_ms": 475.56899999999996, "maxrss_kib": 97364, "answer": null, "correct": null, "launch_ms": 302.55420800000365, "task_ms": null}
+{"driver": "pw-launch", "task": "prefs", "rep": 8, "wall_ms": 350.8880100000056, "cpu_ms": 423.501, "maxrss_kib": 97232, "answer": null, "correct": null, "launch_ms": 274.6950659999925, "task_ms": null}
+{"driver": "python-floor", "task": "table", "rep": 5, "wall_ms": 10.480808000011166, "cpu_ms": 10.251, "maxrss_kib": 13400, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "table", "rep": 5, "wall_ms": 356.2039380000215, "cpu_ms": 427.444, "maxrss_kib": 86056, "answer": null, "correct": null, "launch_ms": 273.9254080000251, "task_ms": null}
+{"driver": "pw-launch", "task": "table", "rep": 4, "wall_ms": 369.1961479999577, "cpu_ms": 428.78099999999995, "maxrss_kib": 99520, "answer": null, "correct": null, "launch_ms": 283.29053699997075, "task_ms": null}
+{"driver": "pw-launch", "task": "search", "rep": 8, "wall_ms": 379.61141399995313, "cpu_ms": 458.915, "maxrss_kib": 99148, "answer": null, "correct": null, "launch_ms": 304.8952320000353, "task_ms": null}
+{"driver": "pw-task", "task": "chain", "rep": 2, "wall_ms": 583.8913840000259, "cpu_ms": 617.401, "maxrss_kib": 116432, "answer": "42", "correct": true, "launch_ms": 308.39603200001875, "task_ms": 182.83019000000422}
+{"driver": "python-floor", "task": "login", "rep": 1, "wall_ms": 10.814596999978221, "cpu_ms": 10.599, "maxrss_kib": 13400, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "prefs", "rep": 7, "wall_ms": 610.167080999986, "cpu_ms": 611.6709999999999, "maxrss_kib": 117448, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true, "launch_ms": 295.7501930000035, "task_ms": 212.05081300001893}
+{"driver": "stdlib", "task": "login", "rep": 4, "wall_ms": 66.92089200004148, "cpu_ms": 64.553, "maxrss_kib": 21780, "answer": "Welcome chris", "correct": true}
+{"driver": "pw-task", "task": "table", "rep": 7, "wall_ms": 579.0180899999768, "cpu_ms": 694.299, "maxrss_kib": 116044, "answer": "69.50", "correct": true, "launch_ms": 396.97384900000543, "task_ms": 48.36089200000515}
+{"driver": "pw-task", "task": "search", "rep": 9, "wall_ms": 618.4729739999852, "cpu_ms": 638.641, "maxrss_kib": 116952, "answer": "Result 2: lattice", "correct": true, "launch_ms": 324.8008969999887, "task_ms": 177.01579900000297}
+{"driver": "python-floor", "task": "prefs", "rep": 0, "wall_ms": 11.048110000047018, "cpu_ms": 10.875, "maxrss_kib": 13400, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "table", "rep": 1, "wall_ms": 404.3061320000447, "cpu_ms": 485.114, "maxrss_kib": 97316, "answer": null, "correct": null, "launch_ms": 301.1848319999899, "task_ms": null}
+{"driver": "pw-task", "task": "search", "rep": 4, "wall_ms": 674.0744540000492, "cpu_ms": 729.8739999999999, "maxrss_kib": 117376, "answer": "Result 2: lattice", "correct": true, "launch_ms": 340.9649900000318, "task_ms": 177.69484300004024}
+{"driver": "pw-import", "task": "prefs", "rep": 8, "wall_ms": 102.756740000018, "cpu_ms": 102.47, "maxrss_kib": 26832, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "search", "rep": 4, "wall_ms": 117.19658899994556, "cpu_ms": 114.61699999999999, "maxrss_kib": 21740, "answer": "Result 2: lattice", "correct": true}
+{"driver": "pw-import", "task": "table", "rep": 4, "wall_ms": 121.27460499999643, "cpu_ms": 121.03299999999999, "maxrss_kib": 26744, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "table", "rep": 3, "wall_ms": 11.472684000011668, "cpu_ms": 11.252999999999998, "maxrss_kib": 13400, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "login", "rep": 7, "wall_ms": 410.25122100001, "cpu_ms": 503.64799999999997, "maxrss_kib": 97260, "answer": null, "correct": null, "launch_ms": 315.33005099998945, "task_ms": null}
+{"driver": "pw-task", "task": "search", "rep": 0, "wall_ms": 576.318103999995, "cpu_ms": 608.422, "maxrss_kib": 116684, "answer": "Result 2: lattice", "correct": true, "launch_ms": 301.7692490000172, "task_ms": 163.39455199999975}
+{"driver": "pw-launch", "task": "prefs", "rep": 7, "wall_ms": 461.12516400000914, "cpu_ms": 554.602, "maxrss_kib": 98528, "answer": null, "correct": null, "launch_ms": 357.8449560000081, "task_ms": null}
+{"driver": "stdlib", "task": "chain", "rep": 6, "wall_ms": 73.29285999998092, "cpu_ms": 71.45400000000001, "maxrss_kib": 21716, "answer": "42", "correct": true}
+{"driver": "pw-task", "task": "prefs", "rep": 4, "wall_ms": 740.3721670000323, "cpu_ms": 751.2090000000001, "maxrss_kib": 116424, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true, "launch_ms": 376.38544300000376, "task_ms": 231.73690500004795}
+{"driver": "pw-import", "task": "table", "rep": 2, "wall_ms": 89.33087299999443, "cpu_ms": 89.106, "maxrss_kib": 26844, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "chain", "rep": 1, "wall_ms": 657.6981499999874, "cpu_ms": 719.949, "maxrss_kib": 117036, "answer": "42", "correct": true, "launch_ms": 338.3250750000002, "task_ms": 194.2582539999762}
+{"driver": "stdlib", "task": "search", "rep": 8, "wall_ms": 66.23695400003271, "cpu_ms": 64.494, "maxrss_kib": 21768, "answer": "Result 2: lattice", "correct": true}
+{"driver": "python-floor", "task": "table", "rep": 1, "wall_ms": 10.717558000010285, "cpu_ms": 10.515, "maxrss_kib": 13400, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "chain", "rep": 4, "wall_ms": 66.4874440000176, "cpu_ms": 64.16999999999999, "maxrss_kib": 21864, "answer": "42", "correct": true}
+{"driver": "python-floor", "task": "prefs", "rep": 1, "wall_ms": 18.472051000003376, "cpu_ms": 18.255, "maxrss_kib": 13400, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "prefs", "rep": 0, "wall_ms": 67.10603199996967, "cpu_ms": 65.705, "maxrss_kib": 21920, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true}
+{"driver": "stdlib", "task": "login", "rep": 7, "wall_ms": 76.77940700000363, "cpu_ms": 75.154, "maxrss_kib": 21764, "answer": "Welcome chris", "correct": true}
+{"driver": "pw-launch", "task": "chain", "rep": 0, "wall_ms": 415.955007999969, "cpu_ms": 513.612, "maxrss_kib": 97172, "answer": null, "correct": null, "launch_ms": 316.73735000003944, "task_ms": null}
+{"driver": "pw-task", "task": "prefs", "rep": 5, "wall_ms": 641.264289999981, "cpu_ms": 636.9579999999999, "maxrss_kib": 115716, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true, "launch_ms": 328.1417319999491, "task_ms": 203.3922819999816}
+{"driver": "pw-launch", "task": "chain", "rep": 2, "wall_ms": 397.4004830000126, "cpu_ms": 483.59599999999995, "maxrss_kib": 96776, "answer": null, "correct": null, "launch_ms": 308.3734890000187, "task_ms": null}
+{"driver": "python-floor", "task": "prefs", "rep": 3, "wall_ms": 15.465005999999448, "cpu_ms": 15.261999999999997, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "chain", "rep": 9, "wall_ms": 11.437427000032585, "cpu_ms": 11.265999999999998, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "table", "rep": 8, "wall_ms": 14.49024499999041, "cpu_ms": 14.292, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "table", "rep": 4, "wall_ms": 72.95537400000285, "cpu_ms": 72.006, "maxrss_kib": 21864, "answer": "69.50", "correct": true}
+{"driver": "python-floor", "task": "table", "rep": 9, "wall_ms": 13.610206000009839, "cpu_ms": 13.318, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "login", "rep": 1, "wall_ms": 108.26170699999693, "cpu_ms": 107.92399999999999, "maxrss_kib": 26780, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "chain", "rep": 9, "wall_ms": 701.0755119999885, "cpu_ms": 715.711, "maxrss_kib": 117192, "answer": "42", "correct": true, "launch_ms": 336.34817099999736, "task_ms": 233.9476770000033}
+{"driver": "pw-launch", "task": "table", "rep": 0, "wall_ms": 431.31533899997976, "cpu_ms": 488.91799999999995, "maxrss_kib": 99328, "answer": null, "correct": null, "launch_ms": 352.5655639999741, "task_ms": null}
+{"driver": "pw-import", "task": "prefs", "rep": 7, "wall_ms": 89.19974099995898, "cpu_ms": 88.51100000000001, "maxrss_kib": 26800, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "table", "rep": 3, "wall_ms": 102.20312399997056, "cpu_ms": 101.836, "maxrss_kib": 26772, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "login", "rep": 6, "wall_ms": 85.97979899997199, "cpu_ms": 84.45199999999998, "maxrss_kib": 21920, "answer": "Welcome chris", "correct": true}
+{"driver": "pw-task", "task": "prefs", "rep": 2, "wall_ms": 659.7577489999935, "cpu_ms": 652.995, "maxrss_kib": 116380, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true, "launch_ms": 333.9498550000144, "task_ms": 202.07278199995926}
+{"driver": "pw-import", "task": "chain", "rep": 1, "wall_ms": 123.98249000000305, "cpu_ms": 123.699, "maxrss_kib": 26824, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "chain", "rep": 0, "wall_ms": 10.66298499995355, "cpu_ms": 10.509, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "login", "rep": 9, "wall_ms": 106.62927399999944, "cpu_ms": 106.436, "maxrss_kib": 26780, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "prefs", "rep": 9, "wall_ms": 11.520330999985617, "cpu_ms": 11.368, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "login", "rep": 2, "wall_ms": 95.8948709999845, "cpu_ms": 95.746, "maxrss_kib": 26828, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "search", "rep": 8, "wall_ms": 633.5137510000095, "cpu_ms": 565.495, "maxrss_kib": 117576, "answer": "Result 2: lattice", "correct": true, "launch_ms": 313.8561330000016, "task_ms": 166.97807799999964}
+{"driver": "pw-task", "task": "table", "rep": 9, "wall_ms": 460.0041029999602, "cpu_ms": 517.2159999999999, "maxrss_kib": 116220, "answer": "69.50", "correct": true, "launch_ms": 291.67690100001664, "task_ms": 46.94124499997088}
+{"driver": "pw-task", "task": "prefs", "rep": 8, "wall_ms": 616.504731999953, "cpu_ms": 639.605, "maxrss_kib": 116220, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true, "launch_ms": 314.84973900001023, "task_ms": 183.95845899999586}
+{"driver": "pw-import", "task": "table", "rep": 5, "wall_ms": 89.37142299998868, "cpu_ms": 89.173, "maxrss_kib": 26820, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "prefs", "rep": 3, "wall_ms": 397.73867700000665, "cpu_ms": 481.669, "maxrss_kib": 97268, "answer": null, "correct": null, "launch_ms": 301.19953100000885, "task_ms": null}
+{"driver": "pw-import", "task": "chain", "rep": 6, "wall_ms": 103.5061939999764, "cpu_ms": 102.54199999999999, "maxrss_kib": 26788, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "chain", "rep": 6, "wall_ms": 412.52508299999135, "cpu_ms": 504.28399999999993, "maxrss_kib": 98256, "answer": null, "correct": null, "launch_ms": 319.37925300002235, "task_ms": null}
+{"driver": "pw-task", "task": "prefs", "rep": 0, "wall_ms": 645.5068559999972, "cpu_ms": 646.922, "maxrss_kib": 116828, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true, "launch_ms": 315.58711600001743, "task_ms": 217.66083300002492}
+{"driver": "pw-launch", "task": "prefs", "rep": 5, "wall_ms": 403.4682100000282, "cpu_ms": 497.488, "maxrss_kib": 97688, "answer": null, "correct": null, "launch_ms": 305.2030980000495, "task_ms": null}
+{"driver": "python-floor", "task": "search", "rep": 7, "wall_ms": 14.073253999981716, "cpu_ms": 13.841999999999999, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "table", "rep": 7, "wall_ms": 11.418069000001196, "cpu_ms": 11.225, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "table", "rep": 9, "wall_ms": 89.8401089999652, "cpu_ms": 88.962, "maxrss_kib": 21844, "answer": "69.50", "correct": true}
+{"driver": "pw-task", "task": "table", "rep": 0, "wall_ms": 477.5056450000079, "cpu_ms": 556.045, "maxrss_kib": 115812, "answer": "69.50", "correct": true, "launch_ms": 311.02804099998593, "task_ms": 47.344619999989845}
+{"driver": "pw-import", "task": "login", "rep": 8, "wall_ms": 113.38918300003797, "cpu_ms": 113.10499999999999, "maxrss_kib": 26760, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "search", "rep": 6, "wall_ms": 89.8757200000091, "cpu_ms": 89.67, "maxrss_kib": 26696, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "login", "rep": 0, "wall_ms": 89.52149300000656, "cpu_ms": 89.30399999999999, "maxrss_kib": 26700, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "search", "rep": 1, "wall_ms": 402.5213510000185, "cpu_ms": 491.486, "maxrss_kib": 97872, "answer": null, "correct": null, "launch_ms": 315.7005639999966, "task_ms": null}
+{"driver": "pw-launch", "task": "login", "rep": 1, "wall_ms": 467.4619179999695, "cpu_ms": 548.485, "maxrss_kib": 97200, "answer": null, "correct": null, "launch_ms": 366.2314409999681, "task_ms": null}
+{"driver": "python-floor", "task": "login", "rep": 6, "wall_ms": 12.087930000006963, "cpu_ms": 11.898, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "search", "rep": 7, "wall_ms": 417.9171079999833, "cpu_ms": 506.54699999999997, "maxrss_kib": 97232, "answer": null, "correct": null, "launch_ms": 326.39347100001714, "task_ms": null}
+{"driver": "pw-task", "task": "table", "rep": 5, "wall_ms": 513.4052889999907, "cpu_ms": 601.8499999999999, "maxrss_kib": 115020, "answer": "69.50", "correct": true, "launch_ms": 346.1926470000094, "task_ms": 47.12915999999723}
+{"driver": "stdlib", "task": "prefs", "rep": 8, "wall_ms": 90.9878209999988, "cpu_ms": 89.666, "maxrss_kib": 21780, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true}
+{"driver": "stdlib", "task": "chain", "rep": 8, "wall_ms": 96.4055630000189, "cpu_ms": 94.14599999999999, "maxrss_kib": 21712, "answer": "42", "correct": true}
+{"driver": "pw-import", "task": "table", "rep": 9, "wall_ms": 90.69527799999832, "cpu_ms": 90.365, "maxrss_kib": 26784, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "search", "rep": 6, "wall_ms": 404.1309429999842, "cpu_ms": 507.583, "maxrss_kib": 99060, "answer": null, "correct": null, "launch_ms": 324.46042800000896, "task_ms": null}
+{"driver": "pw-import", "task": "search", "rep": 0, "wall_ms": 109.43156199999748, "cpu_ms": 109.121, "maxrss_kib": 26812, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "search", "rep": 2, "wall_ms": 11.453702999972393, "cpu_ms": 11.207, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "table", "rep": 1, "wall_ms": 103.61759699998174, "cpu_ms": 103.365, "maxrss_kib": 26836, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "login", "rep": 3, "wall_ms": 15.626158999964446, "cpu_ms": 15.361999999999998, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "login", "rep": 4, "wall_ms": 12.807407999957832, "cpu_ms": 12.579, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "search", "rep": 1, "wall_ms": 80.16984599998978, "cpu_ms": 77.564, "maxrss_kib": 21788, "answer": "Result 2: lattice", "correct": true}
+{"driver": "pw-task", "task": "login", "rep": 8, "wall_ms": 632.1116309999866, "cpu_ms": 672.0939999999999, "maxrss_kib": 115844, "answer": "Welcome chris", "correct": true, "launch_ms": 350.950671000021, "task_ms": 156.6086720000044}
+{"driver": "pw-launch", "task": "login", "rep": 3, "wall_ms": 468.75350499999513, "cpu_ms": 467.98199999999997, "maxrss_kib": 98624, "answer": null, "correct": null, "launch_ms": 351.69210599997314, "task_ms": null}
+{"driver": "python-floor", "task": "chain", "rep": 4, "wall_ms": 15.619156000013845, "cpu_ms": 15.386, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "login", "rep": 0, "wall_ms": 634.4395890000101, "cpu_ms": 660.288, "maxrss_kib": 116876, "answer": "Welcome chris", "correct": true, "launch_ms": 326.99359700001196, "task_ms": 163.4769560000109}
+{"driver": "stdlib", "task": "chain", "rep": 3, "wall_ms": 68.91763800001627, "cpu_ms": 66.502, "maxrss_kib": 21776, "answer": "42", "correct": true}
+{"driver": "pw-import", "task": "prefs", "rep": 5, "wall_ms": 125.63045699999975, "cpu_ms": 125.36, "maxrss_kib": 26772, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "table", "rep": 8, "wall_ms": 406.49710600001754, "cpu_ms": 495.816, "maxrss_kib": 99516, "answer": null, "correct": null, "launch_ms": 320.5544479999958, "task_ms": null}
+{"driver": "stdlib", "task": "login", "rep": 1, "wall_ms": 74.9229179999702, "cpu_ms": 72.599, "maxrss_kib": 21888, "answer": "Welcome chris", "correct": true}
+{"driver": "pw-launch", "task": "login", "rep": 6, "wall_ms": 409.9064570000337, "cpu_ms": 501.2829999999999, "maxrss_kib": 97060, "answer": null, "correct": null, "launch_ms": 306.22541600001796, "task_ms": null}
+{"driver": "pw-task", "task": "prefs", "rep": 1, "wall_ms": 630.3920699999708, "cpu_ms": 645.3919999999999, "maxrss_kib": 116480, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true, "launch_ms": 328.38511599999265, "task_ms": 192.0520719999672}
+{"driver": "stdlib", "task": "chain", "rep": 7, "wall_ms": 67.30326499996409, "cpu_ms": 64.416, "maxrss_kib": 21760, "answer": "42", "correct": true}
+{"driver": "pw-import", "task": "chain", "rep": 4, "wall_ms": 87.70153400001846, "cpu_ms": 87.45899999999999, "maxrss_kib": 26776, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "search", "rep": 5, "wall_ms": 89.72419100001616, "cpu_ms": 88.68799999999999, "maxrss_kib": 26768, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "login", "rep": 7, "wall_ms": 554.3437009999934, "cpu_ms": 591.069, "maxrss_kib": 117408, "answer": "Welcome chris", "correct": true, "launch_ms": 294.7716940000191, "task_ms": 148.51654699998562}
+{"driver": "stdlib", "task": "login", "rep": 3, "wall_ms": 64.65360999999348, "cpu_ms": 63.10199999999999, "maxrss_kib": 21680, "answer": "Welcome chris", "correct": true}
+{"driver": "pw-launch", "task": "login", "rep": 8, "wall_ms": 421.64851200004705, "cpu_ms": 501.807, "maxrss_kib": 99556, "answer": null, "correct": null, "launch_ms": 333.53248699995675, "task_ms": null}
+{"driver": "pw-launch", "task": "prefs", "rep": 9, "wall_ms": 412.8400170000077, "cpu_ms": 498.78599999999994, "maxrss_kib": 97140, "answer": null, "correct": null, "launch_ms": 328.30038300005526, "task_ms": null}
+{"driver": "pw-import", "task": "chain", "rep": 0, "wall_ms": 90.80177100003084, "cpu_ms": 90.545, "maxrss_kib": 26820, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "search", "rep": 7, "wall_ms": 615.683305999994, "cpu_ms": 652.704, "maxrss_kib": 117200, "answer": "Result 2: lattice", "correct": true, "launch_ms": 302.1324260000142, "task_ms": 183.04766199997857}
+{"driver": "pw-task", "task": "table", "rep": 3, "wall_ms": 571.9360289999713, "cpu_ms": 692.059, "maxrss_kib": 114940, "answer": "69.50", "correct": true, "launch_ms": 416.41634600000543, "task_ms": 43.87000200000557}
+{"driver": "pw-launch", "task": "chain", "rep": 5, "wall_ms": 447.55510799996046, "cpu_ms": 520.2280000000001, "maxrss_kib": 98180, "answer": null, "correct": null, "launch_ms": 350.08385800000497, "task_ms": null}
+{"driver": "pw-import", "task": "search", "rep": 9, "wall_ms": 100.68982999996479, "cpu_ms": 100.352, "maxrss_kib": 26892, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "login", "rep": 1, "wall_ms": 646.2995470000124, "cpu_ms": 694.5279999999999, "maxrss_kib": 116180, "answer": "Welcome chris", "correct": true, "launch_ms": 348.3539210000117, "task_ms": 164.61117500000455}
+{"driver": "pw-import", "task": "table", "rep": 7, "wall_ms": 127.45330899997498, "cpu_ms": 127.214, "maxrss_kib": 26744, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "search", "rep": 3, "wall_ms": 15.962283999954252, "cpu_ms": 15.729, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "login", "rep": 0, "wall_ms": 12.240259000009246, "cpu_ms": 12.050999999999998, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "table", "rep": 8, "wall_ms": 478.6826759999485, "cpu_ms": 570.782, "maxrss_kib": 116212, "answer": "69.50", "correct": true, "launch_ms": 307.7586040000142, "task_ms": 47.109542999976384}
+{"driver": "pw-launch", "task": "table", "rep": 2, "wall_ms": 434.1086459999701, "cpu_ms": 524.975, "maxrss_kib": 97572, "answer": null, "correct": null, "launch_ms": 331.29648000004863, "task_ms": null}
+{"driver": "pw-launch", "task": "prefs", "rep": 0, "wall_ms": 384.367794999946, "cpu_ms": 478.7149999999999, "maxrss_kib": 98424, "answer": null, "correct": null, "launch_ms": 295.4971650000289, "task_ms": null}
+{"driver": "pw-task", "task": "chain", "rep": 3, "wall_ms": 627.6695399999994, "cpu_ms": 678.453, "maxrss_kib": 117332, "answer": "42", "correct": true, "launch_ms": 311.50105099999337, "task_ms": 189.88866500001222}
+{"driver": "stdlib", "task": "search", "rep": 9, "wall_ms": 65.42326999999659, "cpu_ms": 63.485, "maxrss_kib": 21868, "answer": "Result 2: lattice", "correct": true}
+{"driver": "pw-launch", "task": "table", "rep": 7, "wall_ms": 384.30929200001174, "cpu_ms": 479.863, "maxrss_kib": 99108, "answer": null, "correct": null, "launch_ms": 296.62537400002975, "task_ms": null}
+{"driver": "pw-import", "task": "prefs", "rep": 3, "wall_ms": 89.68203200004154, "cpu_ms": 89.43599999999999, "maxrss_kib": 26700, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "prefs", "rep": 4, "wall_ms": 117.41230799998448, "cpu_ms": 117.115, "maxrss_kib": 26808, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "search", "rep": 2, "wall_ms": 68.75696600002357, "cpu_ms": 66.47699999999999, "maxrss_kib": 21748, "answer": "Result 2: lattice", "correct": true}
+{"driver": "pw-task", "task": "prefs", "rep": 6, "wall_ms": 687.9112120000173, "cpu_ms": 704.2919999999999, "maxrss_kib": 116812, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true, "launch_ms": 338.63193899998123, "task_ms": 227.85403500000712}
+{"driver": "pw-launch", "task": "prefs", "rep": 6, "wall_ms": 415.82627700000785, "cpu_ms": 509.15199999999993, "maxrss_kib": 99512, "answer": null, "correct": null, "launch_ms": 320.734396999967, "task_ms": null}
+{"driver": "stdlib", "task": "table", "rep": 1, "wall_ms": 65.61995900000284, "cpu_ms": 64.342, "maxrss_kib": 21800, "answer": "69.50", "correct": true}
+{"driver": "stdlib", "task": "login", "rep": 2, "wall_ms": 66.97149500001842, "cpu_ms": 64.464, "maxrss_kib": 21804, "answer": "Welcome chris", "correct": true}
+{"driver": "pw-import", "task": "search", "rep": 1, "wall_ms": 97.84389399999327, "cpu_ms": 97.35199999999999, "maxrss_kib": 26820, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "prefs", "rep": 1, "wall_ms": 94.5076080000149, "cpu_ms": 92.226, "maxrss_kib": 26800, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "table", "rep": 7, "wall_ms": 66.21017099996607, "cpu_ms": 64.07000000000001, "maxrss_kib": 21828, "answer": "69.50", "correct": true}
+{"driver": "pw-task", "task": "search", "rep": 3, "wall_ms": 660.3088420000063, "cpu_ms": 734.712, "maxrss_kib": 117260, "answer": "Result 2: lattice", "correct": true, "launch_ms": 325.6820930000117, "task_ms": 189.87339400001702}
+{"driver": "stdlib", "task": "prefs", "rep": 5, "wall_ms": 108.45933900003502, "cpu_ms": 106.548, "maxrss_kib": 21716, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true}
+{"driver": "python-floor", "task": "prefs", "rep": 2, "wall_ms": 17.25038099999665, "cpu_ms": 16.965, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "chain", "rep": 1, "wall_ms": 520.0355129999821, "cpu_ms": 632.9979999999999, "maxrss_kib": 99476, "answer": null, "correct": null, "launch_ms": 432.64092999999093, "task_ms": null}
+{"driver": "python-floor", "task": "chain", "rep": 8, "wall_ms": 12.243984000008368, "cpu_ms": 12.031, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "chain", "rep": 2, "wall_ms": 65.9792630000311, "cpu_ms": 63.762, "maxrss_kib": 21696, "answer": "42", "correct": true}
+{"driver": "python-floor", "task": "table", "rep": 0, "wall_ms": 14.795724999999038, "cpu_ms": 14.589999999999998, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "search", "rep": 4, "wall_ms": 436.4058809999847, "cpu_ms": 526.965, "maxrss_kib": 97272, "answer": null, "correct": null, "launch_ms": 330.7873200000131, "task_ms": null}
+{"driver": "pw-launch", "task": "table", "rep": 9, "wall_ms": 478.6515519999739, "cpu_ms": 547.271, "maxrss_kib": 96620, "answer": null, "correct": null, "launch_ms": 353.87444299999515, "task_ms": null}
+{"driver": "pw-launch", "task": "login", "rep": 0, "wall_ms": 466.6312170000424, "cpu_ms": 580.086, "maxrss_kib": 99272, "answer": null, "correct": null, "launch_ms": 375.1541049999787, "task_ms": null}
+{"driver": "pw-import", "task": "search", "rep": 2, "wall_ms": 116.56440499996279, "cpu_ms": 114.997, "maxrss_kib": 26804, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "chain", "rep": 8, "wall_ms": 427.1580249999829, "cpu_ms": 518.691, "maxrss_kib": 99132, "answer": null, "correct": null, "launch_ms": 324.8636099999658, "task_ms": null}
+{"driver": "stdlib", "task": "table", "rep": 5, "wall_ms": 77.64704900000652, "cpu_ms": 76.499, "maxrss_kib": 21876, "answer": "69.50", "correct": true}
+{"driver": "stdlib", "task": "chain", "rep": 9, "wall_ms": 79.94127199998502, "cpu_ms": 76.928, "maxrss_kib": 21884, "answer": "42", "correct": true}
+{"driver": "python-floor", "task": "chain", "rep": 6, "wall_ms": 11.104333999981009, "cpu_ms": 10.794999999999998, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "search", "rep": 6, "wall_ms": 77.79573599998457, "cpu_ms": 75.61499999999998, "maxrss_kib": 21776, "answer": "Result 2: lattice", "correct": true}
+{"driver": "pw-import", "task": "prefs", "rep": 0, "wall_ms": 121.3083300000335, "cpu_ms": 119.386, "maxrss_kib": 26788, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "search", "rep": 0, "wall_ms": 13.274871000021449, "cpu_ms": 12.938999999999998, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "prefs", "rep": 9, "wall_ms": 119.16504500004521, "cpu_ms": 118.75999999999999, "maxrss_kib": 26696, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "chain", "rep": 7, "wall_ms": 445.4914290000147, "cpu_ms": 563.789, "maxrss_kib": 98856, "answer": null, "correct": null, "launch_ms": 355.7130190000066, "task_ms": null}
+{"driver": "pw-launch", "task": "table", "rep": 6, "wall_ms": 473.52379999995264, "cpu_ms": 570.874, "maxrss_kib": 98832, "answer": null, "correct": null, "launch_ms": 387.2063460000277, "task_ms": null}
+{"driver": "pw-task", "task": "login", "rep": 5, "wall_ms": 611.3773039999728, "cpu_ms": 647.6919999999999, "maxrss_kib": 116716, "answer": "Welcome chris", "correct": true, "launch_ms": 322.5849799999878, "task_ms": 153.37068899998485}
+{"driver": "pw-launch", "task": "login", "rep": 2, "wall_ms": 452.120788000002, "cpu_ms": 527.562, "maxrss_kib": 98232, "answer": null, "correct": null, "launch_ms": 358.47835700002406, "task_ms": null}
+{"driver": "pw-import", "task": "search", "rep": 4, "wall_ms": 90.13248200000135, "cpu_ms": 89.859, "maxrss_kib": 26796, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "login", "rep": 4, "wall_ms": 110.5520419999948, "cpu_ms": 110.178, "maxrss_kib": 26772, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "chain", "rep": 5, "wall_ms": 66.06891500001666, "cpu_ms": 63.690999999999995, "maxrss_kib": 21784, "answer": "42", "correct": true}
+{"driver": "python-floor", "task": "prefs", "rep": 8, "wall_ms": 10.859197000002041, "cpu_ms": 10.594, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "table", "rep": 3, "wall_ms": 438.2712880000099, "cpu_ms": 550.728, "maxrss_kib": 96748, "answer": null, "correct": null, "launch_ms": 343.7833230000251, "task_ms": null}
+{"driver": "pw-launch", "task": "search", "rep": 9, "wall_ms": 383.0875909999918, "cpu_ms": 464.94399999999996, "maxrss_kib": 97768, "answer": null, "correct": null, "launch_ms": 296.9619479999892, "task_ms": null}
+{"driver": "python-floor", "task": "login", "rep": 8, "wall_ms": 11.245250999991185, "cpu_ms": 10.948999999999998, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "chain", "rep": 6, "wall_ms": 669.4924729999912, "cpu_ms": 684.0079999999999, "maxrss_kib": 116736, "answer": "42", "correct": true, "launch_ms": 334.46776200003114, "task_ms": 185.66806899997346}
+{"driver": "pw-launch", "task": "search", "rep": 3, "wall_ms": 422.90856699997903, "cpu_ms": 521.183, "maxrss_kib": 98064, "answer": null, "correct": null, "launch_ms": 336.98522700001377, "task_ms": null}
+{"driver": "pw-task", "task": "chain", "rep": 8, "wall_ms": 626.9312240000318, "cpu_ms": 691.89, "maxrss_kib": 117300, "answer": "42", "correct": true, "launch_ms": 298.34154799999624, "task_ms": 199.42854399999987}
+{"driver": "pw-task", "task": "prefs", "rep": 3, "wall_ms": 667.562117999978, "cpu_ms": 678.465, "maxrss_kib": 104892, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true, "launch_ms": 350.8187200000066, "task_ms": 194.48330599999508}
+{"driver": "pw-task", "task": "search", "rep": 5, "wall_ms": 602.5316189999899, "cpu_ms": 649.55, "maxrss_kib": 117308, "answer": "Result 2: lattice", "correct": true, "launch_ms": 300.9267829999658, "task_ms": 183.62709000001587}
+{"driver": "python-floor", "task": "chain", "rep": 1, "wall_ms": 14.920784999958414, "cpu_ms": 14.696, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "chain", "rep": 5, "wall_ms": 685.0563619999548, "cpu_ms": 725.938, "maxrss_kib": 116716, "answer": "42", "correct": true, "launch_ms": 375.48515099996393, "task_ms": 185.03407800000105}
+{"driver": "pw-import", "task": "login", "rep": 6, "wall_ms": 96.34813600001735, "cpu_ms": 95.98399999999998, "maxrss_kib": 26804, "answer": null, "correct": null}
+{"driver": "python-floor", "task": "search", "rep": 4, "wall_ms": 10.5927370000245, "cpu_ms": 10.362, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "login", "rep": 6, "wall_ms": 681.8982760000267, "cpu_ms": 633.563, "maxrss_kib": 117060, "answer": "Welcome chris", "correct": true, "launch_ms": 336.51717800000824, "task_ms": 187.30400900000177}
+{"driver": "pw-launch", "task": "prefs", "rep": 1, "wall_ms": 338.2088950000366, "cpu_ms": 434.572, "maxrss_kib": 99292, "answer": null, "correct": null, "launch_ms": 273.94429899999295, "task_ms": null}
+{"driver": "stdlib", "task": "search", "rep": 7, "wall_ms": 65.00153400003228, "cpu_ms": 62.94, "maxrss_kib": 21792, "answer": "Result 2: lattice", "correct": true}
+{"driver": "pw-import", "task": "login", "rep": 5, "wall_ms": 103.3990410000456, "cpu_ms": 103.121, "maxrss_kib": 26844, "answer": null, "correct": null}
+{"driver": "stdlib", "task": "prefs", "rep": 1, "wall_ms": 67.73172399999794, "cpu_ms": 66.118, "maxrss_kib": 21840, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true}
+{"driver": "python-floor", "task": "login", "rep": 7, "wall_ms": 10.923160000004373, "cpu_ms": 10.77, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-import", "task": "table", "rep": 6, "wall_ms": 87.18921399997726, "cpu_ms": 86.98899999999999, "maxrss_kib": 26828, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "chain", "rep": 0, "wall_ms": 636.0946809999746, "cpu_ms": 682.619, "maxrss_kib": 117864, "answer": "42", "correct": true, "launch_ms": 331.2119590000293, "task_ms": 182.20312099998637}
+{"driver": "pw-task", "task": "table", "rep": 6, "wall_ms": 491.73566299998583, "cpu_ms": 585.4739999999999, "maxrss_kib": 115316, "answer": "69.50", "correct": true, "launch_ms": 342.7658699999938, "task_ms": 42.386160000035034}
+{"driver": "python-floor", "task": "chain", "rep": 5, "wall_ms": 11.624414000038996, "cpu_ms": 11.448, "maxrss_kib": 13528, "answer": null, "correct": null}
+{"driver": "pw-launch", "task": "chain", "rep": 9, "wall_ms": 393.5187059999521, "cpu_ms": 463.12399999999997, "maxrss_kib": 98332, "answer": null, "correct": null, "launch_ms": 292.11151999999174, "task_ms": null}
+{"driver": "pw-import", "task": "prefs", "rep": 6, "wall_ms": 91.13938799998778, "cpu_ms": 90.86599999999999, "maxrss_kib": 26792, "answer": null, "correct": null}
+{"driver": "pw-task", "task": "prefs", "rep": 9, "wall_ms": 623.99145400002, "cpu_ms": 627.035, "maxrss_kib": 117192, "answer": "color=blue;news=on;size=l;note=hello world", "correct": true, "launch_ms": 289.16381000004776, "task_ms": 219.76519399999006}
+{"driver": "pw-launch", "task": "prefs", "rep": 2, "wall_ms": 407.84547699996665, "cpu_ms": 507.56899999999996, "maxrss_kib": 98508, "answer": null, "correct": null, "launch_ms": 324.0488189999837, "task_ms": null}
+{"driver": "pw-dom-warm", "task": "login", "task_ms": [43.97265900001912, 47.84432899998592, 48.11983000001874, 38.51836799998409, 38.83058799999617, 36.07870500002264, 40.02623999997468, 36.95643500003598, 37.92133899997907, 39.365653000004386], "answer": "Welcome chris", "correct": true}
+{"driver": "pw-dom-warm", "task": "chain", "task_ms": [62.48233100001244, 79.31318500004636, 65.8429270000056, 61.5784149999854, 69.4435849999877, 72.64673000003086, 60.91806599999927, 70.10084999996025, 71.0058280000112, 65.23225800003729], "answer": "42", "correct": true}
+{"driver": "pw-dom-warm", "task": "prefs", "task_ms": [65.02312999998594, 67.5043100000039, 64.72918800000116, 52.09346599997389, 59.04799500001445, 64.05539000002136, 61.90682799996239, 60.13684700002386, 77.8689890000237, 60.695791000000554], "answer": "color=blue;news=on;size=l;note=hello world", "correct": true}
+{"driver": "pw-dom-warm", "task": "table", "task_ms": [23.77417999997533, 22.361457999977574, 27.436412999975346, 22.431825000012395, 24.69474999998056, 29.853774000002886, 33.22288499998649, 23.878104000004896, 32.87493900000982, 27.073795999967842], "answer": "69.50", "correct": true}
+{"driver": "pw-dom-warm", "task": "search", "task_ms": [65.94799999999168, 79.35771100000011, 79.6278290000032, 73.25395500004106, 78.61629400002812, 69.07844099998783, 70.82903599996371, 72.34667000000172, 69.11604099997248, 59.65274800001907], "answer": "Result 2: lattice", "correct": true}
+{"driver": "pw-dom-warm", "task": "spa", "task_ms": [47.51432000000477, 52.74724599996716, 52.66857000003711, 51.61596300001747, 45.68939199998567, 46.327957000016795, 47.3576339999795, 53.88734000001705, 50.19596699997919, 39.50145699997165], "answer": "loaded", "correct": true}
+{"driver": "pw-dom-warm", "task": "todo", "task_ms": [50.60169099999712, 42.47105900003589, 42.916107000053216, 47.75136400002111, 42.92459300000928, 48.081480999996984, 47.28332000001956, 48.466184000005796, 51.893663999976525, 46.31904699999723], "answer": "2 items", "correct": true}
+{"driver": "pw-dom-warm", "task": "counter", "task_ms": [51.61391500001855, 49.23274599997285, 50.117826000018795, 43.6903110000344, 44.781659000022955, 57.8700949999984, 55.57157300000881, 48.457464000023265, 53.92721500004427, 52.716534999945], "answer": "sent 3", "correct": true}
+{"driver": "pw-dom-warm", "task": "visible", "task_ms": [43.03656999996974, 41.72772999999097, 44.49809699997331, 42.297145000020464, 41.347990999952344, 38.92705200001956, 36.58824100000402, 35.14890399998194, 41.71881799999255, 40.25301500001888], "answer": "d", "correct": true}
+{"driver": "pw-dom-warm", "task": "nested", "task_ms": [36.065962999998646, 35.98880599997756, 33.000075000018114, 36.50034199995389, 34.927594000009776, 35.400807000030454, 31.554203000041525, 28.910549999977775, 33.22347200003151, 36.01612899996098], "answer": "live", "correct": true}
+{"driver": "pw-dom-warm", "task": "styled", "task_ms": [35.261176999995314, 37.253345999999965, 31.300088000023152, 37.55275299999994, 39.38441499997225, 36.324086999968586, 34.47547000001805, 36.86169200000222, 31.24532599997565, 34.50720000000729], "answer": "b", "correct": false}

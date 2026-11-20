@@ -1,0 +1,191 @@
+[
+ {
+  "pin": "4652833",
+  "records": 1746,
+  "levels": {
+   "symbol": {
+    "parallel": 0,
+    "scratch": 0,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 0,
+    "members_in_groups": 0,
+    "by_kind": {}
+   },
+   "content": {
+    "parallel": 265,
+    "scratch": 265,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 173,
+    "members_in_groups": 438,
+    "by_kind": {
+     "definition": 66,
+     "behavior": 199
+    }
+   },
+   "joined-name": {
+    "parallel": 311,
+    "scratch": 311,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 208,
+    "members_in_groups": 519,
+    "by_kind": {
+     "definition": 79,
+     "behavior": 232
+    }
+   },
+   "file": {
+    "parallel": 1635,
+    "scratch": 1635,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 63,
+    "members_in_groups": 1698,
+    "by_kind": {
+     "behavior": 1411,
+     "definition": 224
+    }
+   },
+   "library": {
+    "parallel": 1659,
+    "scratch": 1659,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 57,
+    "members_in_groups": 1716,
+    "by_kind": {
+     "behavior": 1411,
+     "definition": 248
+    }
+   }
+  }
+ },
+ {
+  "pin": "4b2d5f8",
+  "records": 1746,
+  "levels": {
+   "symbol": {
+    "parallel": 0,
+    "scratch": 0,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 0,
+    "members_in_groups": 0,
+    "by_kind": {}
+   },
+   "content": {
+    "parallel": 265,
+    "scratch": 265,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 173,
+    "members_in_groups": 438,
+    "by_kind": {
+     "definition": 66,
+     "behavior": 199
+    }
+   },
+   "joined-name": {
+    "parallel": 311,
+    "scratch": 311,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 208,
+    "members_in_groups": 519,
+    "by_kind": {
+     "definition": 79,
+     "behavior": 232
+    }
+   },
+   "file": {
+    "parallel": 1635,
+    "scratch": 1635,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 63,
+    "members_in_groups": 1698,
+    "by_kind": {
+     "behavior": 1411,
+     "definition": 224
+    }
+   },
+   "library": {
+    "parallel": 1659,
+    "scratch": 1659,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 57,
+    "members_in_groups": 1716,
+    "by_kind": {
+     "behavior": 1411,
+     "definition": 248
+    }
+   }
+  }
+ },
+ {
+  "pin": "f9f9de2",
+  "records": 1746,
+  "levels": {
+   "symbol": {
+    "parallel": 0,
+    "scratch": 0,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 0,
+    "members_in_groups": 0,
+    "by_kind": {}
+   },
+   "content": {
+    "parallel": 265,
+    "scratch": 265,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 173,
+    "members_in_groups": 438,
+    "by_kind": {
+     "definition": 66,
+     "behavior": 199
+    }
+   },
+   "joined-name": {
+    "parallel": 311,
+    "scratch": 311,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 208,
+    "members_in_groups": 519,
+    "by_kind": {
+     "definition": 79,
+     "behavior": 232
+    }
+   },
+   "file": {
+    "parallel": 1635,
+    "scratch": 1635,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 63,
+    "members_in_groups": 1698,
+    "by_kind": {
+     "behavior": 1411,
+     "definition": 224
+    }
+   },
+   "library": {
+    "parallel": 1659,
+    "scratch": 1659,
+    "agree": true,
+    "order_invariant": true,
+    "groups": 57,
+    "members_in_groups": 1716,
+    "by_kind": {
+     "behavior": 1411,
+     "definition": 248
+    }
+   }
+  }
+ }
+]

@@ -1,0 +1,75 @@
+[
+ {
+  "pin": "69ee40e",
+  "json_files": 0,
+  "records": 0,
+  "record_red": 0,
+  "scratch_record_red": 0,
+  "agree": true,
+  "file_red_nonempty": 0,
+  "blobs_hashed_so_far": 0,
+  "files_sharing_records": {}
+ },
+ {
+  "pin": "4652833",
+  "json_files": 16,
+  "records": 13479,
+  "record_red": 4281,
+  "scratch_record_red": 4281,
+  "agree": true,
+  "file_red_nonempty": 0,
+  "blobs_hashed_so_far": 16,
+  "files_sharing_records": {
+   "graphs/universal.json": 4281,
+   "graphs/joined.json": 4281
+  }
+ },
+ {
+  "pin": "4b2d5f8",
+  "json_files": 32,
+  "records": 14658,
+  "record_red": 4602,
+  "scratch_record_red": 4602,
+  "agree": true,
+  "file_red_nonempty": 0,
+  "blobs_hashed_so_far": 32,
+  "files_sharing_records": {
+   "graphs/universal.json": 4281,
+   "graphs/joined.json": 4281,
+   "graphs/extract/all.json": 321,
+   "graphs/extract/msgpack.json": 44,
+   "graphs/extract/jq.json": 41,
+   "graphs/extract/snappy.json": 40,
+   "graphs/extract/json.json": 33,
+   "graphs/extract/cbor.json": 32,
+   "graphs/extract/xxhash.json": 27,
+   "graphs/extract/crc32.json": 20,
+   "graphs/extract/md5.json": 17,
+   "graphs/extract/base64.json": 14
+  }
+ },
+ {
+  "pin": "f9f9de2",
+  "json_files": 32,
+  "records": 14658,
+  "record_red": 4602,
+  "scratch_record_red": 4602,
+  "agree": true,
+  "file_red_nonempty": 0,
+  "blobs_hashed_so_far": 32,
+  "files_sharing_records": {
+   "graphs/universal.json": 4281,
+   "graphs/joined.json": 4281,
+   "graphs/extract/all.json": 321,
+   "graphs/extract/msgpack.json": 44,
+   "graphs/extract/jq.json": 41,
+   "graphs/extract/snappy.json": 40,
+   "graphs/extract/json.json": 33,
+   "graphs/extract/cbor.json": 32,
+   "graphs/extract/xxhash.json": 27,
+   "graphs/extract/crc32.json": 20,
+   "graphs/extract/md5.json": 17,
+   "graphs/extract/base64.json": 14
+  }
+ }
+]
