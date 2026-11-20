@@ -1,0 +1,177 @@
+log records 3739 chain head ceec0b630a4d41dfeb12c4dba1e40cd6575fe1a87afe91a0a6370d5ceff0ddf9
+candidate terms 57 {'product': 54, 'parameter': 3} measured 56
+seeds that are also generated (one term, two derivations): ['cand:a/trigger=counter,dedup=on,check=-', 'cand:b2/joint=fold,prune=on', 'cand:b3/select=ch,scope=frontfirst', 'cand:c/stop=exhaustive', 'cand:c/stop=threshold']
+
+== verdicts, phase dev
+survivor   cand:a/trigger=counter,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 1484.4 [463.3..1021.1] n=2; premise_ops sum 10579 [4299..6280] n=2; wall_ms sum 6.913 [2.727..4.186] n=2
+survivor   cand:a/trigger=counter,dedup=on,check=-
+            correct_every_prefix 2/2; peak_kib sum 1480.3 [459.1..1021.2] n=2; premise_ops sum 10579 [4299..6280] n=2; wall_ms sum 10.02 [2.775..7.245] n=2
+dominated  cand:a/trigger=delta,dedup=off,check=full  <- cand:a/trigger=counter,dedup=on,check=-, cand:a/trigger=counter,dedup=off,check=-, cand:a/trigger=watch,dedup=on,check=-, cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 2774.5 [869.4..1905.1] n=2; premise_ops sum 23262 [9396..13866] n=2; wall_ms sum 10.399 [3.838..6.561] n=2
+dominated  cand:a/trigger=delta,dedup=off,check=short  <- cand:a/trigger=counter,dedup=on,check=-, cand:a/trigger=counter,dedup=off,check=-, cand:a/trigger=watch,dedup=on,check=-
+            correct_every_prefix 2/2; peak_kib sum 2774.6 [869.5..1905.1] n=2; premise_ops sum 14557 [6039..8518] n=2; wall_ms sum 8.943 [3.103..5.84] n=2
+dominated  cand:a/trigger=delta,dedup=on,check=full  <- cand:a/trigger=delta,dedup=off,check=short, cand:a/trigger=delta,dedup=off,check=full, cand:a/trigger=counter,dedup=on,check=-, cand:a/trigger=counter,dedup=off,check=-, cand:a/trigger=watch,dedup=on,check=-, cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 2834.4 [882.4..1952.0] n=2; premise_ops sum 23262 [9396..13866] n=2; wall_ms sum 10.476 [3.809..6.667] n=2
+dominated  cand:a/trigger=delta,dedup=on,check=short  <- cand:a/trigger=delta,dedup=off,check=short, cand:a/trigger=counter,dedup=on,check=-, cand:a/trigger=counter,dedup=off,check=-, cand:a/trigger=watch,dedup=on,check=-, cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 2834.4 [882.4..1952.0] n=2; premise_ops sum 14557 [6039..8518] n=2; wall_ms sum 12.724 [3.588..9.136] n=2
+dominated  cand:a/trigger=rounds,dedup=off,check=full  <- cand:a/trigger=rounds,dedup=off,check=short, cand:a/trigger=counter,dedup=on,check=-, cand:a/trigger=counter,dedup=off,check=-, cand:a/trigger=watch,dedup=on,check=-, cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 2006.2 [593.4..1412.8] n=2; premise_ops sum 3433501 [1007675..2425826] n=2; wall_ms sum 727.821 [140.066..587.755] n=2
+dominated  cand:a/trigger=rounds,dedup=off,check=short  <- cand:a/trigger=counter,dedup=on,check=-, cand:a/trigger=counter,dedup=off,check=-, cand:a/trigger=watch,dedup=on,check=-, cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 2006.2 [593.4..1412.8] n=2; premise_ops sum 1877014 [395952..1481062] n=2; wall_ms sum 674.917 [148.726..526.191] n=2
+dominated  cand:a/trigger=rounds,dedup=on,check=full  <- cand:a/trigger=rounds,dedup=on,check=short, cand:a/trigger=rounds,dedup=off,check=short, cand:a/trigger=rounds,dedup=off,check=full, cand:a/trigger=counter,dedup=on,check=-, cand:a/trigger=counter,dedup=off,check=-, cand:a/trigger=watch,dedup=on,check=-, cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 2066.0 [606.4..1459.6] n=2; premise_ops sum 3433501 [1007675..2425826] n=2; wall_ms sum 716.327 [153.021..563.306] n=2
+dominated  cand:a/trigger=rounds,dedup=on,check=short  <- cand:a/trigger=rounds,dedup=off,check=short, cand:a/trigger=counter,dedup=on,check=-, cand:a/trigger=counter,dedup=off,check=-, cand:a/trigger=watch,dedup=on,check=-, cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 2066.0 [606.4..1459.6] n=2; premise_ops sum 1877014 [395952..1481062] n=2; wall_ms sum 628.194 [100.182..528.012] n=2
+dominated  cand:a/trigger=scratch,dedup=off,check=full  <- cand:a/trigger=rounds,dedup=on,check=short, cand:a/trigger=rounds,dedup=on,check=full, cand:a/trigger=rounds,dedup=off,check=short, cand:a/trigger=rounds,dedup=off,check=full, cand:a/trigger=counter,dedup=on,check=-, cand:a/trigger=counter,dedup=off,check=-, cand:a/trigger=watch,dedup=on,check=-, cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 2206.0 [633.3..1572.7] n=2; premise_ops sum 31029640 [15418252..15611388] n=2; wall_ms sum 4216.084 [1768.797..2447.287] n=2
+dominated  cand:a/trigger=scratch,dedup=off,check=short  <- cand:a/trigger=rounds,dedup=on,check=short, cand:a/trigger=rounds,dedup=on,check=full, cand:a/trigger=rounds,dedup=off,check=short, cand:a/trigger=rounds,dedup=off,check=full, cand:a/trigger=counter,dedup=on,check=-, cand:a/trigger=counter,dedup=off,check=-, cand:a/trigger=watch,dedup=on,check=-, cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 2206.1 [633.4..1572.7] n=2; premise_ops sum 20813546 [7840266..12973280] n=2; wall_ms sum 3855.817 [1306.94..2548.877] n=2
+dominated  cand:a/trigger=scratch,dedup=on,check=full  <- cand:a/trigger=scratch,dedup=on,check=short, cand:a/trigger=scratch,dedup=off,check=short, cand:a/trigger=scratch,dedup=off,check=full, cand:a/trigger=rounds,dedup=on,check=short, cand:a/trigger=rounds,dedup=on,check=full, cand:a/trigger=rounds,dedup=off,check=short, cand:a/trigger=rounds,dedup=off,check=full, cand:a/trigger=counter,dedup=on,check=-, cand:a/trigger=counter,dedup=off,check=-, cand:a/trigger=watch,dedup=on,check=-, cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 2265.8 [646.3..1619.5] n=2; premise_ops sum 31029640 [15418252..15611388] n=2; wall_ms sum 4316.574 [2037.587..2278.987] n=2
+dominated  cand:a/trigger=scratch,dedup=on,check=short  <- cand:a/trigger=scratch,dedup=off,check=short, cand:a/trigger=rounds,dedup=on,check=short, cand:a/trigger=rounds,dedup=on,check=full, cand:a/trigger=rounds,dedup=off,check=short, cand:a/trigger=rounds,dedup=off,check=full, cand:a/trigger=counter,dedup=on,check=-, cand:a/trigger=counter,dedup=off,check=-, cand:a/trigger=watch,dedup=on,check=-, cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 2265.8 [646.3..1619.5] n=2; premise_ops sum 20813546 [7840266..12973280] n=2; wall_ms sum 3852.65 [1326.559..2526.091] n=2
+survivor   cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 1848.2 [571.7..1276.5] n=2; premise_ops sum 7566 [2652..4914] n=2; wall_ms sum 9.816 [2.802..7.014] n=2
+dominated  cand:a/trigger=watch,dedup=on,check=-  <- cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 1903.7 [584.6..1319.1] n=2; premise_ops sum 7566 [2652..4914] n=2; wall_ms sum 11.105 [3.085..8.02] n=2
+survivor   cand:b1/front=archive
+            correct 4/4; dominance_tests sum 3291 [337..1883] n=4; wall_ms sum 2.585 [0.253..1.584] n=4
+dominated  cand:b1/front=pairwise  <- cand:b1/front=sortfilter, cand:b1/front=archive
+            correct 4/4; dominance_tests sum 31402 [2989..17470] n=4; wall_ms sum 17.237 [1.125..11.102] n=4
+survivor   cand:b1/front=sortfilter
+            correct 4/4; dominance_tests sum 1992 [325..865] n=4; wall_ms sum 2.47 [0.339..1.205] n=4
+dominated  cand:b2/joint=brute,prune=off  <- cand:b2/joint=brute,prune=on, cand:b2/joint=fold,prune=on, cand:b2/joint=fold,prune=off
+            correct 23/23; ops sum 5680919 [31..2607148] n=23; peak_kib sum 27344.7 [7.5..6459.8] n=20; wall_ms sum 3731.705 [0.085..1634.152] n=23
+survivor   cand:b2/joint=brute,prune=on
+            correct 23/23; ops sum 4927 [7..1673] n=23; peak_kib sum 161.8 [2.7..27.9] n=20; wall_ms sum 5.232 [0.051..1.454] n=23
+dominated  cand:b2/joint=fold,prune=off  <- cand:b2/joint=fold,prune=on
+            correct 32/32; ops sum 224940 [14..109501] n=32; peak_kib sum 283.5 [4.0..49.4] n=20; wall_ms sum 141.754 [0.058..58.415] n=32
+survivor   cand:b2/joint=fold,prune=on
+            correct 32/32; ops sum 89712 [8..43279] n=32; peak_kib sum 139.2 [3.1..22.1] n=20; wall_ms sum 66.953 [0.06..33.944] n=32
+dominated  cand:b3/select=ach,scope=direct  <- cand:b3/select=ch,scope=frontfirst, cand:b3/select=ach,scope=frontfirst, cand:b3/select=lex,scope=direct, cand:b3/select=lex,scope=frontfirst
+            evaluations sum 1441104 [1344..344064] n=17; front_coverage_on_grid sum 8.192 [0.2..1.0] n=17; pick_on_front_rate sum 17.0 [1.0..1.0] n=17
+dominated  cand:b3/select=ach,scope=frontfirst  <- cand:b3/select=lex,scope=frontfirst
+            evaluations sum 71771 [99..32521] n=17; front_coverage_on_grid sum 8.192 [0.2..1.0] n=17; pick_on_front_rate sum 17.0 [1.0..1.0] n=17
+dominated  cand:b3/select=ch,scope=direct  <- cand:b3/select=ch,scope=frontfirst, cand:b3/select=ach,scope=frontfirst, cand:b3/select=lex,scope=direct, cand:b3/select=lex,scope=frontfirst
+            evaluations sum 1441104 [1344..344064] n=17; front_coverage_on_grid sum 8.192 [0.2..1.0] n=17; pick_on_front_rate sum 17.0 [1.0..1.0] n=17
+dominated  cand:b3/select=ch,scope=frontfirst  <- cand:b3/select=lex,scope=frontfirst
+            evaluations sum 71771 [99..32521] n=17; front_coverage_on_grid sum 8.192 [0.2..1.0] n=17; pick_on_front_rate sum 17.0 [1.0..1.0] n=17
+dominated  cand:b3/select=eps,scope=direct  <- cand:b3/select=eps,scope=frontfirst, cand:b3/select=lex,scope=direct, cand:b3/select=lex,scope=frontfirst
+            evaluations sum 22834636 [21296..5451776] n=17; front_coverage_on_grid sum 11.642 [0.25..1.0] n=17; pick_on_front_rate sum 17.0 [1.0..1.0] n=17
+dominated  cand:b3/select=eps,scope=frontfirst  <- cand:b3/select=lex,scope=frontfirst
+            evaluations sum 190236 [1346..52473] n=17; front_coverage_on_grid sum 11.642 [0.25..1.0] n=17; pick_on_front_rate sum 17.0 [1.0..1.0] n=17
+dominated  cand:b3/select=lex,scope=direct  <- cand:b3/select=lex,scope=frontfirst
+            evaluations sum 411744 [384..98304] n=17; front_coverage_on_grid sum 12.35 [0.25..1.0] n=17; pick_on_front_rate sum 17.0 [1.0..1.0] n=17
+survivor   cand:b3/select=lex,scope=frontfirst
+            evaluations sum 66071 [39..31561] n=17; front_coverage_on_grid sum 12.35 [0.25..1.0] n=17; pick_on_front_rate sum 17.0 [1.0..1.0] n=17
+dominated  cand:b3/select=ws,scope=direct  <- cand:b3/select=ws,scope=frontfirst, cand:b3/select=lex,scope=direct, cand:b3/select=lex,scope=frontfirst
+            evaluations sum 1441104 [1344..344064] n=17; front_coverage_on_grid sum 8.4 [0.188..1.0] n=17; pick_on_front_rate sum 17.0 [1.0..1.0] n=17
+dominated  cand:b3/select=ws,scope=frontfirst  <- cand:b3/select=lex,scope=frontfirst
+            evaluations sum 71771 [99..32521] n=17; front_coverage_on_grid sum 8.4 [0.188..1.0] n=17; pick_on_front_rate sum 17.0 [1.0..1.0] n=17
+survivor   cand:c/stop=bestfirst
+            certified 17/17; examined_ops sum 290 [8..25] n=17; regret sum 0.0 [0.0..0.0] n=17
+dominated  cand:c/stop=bound  <- cand:c/stop=bestfirst
+            certified 17/17; examined_ops sum 33883 [18..9534] n=17; regret sum 0.0 [0.0..0.0] n=17
+dominated  cand:c/stop=exhaustive  <- cand:c/stop=bestfirst
+            certified 17/17; examined_ops sum 17156 [16..4096] n=17; regret sum 0.0 [0.0..0.0] n=17
+survivor   cand:c/stop=threshold/delta=0.05
+            certified 2/17; examined_ops sum 8168 [6..4096] n=17; regret sum 0.001 [0.0..0.0] n=17
+survivor   cand:c/stop=threshold/delta=0.1
+            certified 0/17; examined_ops sum 2561 [6..1362] n=17; regret sum 0.555 [0.0..0.097] n=17
+survivor   cand:c/stop=threshold/delta=0.2
+            certified 0/17; examined_ops sum 355 [2..85] n=17; regret sum 2.289 [0.0..0.197] n=17
+survivor   cand:d/rescoring=archive
+            correct_every_prefix 4/4; dominance_tests sum 3291 [337..1883] n=4; wall_ms sum 2.473 [0.353..1.115] n=4
+dominated  cand:d/rescoring=cold-pairwise  <- cand:d/rescoring=archive, cand:d/rescoring=cold-sortfilter
+            correct_every_prefix 4/4; dominance_tests sum 4164018 [283607..2856319] n=4; wall_ms sum 1704.259 [100.964..1203.862] n=4
+dominated  cand:d/rescoring=cold-sortfilter  <- cand:d/rescoring=archive
+            correct_every_prefix 4/4; dominance_tests sum 314184 [37754..191074] n=4; wall_ms sum 261.648 [30.246..148.796] n=4
+dominated  cand:e/ach,params=10  <- cand:e/lex,params=None, cand:e/ch,params=solved, cand:e/ach,params=solved
+            coverage sum 8.192 [0.2..1.0] n=17; evaluations sum 7980 [84..1344] n=17; unsupported_reached sum 0 [0..0] n=17; unsupported_reached_nonneg_reported_only sum 0 [0..0] n=17
+dominated  cand:e/ach,params=20  <- cand:e/ch,params=solved
+            coverage sum 9.383 [0.25..1.0] n=17; evaluations sum 92055 [969..15504] n=17; unsupported_reached sum 2 [0..1] n=17; unsupported_reached_nonneg_reported_only sum 0 [0..0] n=17
+dominated  cand:e/ach,params=solved  <- cand:e/ch,params=solved
+            coverage sum 14.367 [0.6..1.0] n=17; evaluations sum 905 [1..256] n=17; unsupported_reached sum 47 [0..11] n=17; unsupported_reached_nonneg_reported_only sum 18 [0..8] n=17
+dominated  cand:e/ch,params=10  <- cand:e/lex,params=None, cand:e/ch,params=solved, cand:e/ach,params=solved
+            coverage sum 8.192 [0.2..1.0] n=17; evaluations sum 7980 [84..1344] n=17; unsupported_reached sum 0 [0..0] n=17; unsupported_reached_nonneg_reported_only sum 0 [0..0] n=17
+dominated  cand:e/ch,params=20  <- cand:e/ch,params=solved
+            coverage sum 9.383 [0.25..1.0] n=17; evaluations sum 92055 [969..15504] n=17; unsupported_reached sum 2 [0..1] n=17; unsupported_reached_nonneg_reported_only sum 0 [0..0] n=17
+survivor   cand:e/ch,params=solved
+            coverage sum 17.0 [1.0..1.0] n=17; evaluations sum 905 [1..256] n=17; unsupported_reached sum 55 [0..12] n=17; unsupported_reached_nonneg_reported_only sum 18 [0..8] n=17
+dominated  cand:e/eps,params=10  <- cand:e/ch,params=solved
+            coverage sum 11.642 [0.25..1.0] n=17; evaluations sum 126445 [1331..21296] n=17; unsupported_reached sum 20 [0..3] n=17; unsupported_reached_nonneg_reported_only sum 2 [0..1] n=17
+dominated  cand:e/lex,params=None  <- cand:e/ch,params=solved
+            coverage sum 12.35 [0.25..1.0] n=17; evaluations sum 2280 [24..384] n=17; unsupported_reached sum 18 [0..2] n=17; unsupported_reached_nonneg_reported_only sum 0 [0..0] n=17
+dominated  cand:e/ws,params=10  <- cand:e/lex,params=None, cand:e/ch,params=solved
+            coverage sum 8.4 [0.188..1.0] n=17; evaluations sum 7980 [84..1344] n=17; unsupported_reached sum 0 [0..0] n=17; unsupported_reached_nonneg_reported_only sum 0 [0..0] n=17
+dominated  cand:e/ws,params=20  <- cand:e/ch,params=20, cand:e/ach,params=20, cand:e/lex,params=None, cand:e/ch,params=solved
+            coverage sum 8.921 [0.188..1.0] n=17; evaluations sum 92055 [969..15504] n=17; unsupported_reached sum 0 [0..0] n=17; unsupported_reached_nonneg_reported_only sum 0 [0..0] n=17
+survivor   cand:f/resolver=enclosing
+            ambiguous_refs sum 0 [0..0] n=1; jq_shape_reach_reported_only sum 0 [0..0] n=1; lexically_unsound_edges sum 0 [0..0] n=1; unresolved_refs sum 0 [0..0] n=1
+dominated  cand:f/resolver=name  <- cand:f/resolver=enclosing
+            ambiguous_refs sum 95 [95..95] n=1; jq_shape_reach_reported_only sum 56 [56..56] n=1; lexically_unsound_edges sum 57 [57..57] n=1; unresolved_refs sum 0 [0..0] n=1
+dominated  cand:f/resolver=nearest  <- cand:f/resolver=enclosing
+            ambiguous_refs sum 50 [50..50] n=1; jq_shape_reach_reported_only sum 54 [54..54] n=1; lexically_unsound_edges sum 0 [0..0] n=1; unresolved_refs sum 37 [37..37] n=1
+dominated  cand:f/resolver=visible  <- cand:f/resolver=nearest, cand:f/resolver=enclosing
+            ambiguous_refs sum 79 [79..79] n=1; jq_shape_reach_reported_only sum 56 [56..56] n=1; lexically_unsound_edges sum 0 [0..0] n=1; unresolved_refs sum 37 [37..37] n=1
+
+== verdicts, phase heldout
+dominated  cand:a/trigger=counter,dedup=off,check=-  <- cand:a/trigger=counter,dedup=on,check=-
+            correct_every_prefix 2/2; peak_kib sum 1186.3 [165.2..1021.1] n=2; premise_ops sum 7787 [1507..6280] n=2; wall_ms sum 5.181 [0.934..4.247] n=2
+survivor   cand:a/trigger=counter,dedup=on,check=-
+            correct_every_prefix 2/2; peak_kib sum 1183.3 [162.2..1021.1] n=2; premise_ops sum 7787 [1507..6280] n=2; wall_ms sum 5.427 [0.81..4.617] n=2
+survivor   cand:a/trigger=watch,dedup=off,check=-
+            correct_every_prefix 2/2; peak_kib sum 1471.6 [190.8..1280.8] n=2; premise_ops sum 5576 [662..4914] n=2; wall_ms sum 9.046 [0.669..8.377] n=2
+survivor   cand:b1/front=archive
+            correct 2/2; dominance_tests sum 896 [434..462] n=2; wall_ms sum 0.62 [0.297..0.323] n=2
+survivor   cand:b1/front=sortfilter
+            correct 2/2; dominance_tests sum 769 [351..418] n=2; wall_ms sum 0.799 [0.399..0.4] n=2
+survivor   cand:b2/joint=brute,prune=on
+            correct 12/12; ops sum 294 [9..41] n=12; peak_kib sum 37.9 [2.9..5.0] n=10; wall_ms sum 1.09 [0.056..0.189] n=12
+survivor   cand:b2/joint=fold,prune=on
+            correct 22/22; ops sum 914 [10..76] n=22; peak_kib sum 36.5 [3.2..4.2] n=10; wall_ms sum 2.596 [0.058..0.197] n=22
+survivor   cand:b3/select=lex,scope=frontfirst
+            evaluations sum 9280 [48..3796] n=8; front_coverage_on_grid sum 8.0 [1.0..1.0] n=8; pick_on_front_rate sum 8.0 [1.0..1.0] n=8
+survivor   cand:c/stop=bestfirst
+            certified 8/8; examined_ops sum 140 [10..25] n=8; regret sum 0.0 [0.0..0.0] n=8
+survivor   cand:c/stop=threshold/delta=0.05
+            certified 0/8; examined_ops sum 1958 [7..783] n=8; regret sum 0.0 [0.0..0.0] n=8
+survivor   cand:c/stop=threshold/delta=0.1
+            certified 0/8; examined_ops sum 458 [7..158] n=8; regret sum 0.306 [0.0..0.085] n=8
+survivor   cand:c/stop=threshold/delta=0.2
+            certified 0/8; examined_ops sum 98 [2..33] n=8; regret sum 1.241 [0.102..0.192] n=8
+survivor   cand:d/rescoring=archive
+            correct_every_prefix 2/2; dominance_tests sum 896 [434..462] n=2; wall_ms sum 0.809 [0.383..0.426] n=2
+survivor   cand:e/ch,params=solved
+            coverage sum 8.0 [1.0..1.0] n=8; evaluations sum 14 [1..4] n=8; unsupported_reached sum 2 [0..1] n=8; unsupported_reached_nonneg_reported_only sum 0 [0..0] n=8
+
+== controls (correctness on adversarial inputs)
+coverage cand:e/ch,params=solved control/chris-(0,4)(4,0)(3,3) 1.0
+coverage cand:e/ch,params=solved control/all-equal 0.1667
+coverage cand:e/ch,params=solved control/duplicates 0.6
+coverage cand:b3/select=lex,scope=frontfirst control/chris-(0,4)(4,0)(3,3) 0.6667
+coverage cand:b3/select=lex,scope=frontfirst control/duplicates 0.4
+correct 28/28 cand:a/trigger=counter,dedup=off,check=-
+correct 28/28 cand:a/trigger=counter,dedup=on,check=-
+correct 28/28 cand:a/trigger=watch,dedup=off,check=-
+correct 3/3 cand:b1/front=archive
+correct 3/3 cand:b1/front=sortfilter
+correct 6/6 cand:d/rescoring=archive
+
+== validation
+lost-on-heldout            cand:a/trigger=counter,dedup=off,check=-
+held                       cand:a/trigger=counter,dedup=on,check=-
+held                       cand:a/trigger=watch,dedup=off,check=-
+held                       cand:b1/front=archive
+held                       cand:b1/front=sortfilter
+held                       cand:b2/joint=brute,prune=on
+held                       cand:b2/joint=fold,prune=on
+held                       cand:b3/select=lex,scope=frontfirst
+held                       cand:c/stop=bestfirst
+held                       cand:c/stop=threshold/delta=0.05
+held                       cand:c/stop=threshold/delta=0.1
+held                       cand:c/stop=threshold/delta=0.2
+held                       cand:d/rescoring=archive
+held                       cand:e/ch,params=solved
+not-applicable-on-heldout  cand:f/resolver=enclosing
