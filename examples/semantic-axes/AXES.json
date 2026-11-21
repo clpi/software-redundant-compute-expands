@@ -81,5 +81,15 @@
   "reversibility": "undo cost is now divided by a common baseline: the plain counter's ops to reach k-1 (closure) or one sort-filter of the prefix (front)",
   "order_invariance": "spread is now (max ops - min ops) / the cold-recompute baseline of the forward order, not / the candidate's own mean",
   "visibility": "added a second gamed control, lastwitness (witness = the record just appended), because firsthead coincides with the true witness when every head has one record"
+ },
+ "round_2": {
+  "declared": "2026-11-21, before any round-2 candidate runs; asked by Chris 11:09Z ('improve end to end')",
+  "why": "close the gaps round 1 left open (CLAIMS L1, S6 v2-rr loss, compositionality held-out weakness, journal proofs, one-command rerun)",
+  "alias_traces": "for every dev and held-out closure trace T, T+alias inserts, before the first producing record of each head h with premises ps, an alias record (ps + [fresh_h], h) where fresh_h is a term no record produces. The least closure is unchanged, but the first record with head h no longer witnesses it, so a visibility axis that cannot reject the firsthead control is invalid. Alias traces are inputs on every axis, in both phases.",
+  "new_component": "ax-a merge=adaptive for counter and watch: before merging, estimate the cost of state propagation (copied rule slots + derived terms + 2 x pending waiter entries) and of replaying the smaller half's log onto the other half's state (that log's premise count); run the cheaper. Counted ops include everything it runs. A replay is not a rebuild: it starts from one half's full state.",
+  "selection_rule": "unchanged: validity (null 0, gamed <= best honest, every rebuild merge exactly 0), Pareto on classic + valid semantic axes, 10% wall tie rule, amendment-2 compositionality",
+  "phases": "r2-dev: estate, v2 and their alias traces, every ax-a candidate including the new ones. Down-select frozen as downselect:ax-r2-dev. r2-heldout: refs, v2-rr, fresh-refs, fresh-v2 and their alias traces; frozen survivors + every control + current approach only.",
+  "fresh_heldout": "idol-lib origin/master f8a45b4 added four library homes never seen by any run: blake2b, flatbuf, protobuf, toml. fresh-refs and fresh-v2 are their reference graph and v2 records, built with idol-lib's own graphs/build.py functions over a locally hashed manifest, only after downselect:ax-r2-dev exists. This gives the compositionality axis a held-out confirmation that its amendment did not see.",
+  "front_family": "no new decision data exists (campaigns 1-6 all used); the front family is not re-run and its compositionality held-out caveat stands"
  }
 }
