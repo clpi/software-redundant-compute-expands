@@ -1,0 +1,254 @@
+{
+ "validity": {
+  "ax-a/visibility": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-a/control=lookahead": -0.9894,
+    "cand:ax-a/control=firsthead": 0.0,
+    "cand:ax-a/control=lastwitness": -0.09519999999999995
+   }
+  },
+  "ax-a/work_saved": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-a/control=lookahead": -0.98416,
+    "cand:ax-a/control=firsthead": -4.700000000001925e-05,
+    "cand:ax-a/control=lastwitness": -4.700000000001925e-05
+   }
+  },
+  "ax-a/reversibility": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-a/control=lookahead": -1.0,
+    "cand:ax-a/control=firsthead": -1.0,
+    "cand:ax-a/control=lastwitness": -1.0
+   }
+  },
+  "ax-a/compositionality": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-a/control=lookahead": -0.089711,
+    "cand:ax-a/control=firsthead": 0.0,
+    "cand:ax-a/control=lastwitness": 0.0,
+    "cand:ax-a/engine=counter,undo=none,witness=on,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=watch,undo=none,witness=on,merge=recompute (rebuild merge)": 0.0,
+    "cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute (rebuild merge)": 0.0
+   }
+  },
+  "ax-a/order_invariance": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-a/control=lookahead": 0.0,
+    "cand:ax-a/control=firsthead": -9.599999999998499e-05,
+    "cand:ax-a/control=lastwitness": -9.599999999998499e-05
+   }
+  },
+  "ax-a/robustness": {
+   "valid": true,
+   "null": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gamed_excess": {
+    "cand:ax-a/control=lookahead": -1.0,
+    "cand:ax-a/control=firsthead": 0.0,
+    "cand:ax-a/control=lastwitness": 0.0
+   }
+  }
+ },
+ "survivors": {
+  "ax-a": [
+   "cand:ax-a/control=firsthead",
+   "cand:ax-a/control=lastwitness",
+   "cand:ax-a/engine=counter,undo=journal,witness=off,merge=adaptive",
+   "cand:ax-a/engine=counter,undo=journal,witness=on,merge=adaptive",
+   "cand:ax-a/engine=counter,undo=none,witness=off,merge=adaptive",
+   "cand:ax-a/engine=counter,undo=none,witness=off,merge=propagate",
+   "cand:ax-a/engine=counter,undo=none,witness=on,merge=adaptive",
+   "cand:ax-a/engine=counter,undo=none,witness=on,merge=propagate",
+   "cand:ax-a/engine=counter,undo=none,witness=on,merge=recompute",
+   "cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=adaptive",
+   "cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=adaptive",
+   "cand:ax-a/engine=rounds,undo=none,witness=off,merge=propagate",
+   "cand:ax-a/engine=rounds,undo=none,witness=on,merge=propagate",
+   "cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=propagate",
+   "cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=propagate",
+   "cand:ax-a/engine=watch,undo=journal,witness=off,merge=adaptive",
+   "cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate",
+   "cand:ax-a/engine=watch,undo=journal,witness=on,merge=adaptive",
+   "cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute",
+   "cand:ax-a/engine=watch,undo=none,witness=off,merge=adaptive",
+   "cand:ax-a/engine=watch,undo=none,witness=on,merge=adaptive",
+   "cand:ax-a/engine=watch,undo=none,witness=on,merge=propagate",
+   "cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=adaptive",
+   "cand:ax-a/engine=watch,undo=snapshot,witness=on,merge=adaptive"
+  ]
+ },
+ "dominates_current": {
+  "cand:ax-a/engine=counter,undo=none,witness=on,merge=propagate": {
+   "subsets_with_dominator": 284,
+   "of": 511,
+   "shown": {
+    "premise_ops": [
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=adaptive"
+    ],
+    "wall_ms": [
+     "cand:ax-a/engine=counter,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=recompute",
+     "cand:ax-a/control=firsthead",
+     "cand:ax-a/control=lastwitness",
+     "cand:ax-a/engine=counter,undo=none,witness=off,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=adaptive"
+    ],
+    "peak_kib": [
+     "cand:ax-a/engine=counter,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=counter,undo=none,witness=off,merge=adaptive",
+     "cand:ax-a/engine=counter,undo=journal,witness=off,merge=adaptive"
+    ],
+    "work_saved": [
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=adaptive"
+    ],
+    "reversibility": [
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=propagate",
+     "cand:ax-a/engine=counter,undo=journal,witness=on,merge=adaptive",
+     "cand:ax-a/engine=counter,undo=journal,witness=off,merge=adaptive",
+     "cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=adaptive",
+     "cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=snapshot,witness=on,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=adaptive"
+    ],
+    "order_invariance": [
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=watch,undo=none,witness=on,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=adaptive"
+    ]
+   }
+  },
+  "cand:ax-a/engine=watch,undo=none,witness=on,merge=propagate": {
+   "subsets_with_dominator": 158,
+   "of": 511,
+   "shown": {
+    "wall_ms": [
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=adaptive"
+    ],
+    "peak_kib": [
+     "cand:ax-a/engine=counter,undo=none,witness=on,merge=propagate",
+     "cand:ax-a/engine=counter,undo=none,witness=on,merge=recompute",
+     "cand:ax-a/engine=counter,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/control=firsthead",
+     "cand:ax-a/control=lastwitness",
+     "cand:ax-a/engine=counter,undo=none,witness=on,merge=adaptive",
+     "cand:ax-a/engine=counter,undo=none,witness=off,merge=adaptive",
+     "cand:ax-a/engine=counter,undo=journal,witness=on,merge=adaptive",
+     "cand:ax-a/engine=counter,undo=journal,witness=off,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=none,witness=off,merge=adaptive"
+    ],
+    "reversibility": [
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=recompute",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=propagate",
+     "cand:ax-a/engine=counter,undo=journal,witness=on,merge=adaptive",
+     "cand:ax-a/engine=counter,undo=journal,witness=off,merge=adaptive",
+     "cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=adaptive",
+     "cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=journal,witness=on,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=journal,witness=off,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=snapshot,witness=on,merge=adaptive",
+     "cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=adaptive"
+    ],
+    "compositionality": [
+     "cand:ax-a/engine=rounds,undo=none,witness=on,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=none,witness=off,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=propagate",
+     "cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=propagate"
+    ]
+   }
+  }
+ }
+}
