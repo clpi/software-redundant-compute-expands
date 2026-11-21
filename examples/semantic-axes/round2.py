@@ -129,7 +129,7 @@ def main():
         for n, ks in todo.items():
             if ks:
                 A.run_closure(S, made, {n: ins[n]}, "r2-dev", only=set(ks))
-    elif phase == "heldout":
+    elif phase in ("heldout", "heldout-resume"):
         fr = [r for r in S.with_color("downselect") if r["head"] == "downselect:ax-r2-dev"]
         assert fr, "run axes_select.py out/space.jsonl r2-dev first"
         idol_lib = sys.argv[3]
@@ -139,6 +139,20 @@ def main():
         fr2, meta = fresh(idol_lib)
         ho.update(fr2)
         ins = with_alias(ho)
+        if phase == "heldout-resume":
+            # stopped by the session's background time limit; finish only the
+            # (candidate, input) pairs with no complete set of axes yet
+            done = {(r["premises"][0], r["premises"][1]) for r in S.with_color("phase:r2-heldout") if r["head"].endswith("|robustness|r2-heldout")}
+            built = {r["head"][len("heldout-built:ax/"):]: r["receipt"]["sha256"] for r in S.recs if r["head"].startswith("heldout-built:ax/") and "phase:r2-heldout" in r["colors"]}
+            assert all(built.get(n, traces.digest(tr)) == traces.digest(tr) for n, tr in ins.items()), "rebuilt held-out traces differ"
+            todo = {n: sorted(k for k in keep if (k, "input:ax/" + n) not in done) for n in ins}
+            S.append("attempt:r2-heldout-1", [], ["attempt", "interrupted"], {"remaining": {n: len(v) for n, v in todo.items()}})
+            for n, ks in todo.items():
+                if ks:
+                    if n not in built:
+                        S.append("heldout-built:ax/" + n, [], ["heldout", "phase:r2-heldout"], {"records": len(ins[n]), "sha256": traces.digest(ins[n])})
+                    A.run_closure(S, made, {n: ins[n]}, "r2-heldout", only=set(ks))
+            print("records", len(S.recs), "head", S.prev); return
         for name, tr in ins.items():
             S.append("heldout-built:ax/" + name, [], ["heldout", "phase:r2-heldout"], dict({"records": len(tr), "sha256": traces.digest(tr)}, **(meta if name.startswith("fresh") else {})))
         A.run_closure(S, made, ins, "r2-heldout", only=keep)

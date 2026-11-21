@@ -5,6 +5,10 @@
 # Deterministic claims (ops, correctness, undo, merge, visibility, front
 # updates, validity) must reproduce exactly; wall-time-dependent ones are
 # reported as skipped, since timings are re-measured.
+# A full contract run takes over two hours in one container. If a session
+# limit stops it, round2.py has dev-resume and heldout-resume modes that log
+# the interruption and finish only the unmeasured (candidate, input) pairs.
+# rerun.verify.txt is the result of the last from-scratch rerun (REPEATS=1).
 set -e
 OUT="$1"; IDOL_LIB="$2"
 [ -n "$OUT" ] && [ -n "$IDOL_LIB" ] || { echo "usage: sh run_all.sh OUT IDOL_LIB"; exit 2; }

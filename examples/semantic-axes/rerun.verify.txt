@@ -1,0 +1,40 @@
+PASS S1  counter journal reversibility dev  [0.997, 0.996]
+PASS S1  counter journal reversibility held-out  [0.992, 0.955]
+PASS S1  counter journal ops equal current ops  [[4299, 6280], [4299, 6280]]
+PASS S1  counter current reversibility is 0  [0.0, 0.0, 0.0, 0.0]
+PASS S2  watch journal reversibility dev  [0.998, 0.996]
+PASS S2  watch journal reversibility held-out  [0.995, 0.955]
+PASS S2  watch journal ops equal current ops  [[2652, 4914], [2652, 4914]]
+PASS S2  watch current reversibility is 0  [0.0, 0.0, 0.0, 0.0]
+PASS S3  residual archive undo >= 0.996 (dev)  [0.999435, 0.996951, 1.0, 1.0]
+PASS S3  residual archive tests equal current (dev)  [3291, 3291]
+PASS S3  residual archive undo >= 0.996 (heldout)  [0.998016, 0.998677]
+PASS S3  residual archive tests equal current (heldout)  [896, 896]
+PASS S4  archive 3,291 vs cold 314,184 tests (dev)  [3291, 314184]
+SKIP S4  cold sort-filter dominated (dev) (depends on timing)
+PASS S5  fixed-frame picks compose 100%  [48, 1.0]
+PASS S6  every propagate merge correct  228
+PASS F1  ax-a column appends exact (dev)  [3639, 34386]
+SKIP F1  ax-a column-append compare counts (dev) (depends on timing)
+PASS F2  ax-a candidate appends exact (dev)  [1920, 34114]
+PASS F3  ax-a every front point reached by own weights (dev)  [25, 25]
+SKIP F3  ax-a front size (dev) (depends on timing)
+PASS F1  ax-b column appends exact (dev)  [2188, 21974]
+SKIP F1  ax-b column-append compare counts (dev) (depends on timing)
+PASS F3  ax-b every front point reached by own weights (dev)  [11, 11]
+SKIP F3  ax-b front size (dev) (depends on timing)
+PASS V   all 12 axis/family pairs valid (dev)  12
+PASS V   all 12 axis/family pairs valid (heldout)  12
+PASS R1  alias traces: firsthead visibility < 1, honest 1.0 (r2-dev)  [[0.3313, 0.0226], [1.0, 1.0]]
+PASS R1  all 6 closure axes valid (r2-dev)  6
+PASS R2  adaptive merge correct everywhere; cheaper than propagate on 8 of 8 pairs (r2-dev)  [8, 8]
+PASS F1  ax-a column appends exact (r2-dev)  [7330, 154230]
+PASS F2  ax-a candidate appends exact (r2-dev)  [5817, 96548]
+PASS F3  ax-a every front point reached by own weights (r2-dev)  [42, 42]
+PASS R1  alias traces: firsthead visibility < 1, honest 1.0 (r2-heldout)  [[0.5044, 0.0226, 0.3936, 0.0549], [1.0, 1.0, 1.0, 1.0]]
+PASS R1  all 6 closure axes valid (r2-heldout)  6
+PASS R2  adaptive merge correct everywhere; cheaper than propagate on 4 of 16 pairs (r2-heldout)  [4, 16]
+PASS F1  ax-a column appends exact (r2-heldout)  [3414, 213918]
+PASS F2  ax-a candidate appends exact (r2-heldout)  [3414, 40397]
+PASS F3  ax-a every front point reached by own weights (r2-heldout)  [33, 33]
+chain ok, records 8203, head 8f8c37396e89c24d00a6bf89bd8d5fca657d46a01f584ee7733742b8c32354b9, failed 0
