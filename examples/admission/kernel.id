@@ -1,0 +1,564 @@
+cut = (t: str, sep: i64)
+    out = stream()
+    begin = 1
+    i = 1
+    n = t:len()
+    while i <= n
+        if t:byte(i) == sep
+            push(out, t:sub(begin, i - 1))
+            begin = i + 1
+        i = i + 1
+    if begin <= n
+        push(out, t:sub(begin, n))
+    out
+
+starts = (t: str, p: str)
+    t:len() >= p:len() and t:sub(1, p:len()) == p
+
+ends = (t: str, p: str)
+    t:len() >= p:len() and t:sub(t:len() - p:len() + 1, t:len()) == p
+
+holds = (t: str, p: str)
+    i = 1
+    n = t:len() - p:len() + 1
+    while i <= n
+        if t:sub(i, i + p:len() - 1) == p
+            return true
+        i = i + 1
+    false
+
+member = (s, v: str)
+    i = 1
+    while i <= s[0]
+        if s[i] == v
+            return true
+        i = i + 1
+    false
+
+unitcat = (l: str)
+    if not starts(l, "+ cat ")
+        return false
+    words = cut(l:sub(7, l:len()), 32)
+    if words[0] == 0
+        return false
+    i = 1
+    while i <= words[0]
+        w = words[i]
+        if not ends(w, ".id") or holds(w, "/") or holds(w, "$")
+            return false
+        i = i + 1
+    true
+
+lastexit = (exits: str, home: str)
+    code = -1
+    rows = cut(exits, 10)
+    i = 1
+    while i <= rows[0]
+        p = cut(rows[i], 32)
+        if p[0] >= 2 and p[1] == home
+            code = tonumber(p[2])
+        i = i + 1
+    code
+
+verdict = (trace: str, code: i64)
+    rows = cut(trace, 10)
+    work = ""
+    unit = false
+    dumpc = false
+    verify = 0
+    after = false
+    i = 1
+    while i <= rows[0]
+        l = rows[i]
+        if starts(l, "+ ")
+            if work == "" and starts(l, "+ work=") and l:len() > 7
+                rest = l:sub(8, l:len())
+                if not holds(rest, " ")
+                    work = rest
+            if not unit and unitcat(l)
+                unit = true
+            if holds(l, " dump-c ")
+                dumpc = true
+            if verify == 0 and starts(l, "+ python3 verify.py")
+                verify = i
+            else
+                if verify > 0 and i > verify and l != "+ rm -rf " .. work
+                    after = true
+        i = i + 1
+    if work == "" or not unit
+        return "NOT_RUN"
+    if dumpc and verify > 0 and (after or code == 0)
+        return "PASSED"
+    if verify > 0
+        return "FAILED"
+    "NOT_RUN"
+
+route = (trace: str)
+    if holds(trace, " dump-c ")
+        return "c"
+    "native"
+
+sha = (path: str)
+    text(path:read())
+
+idlist = (t: str)
+    cut(t, 44)
+
+note = (state, line: i64, kind: str, words: str)
+    state.refused = state.refused + 1
+    print("REFUSE line " .. line:to(str) .. " " .. kind .. ": " .. words)
+
+
+csv = (t: str)
+    if t == "-"
+        return stream()
+    cut(t, 44)
+
+accept = (state, line: i64, kind: str)
+    state.accepted = state.accepted + 1
+    print("ACCEPT line " .. line:to(str) .. " " .. kind)
+
+refuse = (state, line: i64, kind: str, words: str)
+    state.refused = state.refused + 1
+    print("REFUSE line " .. line:to(str) .. " " .. kind .. ": " .. words)
+
+join = (a, b)
+    out = stream()
+    i = 1
+    while i <= a[0]
+        push(out, a[i])
+        i = i + 1
+    i = 1
+    while i <= b[0]
+        push(out, b[i])
+        i = i + 1
+    out
+
+orempty = (s)
+    if s == nil
+        return stream()
+    s
+
+count = (t, key: str)
+    if t[key] == nil
+        return 0
+    t[key]
+
+kernel = (logpath: str, root: str)
+    state = {}
+    state.refused = 0
+    state.closed = 0
+    state.broken = 0
+    state.accepted = 0
+    isdim = {}
+    dims = {}
+    isdev = {}
+    devw = {}
+    cfgs = {}
+    nul = {}
+    con = {}
+    cinfo = {}
+    carries = {}
+    subj = {}
+    built = {}
+    cnt = {}
+    bad = {}
+    mx = {}
+    mn = {}
+    wcnt = {}
+    wok = {}
+    isrev = {}
+    revw = {}
+    revl = {}
+    grounded = {}
+    files = {}
+    good = {}
+    prem = {}
+    rcpt = {}
+    defs = {}
+    roots = {}
+    head = text("idol kernel genesis")
+    rows = cut(logpath:read(), 10)
+    n = 1
+    while n <= rows[0]
+        line = rows[n]
+        f = cut(line, 9)
+        kind = f[1]
+        ns = n:to(str)
+        if kind == "premise" or kind == "file" or kind == "def" or kind == "root" or kind == "claim" or kind == "head"
+            carries[ns] = ","
+        if kind == "head"
+            if f[2] != head
+                note(state, n, "history", "head " .. f[2] .. " is not the recomputed head " .. head)
+                state.broken = n
+        if kind == "premise"
+            prem[f[2]] = f[4]
+            if f[3] != "-"
+                got = sha(root .. "/" .. f[3])
+                if got != f[4]
+                    note(state, n, "premise", f[2] .. " bytes hash " .. got .. " not " .. f[4])
+                    prem[f[2]] = ""
+        if kind == "file"
+            got = sha(root .. "/" .. f[3])
+            files[f[2]] = got
+            if got == f[4]
+                good[f[2]] = true
+            else
+                good[f[2]] = false
+                note(state, n, "bytes", f[2] .. " hashes to " .. got .. " not the claimed " .. f[4])
+        if kind == "receipt"
+            r = {}
+            r.home = f[3]
+            r.compiler = f[4]
+            r.files = idlist(f[7])
+            r.ok = true
+            trace = (root .. "/" .. f[5]):read()
+            logsha = text(trace)
+            if logsha != f[9]
+                note(state, n, "trace", f[2] .. " trace hashes to " .. logsha .. " not " .. f[9])
+                r.ok = false
+            r.route = route(trace)
+            r.verdict = verdict(trace, lastexit((root .. "/" .. f[6]):read(), f[3]))
+            if r.verdict != f[8]
+                note(state, n, "verdict", f[2] .. " claims " .. f[8] .. " but its own trace gives " .. r.verdict)
+                r.ok = false
+            if prem[f[4]] == nil or prem[f[4]] == ""
+                note(state, n, "premise", f[2] .. " names compiler " .. f[4] .. " with no standing premise")
+                r.ok = false
+            rcpt[f[2]] = r
+            carries[ns] = ","
+            grounded[ns] = r.ok
+        if kind == "def"
+            d = {}
+            d.file = f[3]
+            d.line = f[4]
+            d.sha = f[5]
+            defs[f[2]] = d
+        if kind == "root"
+            roots[f[2] .. " " .. f[3] .. " " .. f[4]] = true
+        if kind == "claim"
+            d = defs[f[2]]
+            r = rcpt[f[3]]
+            why = ""
+            if state.broken > 0
+                why = "history was rewritten before line " .. state.broken:to(str)
+            if why == "" and d == nil
+                why = "no such definition " .. f[2]
+            if why == "" and r == nil
+                why = "no receipt " .. f[3] .. ", a typed-in claim"
+            if why == "" and not r.ok
+                why = "receipt " .. f[3] .. " did not stand"
+            if why == "" and r.verdict != "PASSED"
+                why = "receipt " .. f[3] .. " trace verdict is " .. r.verdict
+            if why == "" and not member(r.files, d.file)
+                why = "receipt " .. f[3] .. " ran other bytes, not file " .. d.file
+            if why == "" and files[d.file] != d.sha
+                why = "definition recorded for bytes " .. d.sha .. " but file " .. d.file .. " is not at them"
+            if why == "" and f[4] == "native" and r.route != "native"
+                why = "receipt " .. f[3] .. " ran the C route; native was claimed"
+            if why == ""
+                i = 1
+                while i <= r.files[0]
+                    if why == "" and good[r.files[i]] != true
+                        why = "unit file " .. r.files[i] .. " is not at its run bytes"
+                    i = i + 1
+            if why == "" and roots[f[3] .. " " .. d.file .. " " .. d.line] != true
+                why = "line " .. d.line .. " of " .. d.file .. " is not an observed root of " .. f[3]
+            if why == ""
+                state.closed = state.closed + 1
+                print("CLOSED " .. f[2])
+            else
+                note(state, n, "claim", f[2] .. ": " .. why)
+        if kind == "dim"
+            if isdim[f[2] .. " " .. f[3]] != true
+                isdim[f[2] .. " " .. f[3]] = true
+                if dims[f[2]] == nil
+                    dims[f[2]] = stream()
+                push(dims[f[2]], f[3])
+            carries[ns] = ","
+            accept(state, n, kind)
+        if kind == "work"
+            if isdev[f[2] .. " " .. f[3]] == true
+                refuse(state, n, kind, "workload " .. f[3] .. " is already registered for domain " .. f[2])
+            else
+                isdev[f[2] .. " " .. f[3]] = true
+                if devw[f[2]] == nil
+                    devw[f[2]] = stream()
+                push(devw[f[2]], f[3])
+                carries[ns] = ","
+                accept(state, n, kind)
+        if kind == "config"
+            if cfgs[f[2]] == nil
+                cfgs[f[2]] = stream()
+            push(cfgs[f[2]], f[3])
+            subj[f[2] .. " " .. f[3]] = true
+            carries[ns] = ","
+            accept(state, n, kind)
+        if kind == "null"
+            if nul[f[2]] != nil
+                refuse(state, n, kind, "domain " .. f[2] .. " already has a do-nothing subject")
+            else
+                nul[f[2]] = f[3]
+                subj[f[2] .. " " .. f[3]] = true
+                carries[ns] = ","
+                accept(state, n, kind)
+        if kind == "contract"
+            why = ""
+            if why == "" and con[f[2]] != nil
+                why = "contractOnce: domain " .. f[2] .. " already has the contract at line " .. con[f[2]]
+            if why == "" and tonumber(f[6]) < 1
+                why = "a contract needs at least one repeat"
+            if why == ""
+                c = {}
+                c.dom = f[2]
+                c.harness = f[3]
+                c.sealed = f[4]
+                c.floor = tonumber(f[5])
+                c.reps = tonumber(f[6])
+                cinfo[ns] = c
+                con[f[2]] = ns
+                carries[ns] = ","
+                accept(state, n, kind)
+            else
+                refuse(state, n, kind, why)
+        if kind == "build"
+            why = ""
+            ins = csv(f[4])
+            car = ","
+            i = 1
+            while i <= ins[0]
+                if why == "" and (tonumber(ins[i]) >= n or carries[ins[i]] == nil)
+                    why = "input line " .. ins[i] .. " is not an earlier accepted record"
+                if why == ""
+                    car = car .. carries[ins[i]]
+                i = i + 1
+            if why == "" and subj[f[2] .. " " .. f[3]] == true
+                why = "subject " .. f[3] .. " is already bound in domain " .. f[2]
+            if why == "" and con[f[2]] == nil
+                why = "buildAfterContract: domain " .. f[2] .. " has no contract yet, so its seal could be chosen after this build"
+            if why == "" and con[f[2]] != nil and holds(car, "," .. con[f[2]] .. ",")
+                why = "buildLeak: built from a run trace or held-out bytes of contract line " .. con[f[2]]
+            if why == ""
+                built[f[2] .. " " .. f[3]] = n
+                subj[f[2] .. " " .. f[3]] = true
+                carries[ns] = car
+                accept(state, n, kind)
+            else
+                refuse(state, n, kind, why)
+        if kind == "run"
+            why = ""
+            c = cinfo[f[2]]
+            if c == nil
+                why = "line " .. f[2] .. " is not an accepted contract"
+            if why == "" and not (isdim[c.dom .. " " .. f[5]] == true and (isdev[c.dom .. " " .. f[4]] == true or isrev[f[2] .. " " .. f[4]] == true))
+                why = "runRegistered: workload " .. f[4] .. " or dimension " .. f[5] .. " is not registered for domain " .. c.dom
+            if why == "" and sha(root .. "/" .. f[6]) != c.harness
+                why = "runHarness: harness " .. f[6] .. " is not the contract's harness"
+            if why == "" and subj[c.dom .. " " .. f[3]] != true
+                why = "runSubject: subject " .. f[3] .. " is not built, a config or the do-nothing subject of domain " .. c.dom
+            trows = stream()
+            if why == ""
+                trows = cut((root .. "/" .. f[7]):read(), 10)
+                if trows[0] < 2
+                    why = "trace " .. f[7] .. " has no samples"
+            if why == ""
+                tok = trows[1] == "ok"
+                worst = tonumber(trows[2])
+                best = tonumber(trows[2])
+                i = 3
+                while i <= trows[0]
+                    v = tonumber(trows[i])
+                    if v > worst
+                        worst = v
+                    if v < best
+                        best = v
+                    i = i + 1
+                key = f[2] .. " " .. f[3] .. " " .. f[4] .. " " .. f[5]
+                cnt[key] = count(cnt, key) + 1
+                if not tok
+                    bad[key] = true
+                if mx[key] == nil or worst > mx[key]
+                    mx[key] = worst
+                if tok and (mn[key] == nil or best < mn[key])
+                    mn[key] = best
+                wkey = f[2] .. " " .. f[3] .. " " .. f[4]
+                wcnt[wkey] = count(wcnt, wkey) + 1
+                if tok
+                    wok[wkey] = true
+                carries[ns] = "," .. f[2] .. ","
+                grounded[ns] = true
+                accept(state, n, kind)
+            else
+                refuse(state, n, kind, why)
+        if kind == "reveal"
+            why = ""
+            c = cinfo[f[2]]
+            if c == nil
+                why = "line " .. f[2] .. " is not an accepted contract"
+            if why == "" and sha(root .. "/" .. f[4]) != c.sealed
+                why = "revealSeal: bytes of " .. f[4] .. " do not hash to the contract's seal"
+            if why == "" and (isrev[f[2] .. " " .. f[3]] == true or isdev[c.dom .. " " .. f[3]] == true)
+                why = "workload " .. f[3] .. " is already known"
+            if why == ""
+                isrev[f[2] .. " " .. f[3]] = true
+                if revw[f[2]] == nil
+                    revw[f[2]] = stream()
+                    revl[f[2]] = stream()
+                push(revw[f[2]], f[3])
+                push(revl[f[2]], ns)
+                carries[ns] = "," .. f[2] .. ","
+                accept(state, n, kind)
+            else
+                refuse(state, n, kind, why)
+        if kind == "derive"
+            why = ""
+            ins = csv(f[3])
+            car = ","
+            gr = ins[0] > 0
+            i = 1
+            while i <= ins[0]
+                if why == "" and (tonumber(ins[i]) >= n or carries[ins[i]] == nil)
+                    why = "input line " .. ins[i] .. " is not an earlier accepted record"
+                if why == ""
+                    car = car .. carries[ins[i]]
+                    if grounded[ins[i]] != true
+                        gr = false
+                i = i + 1
+            if why == ""
+                carries[ns] = car
+                grounded[ns] = gr
+                accept(state, n, kind)
+            else
+                refuse(state, n, kind, why)
+        if kind == "fact"
+            why = ""
+            ins = csv(f[2])
+            gr = ins[0] > 0
+            i = 1
+            while i <= ins[0]
+                if grounded[ins[i]] != true
+                    gr = false
+                i = i + 1
+            if why == "" and ins[0] == 0
+                why = "a fact needs evidence"
+            if why == "" and not gr
+                why = "factGrounded: evidence is not runs or data derived only from runs"
+            if why == ""
+                carries[ns] = ","
+                accept(state, n, kind)
+            else
+                refuse(state, n, kind, why)
+        if kind == "beats"
+            why = ""
+            dom = f[2]
+            s = f[3]
+            k = con[dom]
+            if k == nil
+                why = "domain " .. dom .. " has no contract"
+            b = built[dom .. " " .. s]
+            if why == "" and b == nil
+                why = "subject " .. s .. " was never built in domain " .. dom
+            if why == ""
+                c = cinfo[k]
+                ws = join(orempty(devw[dom]), orempty(revw[k]))
+                ds = orempty(dims[dom])
+                cs = orempty(cfgs[dom])
+                rl = orempty(revl[k])
+                heldok = false
+                i = 1
+                while i <= rl[0]
+                    if tonumber(rl[i]) > b
+                        heldok = true
+                    i = i + 1
+                covok = ws[0] > 0 and ds[0] > 0
+                corok = true
+                peakok = true
+                marok = true
+                where = ""
+                wcor = ""
+                wpeak = ""
+                wmar = ""
+                ncor = 0
+                npeak = 0
+                nmar = 0
+                ncov = 0
+                ncell = 0
+                ncfg = cs[0]
+                if ncfg > cs[0]
+                    ncfg = 0 + cs[0]
+                i = 1
+                while i <= ws[0]
+                    j = 1
+                    while j <= ds[0]
+                        cell = ws[i] .. " " .. ds[j]
+                        key = k .. " " .. s .. " " .. cell
+                        ncell = ncell + 1
+                        if count(cnt, key) < c.reps
+                            covok = false
+                            ncov = ncov + 1
+                            if where == ""
+                                where = cell
+                        if bad[key] == true
+                            corok = false
+                            ncor = ncor + 1
+                            if wcor == ""
+                                wcor = cell
+                        seen = false
+                        m = 1
+                        while m <= cs[0]
+                            if mn[k .. " " .. cs[m] .. " " .. cell] != nil
+                                seen = true
+                            m = m + 1
+                        if not seen
+                            peakok = false
+                            npeak = npeak + 1
+                            if wpeak == ""
+                                wpeak = cell
+                        lose = false
+                        m = 1
+                        while m <= ncfg
+                            ck = k .. " " .. cs[m] .. " " .. cell
+                            if count(cnt, key) > 0 and mn[ck] != nil and mx[key] + c.floor >= mn[ck]
+                                if wmar == ""
+                                    wmar = cell .. " vs " .. cs[m]
+                                lose = true
+                            m = m + 1
+                        if lose
+                            marok = false
+                            nmar = nmar + 1
+                        j = j + 1
+                    i = i + 1
+                nullok = nul[dom] != nil
+                i = 1
+                while i <= ws[0]
+                    if nullok and (wcnt[k .. " " .. nul[dom] .. " " .. ws[i]] == nil or wok[k .. " " .. nul[dom] .. " " .. ws[i]] == true)
+                        nullok = false
+                    i = i + 1
+                fails = ""
+                if not heldok
+                    fails = fails .. "heldout (no held-out revealed after the build at line " .. b:to(str) .. "); "
+                if not covok
+                    fails = fails .. "cover (" .. ncov:to(str) .. " of " .. ncell:to(str) .. " cells lack the contract's repeats, first " .. where .. "); "
+                if not corok
+                    fails = fails .. "correct (" .. ncor:to(str) .. " cells hold a run whose own trace reports a wrong output, first " .. wcor .. "); "
+                if not peakok
+                    fails = fails .. "peak (" .. npeak:to(str) .. " cells have no correct comparator run, first " .. wpeak .. "); "
+                if not marok
+                    fails = fails .. "margin (" .. nmar:to(str) .. " cells where a subject sample plus floor does not beat a correct comparator sample, first " .. wmar .. "); "
+                if not nullok
+                    fails = fails .. "nullBase (do-nothing missing, not run, or passed a workload); "
+                why = fails
+            if why == ""
+                carries[ns] = ","
+                accept(state, n, kind)
+            else
+                refuse(state, n, kind, why)
+        if kind != "head"
+            head = text(head .. line)
+        n = n + 1
+    print("head " .. head)
+    print("closed " .. state.closed:to(str) .. " accepted " .. state.accepted:to(str) .. " refused " .. state.refused:to(str))
+
+
+input = cut(stdin:read(), 10)
+kernel(input[1], input[2])
