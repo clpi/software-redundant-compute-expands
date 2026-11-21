@@ -61,7 +61,7 @@ def main():
     summary = {"validity": {}, "survivors": {}, "dominates_current": {}}
     # 1. axis validity
     valid = {}
-    for fam in ("ax-a", "ax-b"):
+    for fam in [f for f in ("ax-a", "ax-b") if f in T]:
         C = T[fam]
         honest = [c for c in C if "/control=" not in c and correct(fam, C[c])]
         for ax in SEM:
@@ -94,7 +94,7 @@ def main():
     allsurv = sorted(c for f in summary["survivors"].values() for c in f)
     S.append("downselect:ax-%s" % phase, allsurv, ["frozen", "downselect"], {"survivors": allsurv})
     # 3. what dominates the current approach, per axis subset
-    for fam in ("ax-a", "ax-b"):
+    for fam in [f for f in ("ax-a", "ax-b") if f in T]:
         C = T[fam]
         alive = [c for c in C if correct(fam, C[c])]
         names = [o for o in OBJ[fam] if OBJ[fam][o] != "constraint" and (o not in SEM or valid[(fam, o)])]

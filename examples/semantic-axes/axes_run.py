@@ -35,7 +35,7 @@ def meas(S, cand, inp, obj, value, phase, extra=None):
 # ------------------------------------------------------------------
 AXES = {
  "a": {"engine": ["counter", "watch", "rounds"], "undo": ["none", "journal", "snapshot"],
-       "witness": ["on", "off"], "merge": ["propagate", "recompute"]},
+       "witness": ["on", "off"], "merge": ["propagate", "recompute", "adaptive"]},
  "b": {"engine": ["archive", "cold"], "undo": ["none", "residual", "snapshot", "recompute"],
        "witness": ["off", "on", "repoint"]},
  "j": {"compose": ["sequential", "tree"]},
@@ -162,13 +162,15 @@ def closure_merge(c, trace, made_kind, base_ops):
         return s
     whole = build(trace)
     A, B = build(LA), build(LB)
-    m, mops = E.merge(kind, A, B, mid, lambda: build(trace))
+    m, mops = E.merge(kind, A, B, mid, lambda: build(trace), LA, LB)
     good = set(m.D) == ref
     # continuation: re-append the first 200 records; nothing may change
     for k, r in enumerate(trace[:200]):
         m.append(r, len(trace) + k)
     good = good and set(m.D) == ref
-    return (good * max(0.0, 1 - mops / max(base_ops, 1))), {"correct": good, "merge_ops": mops, "whole_ops_same_engine": whole.ops, "baseline_ops": base_ops}
+    v = good * max(0.0, 1 - mops / max(min(whole.ops, base_ops), 1))  # amendment 2, scored at run time from round 2 on
+    return v, {"correct": good, "merge_ops": mops, "whole_ops_same_engine": whole.ops, "baseline_ops": base_ops,
+               "path": getattr(m, "merge_path", kind), "amendment": 2}
 
 def closure_orders(c, trace, base_ops):
     outs = []

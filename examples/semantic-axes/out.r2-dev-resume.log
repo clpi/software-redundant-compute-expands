@@ -1,0 +1,32 @@
+r2-dev v2+alias cand:ax-a/engine=watch,undo=snapshot,witness=on,merge=recompute True 166315889 12586.07 5284.8 vis 1.0 ws -1.6245 rev 1.0 comp 0.0 ord 0.935 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=propagate True 154030144 14489.61 4852.6 vis 0.0 ws -1.4306 rev 1.0 comp 0.359 ord 0.952 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=recompute True 154030144 14433.23 4852.6 vis 0.0 ws -1.4306 rev 1.0 comp 0.0 ord 0.952 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=rounds,undo=none,witness=on,merge=propagate True 4448916 6336.19 2123.4 vis 1.0 ws 0.9298 rev 0.0 comp 0.43 ord 0.778 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=rounds,undo=none,witness=on,merge=recompute True 4448916 6061.46 2123.3 vis 1.0 ws 0.9298 rev 0.0 comp 0.0 ord 0.778 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=rounds,undo=none,witness=off,merge=propagate True 4448916 5877.49 1979.3 vis 0.0 ws 0.9298 rev 0.0 comp 0.43 ord 0.778 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=rounds,undo=none,witness=off,merge=recompute True 4448916 6125.26 1979.3 vis 0.0 ws 0.9298 rev 0.0 comp 0.0 ord 0.778 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=propagate True 54778659 7093.77 2788.1 vis 1.0 ws 0.1356 rev 1.0 comp 0.43 ord 0.757 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=rounds,undo=snapshot,witness=on,merge=recompute True 54778659 6575.06 2788.1 vis 1.0 ws 0.1356 rev 1.0 comp 0.0 ord 0.757 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=propagate True 42492914 6599.55 2356.0 vis 0.0 ws 0.3295 rev 1.0 comp 0.43 ord 0.767 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=rounds,undo=snapshot,witness=off,merge=recompute True 42492914 5958.8 2356.0 vis 0.0 ws 0.3295 rev 1.0 comp 0.0 ord 0.767 rob 1.0
+r2-dev v2+alias cand:ax-a/control=null False 0 1.11 59.7 vis 0.0 ws 1.0 rev 0.0 comp 0.0 ord 0.0 rob 0.0
+r2-dev v2+alias cand:ax-a/control=lookahead False 0 16.2 1626.7 vis 0.0 ws 1.0 rev 0.0 comp 0.0 ord 1.0 rob 0.0
+r2-dev v2+alias cand:ax-a/control=firsthead True 16108 20.85 1855.6 vis 0.023 ws 0.9997 rev 0.0 comp 0.38 ord 1.0 rob 1.0
+r2-dev v2+alias cand:ax-a/control=lastwitness True 16108 16.83 1855.6 vis 0.82 ws 0.9997 rev 0.0 comp 0.38 ord 1.0 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=counter,undo=none,witness=on,merge=adaptive True 16108 16.67 1855.6 vis 1.0 ws 0.9997 rev 0.0 comp 0.548 ord 1.0 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=counter,undo=none,witness=off,merge=adaptive True 16108 14.82 1711.6 vis 0.0 ws 0.9997 rev 0.0 comp 0.548 ord 1.0 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=counter,undo=journal,witness=on,merge=adaptive True 16108 16.28 1855.9 vis 1.0 ws 0.9997 rev 0.999 comp 0.548 ord 1.0 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=counter,undo=journal,witness=off,merge=adaptive True 16108 14.36 1711.9 vis 0.0 ws 0.9997 rev 0.999 comp 0.548 ord 1.0 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=counter,undo=snapshot,witness=on,merge=adaptive True 117925361 4081.13 3540.1 vis 1.0 ws -0.8609 rev 1.0 comp 0.548 ord 0.907 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=counter,undo=snapshot,witness=off,merge=adaptive True 105639616 4315.89 3108.0 vis 0.0 ws -0.667 rev 1.0 comp 0.548 ord 0.842 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=watch,undo=none,witness=on,merge=adaptive True 13376 17.57 2438.6 vis 1.0 ws 0.9998 rev 0.0 comp 0.508 ord 1.0 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=watch,undo=none,witness=off,merge=adaptive True 13376 18.71 2294.6 vis 0.0 ws 0.9998 rev 0.0 comp 0.508 ord 1.0 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=watch,undo=journal,witness=on,merge=adaptive True 13376 18.62 2438.9 vis 1.0 ws 0.9998 rev 0.998 comp 0.508 ord 1.0 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=watch,undo=journal,witness=off,merge=adaptive True 13376 15.98 2294.8 vis 0.0 ws 0.9998 rev 0.998 comp 0.508 ord 1.0 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=watch,undo=snapshot,witness=on,merge=adaptive True 166315889 13869.47 5284.8 vis 1.0 ws -1.6245 rev 1.0 comp 0.508 ord 0.935 rob 1.0
+r2-dev v2+alias cand:ax-a/engine=watch,undo=snapshot,witness=off,merge=adaptive True 154030144 14708.39 4852.6 vis 0.0 ws -1.4306 rev 1.0 comp 0.508 ord 0.952 rob 1.0
+records 5136 head 6b2f7eeddfa5642047acf470b5462763c6faf0d1118dbcdad4dbd3a250f11c69
+
+real	48m9.267s
+user	47m44.928s
+sys	0m0.328s

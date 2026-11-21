@@ -115,4 +115,5 @@ def run(S, fam, phase):
 if __name__ == "__main__":
     S = Space(sys.argv[1]); phase = sys.argv[2]
     for fam in ("ax-a", "ax-b"):
-        run(S, fam, phase)
+        if any("phase:" + phase in r["colors"] and r["head"].startswith("meas:cand:" + fam + "/") for r in S.recs):
+            run(S, fam, phase)

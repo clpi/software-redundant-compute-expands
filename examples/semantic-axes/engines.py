@@ -43,6 +43,7 @@ class Counter:
         self.first = {}       # gaming control: first record index per head
         self.j = None         # journal of the last append
         self.snap = None
+        self.psum = 0         # premises seen on admitted records (replay estimate)
     # -- state copy for the snapshot control (cost counted) --
     def _copy(self):
         st = (set(self.D), {k: list(v) for k, v in self.waiters.items()}, list(self.count),
@@ -67,6 +68,7 @@ class Counter:
             self._log("noop")
             return new
         ps, h = dprem(rec), rec[4]
+        self.psum += len(ps)
         i = len(self.count)
         missing = 0
         for p in ps:
@@ -158,6 +160,7 @@ class Watch(Counter):
         if not admits(rec):
             self._log("noop"); return new
         ps, h = list(rec[3]), rec[4]
+        self.psum += len(ps)
         j = len(self.prs)
         self.prs.append(ps); self.pos.append(0); self.heads.append(h); self.ridx.append(k); self._log("r")
         queue = []
@@ -268,7 +271,21 @@ class Lookahead(Counter):
 ENGINES = {"counter": Counter, "watch": Watch, "rounds": Rounds}
 
 # ---------------- merges (compositionality) ----------------
-def merge(kind, A, B, offset, rebuild):
+def _pending(x):
+    return sum(len(v) for v in (x.watch if isinstance(x, Watch) else x.waiters).values())
+
+def _replay(dst, L, off, relabel=0):
+    """Append log L (indices shifted by off) onto an existing state."""
+    before = dst.ops
+    if relabel:
+        dst.ridx = [k + relabel for k in dst.ridx]
+        dst.wit = {h: k + relabel for h, k in dst.wit.items()}
+        dst.ops += len(dst.ridx) + len(dst.wit)
+    for k, r in enumerate(L):
+        dst.append(r, k + off)
+    return dst.ops - before
+
+def merge(kind, A, B, offset, rebuild, LA=None, LB=None):
     """Merge two states built independently over logs LA and LB (B's
     record indexes shifted by `offset`). kind:
       propagate  reuse both states: D = DA | DB, then wake only rules
@@ -278,6 +295,19 @@ def merge(kind, A, B, offset, rebuild):
     Returns (state, ops)."""
     if kind == "left":
         return A, 0
+    if kind == "adaptive" and isinstance(A, Rounds):
+        kind = "propagate"
+    if kind == "adaptive":
+        # round 2 (AXES.json round_2.new_component): cheaper of state
+        # propagation and replaying the smaller half's log onto the other state
+        est_prop = len(B.heads) + len(B.D) + 2 * _pending(B)
+        if min(A.psum, B.psum) < est_prop:
+            if B.psum <= A.psum:
+                ops = _replay(A, LB, offset); A.merge_path = "replay-right"
+                return A, ops
+            ops = _replay(B, LA, 0, relabel=offset); B.merge_path = "replay-left"
+            return B, ops
+        kind = "propagate"
     if kind == "recompute":
         s = rebuild()
         return s, s.ops
