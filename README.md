@@ -34,6 +34,14 @@ refutes the universal form of the claim.
 - `proof/Synthesis.lean` — the joined theorem assembling
   the parts, with the campaign's empirical yield rate
   carried as a named premise.
+- `proof/Closure.lean` — computable derivability on the
+  canonical view (`Closure.clos`), the naive baseline.
+- `proof/Worklist.lean` — counter-based worklist closure, proved
+  equal to the least closure of `viewC` at every append prefix,
+  with termination, enqueue-once and a visit bound.
+- `examples/worklist/` — same-contract measurement against naive
+  closure on real append traces, and its claims ledger
+  (`CLAIMS.md`).
 - `proof/check.sh` — the family gate.
 
 ## The gate

@@ -1,0 +1,41 @@
+dev cand:f/resolver=name 57 95 0 56
+dev cand:f/resolver=visible 0 79 37 56
+dev cand:f/resolver=nearest 0 50 37 54
+dev cand:f/resolver=enclosing 0 0 0 0
+dev estate cand:a/trigger=scratch,dedup=on,check=short True 7840266 1326.56 646.3
+dev estate cand:a/trigger=scratch,dedup=on,check=full True 15418252 2037.59 646.3
+dev estate cand:a/trigger=scratch,dedup=off,check=short True 7840266 1306.94 633.4
+dev estate cand:a/trigger=scratch,dedup=off,check=full True 15418252 1768.8 633.3
+dev estate cand:a/trigger=rounds,dedup=on,check=short True 395952 100.18 606.4
+dev estate cand:a/trigger=rounds,dedup=on,check=full True 1007675 153.02 606.4
+dev estate cand:a/trigger=rounds,dedup=off,check=short True 395952 148.73 593.4
+dev estate cand:a/trigger=rounds,dedup=off,check=full True 1007675 140.07 593.4
+dev estate cand:a/trigger=delta,dedup=on,check=short True 6039 3.59 882.4
+dev estate cand:a/trigger=delta,dedup=on,check=full True 13866 3.81 882.4
+dev estate cand:a/trigger=delta,dedup=off,check=short True 6039 3.1 869.5
+dev estate cand:a/trigger=delta,dedup=off,check=full True 13866 3.84 869.4
+dev estate cand:a/trigger=counter,dedup=on,check=- True 4299 2.78 459.1
+dev estate cand:a/trigger=counter,dedup=off,check=- True 4299 2.73 463.3
+dev estate cand:a/trigger=watch,dedup=on,check=- True 2652 3.08 584.6
+dev estate cand:a/trigger=watch,dedup=off,check=- True 2652 2.8 571.7
+dev v2 cand:a/trigger=scratch,dedup=on,check=short True 12973280 2526.09 1619.5
+dev v2 cand:a/trigger=scratch,dedup=on,check=full True 15611388 2278.99 1619.5
+dev v2 cand:a/trigger=scratch,dedup=off,check=short True 12973280 2548.88 1572.7
+dev v2 cand:a/trigger=scratch,dedup=off,check=full True 15611388 2447.29 1572.7
+dev v2 cand:a/trigger=rounds,dedup=on,check=short True 1481062 528.01 1459.6
+dev v2 cand:a/trigger=rounds,dedup=on,check=full True 2425826 563.31 1459.6
+dev v2 cand:a/trigger=rounds,dedup=off,check=short True 1481062 526.19 1412.8
+dev v2 cand:a/trigger=rounds,dedup=off,check=full True 2425826 587.76 1412.8
+dev v2 cand:a/trigger=delta,dedup=on,check=short True 8518 9.14 1952.0
+dev v2 cand:a/trigger=delta,dedup=on,check=full True 9396 6.67 1952.0
+dev v2 cand:a/trigger=delta,dedup=off,check=short True 8518 5.84 1905.1
+dev v2 cand:a/trigger=delta,dedup=off,check=full True 9396 6.56 1905.1
+dev v2 cand:a/trigger=counter,dedup=on,check=- True 6280 7.25 1021.2
+dev v2 cand:a/trigger=counter,dedup=off,check=- True 6280 4.19 1021.1
+dev v2 cand:a/trigger=watch,dedup=on,check=- True 4914 8.02 1319.1
+dev v2 cand:a/trigger=watch,dedup=off,check=- True 4914 7.01 1276.5
+dev campaign-1 decisions done
+dev campaign-2 decisions done
+dev campaign-3 decisions done
+dev campaign-4 decisions done
+records 2241 head d4092a42d9634e811bc0841c41fff124ae0c82ba688f61538cc97451b8489617

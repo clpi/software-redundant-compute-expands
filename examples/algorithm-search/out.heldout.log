@@ -1,0 +1,108 @@
+heldout refs cand:a/trigger=counter,dedup=off,check=- True 1507 0.93 165.2
+heldout refs cand:a/trigger=counter,dedup=on,check=- True 1507 0.81 162.2
+heldout refs cand:a/trigger=watch,dedup=off,check=- True 662 0.67 190.8
+heldout v2-rr cand:a/trigger=counter,dedup=off,check=- True 6280 4.25 1021.1
+heldout v2-rr cand:a/trigger=counter,dedup=on,check=- True 6280 4.62 1021.1
+heldout v2-rr cand:a/trigger=watch,dedup=off,check=- True 4914 8.38 1280.8
+control estate+dup-records cand:a/trigger=counter,dedup=off,check=- True 8598 3.52 851.5
+control estate+dup-records cand:a/trigger=counter,dedup=on,check=- True 8598 5.36 847.2
+control estate+dup-records cand:a/trigger=watch,dedup=off,check=- True 5304 4.32 1068.7
+control estate+dup-premises cand:a/trigger=counter,dedup=off,check=- True 8598 3.31 463.2
+control estate+dup-premises cand:a/trigger=counter,dedup=on,check=- True 4299 3.25 459.0
+control estate+dup-premises cand:a/trigger=watch,dedup=off,check=- True 5138 2.44 590.6
+control estate+filtered cand:a/trigger=counter,dedup=off,check=- True 4464 2.36 605.9
+control estate+filtered cand:a/trigger=counter,dedup=on,check=- True 4464 2.66 601.6
+control estate+filtered cand:a/trigger=watch,dedup=off,check=- True 2817 2.51 722.8
+control estate+reversed cand:a/trigger=counter,dedup=off,check=- True 4714 2.17 491.3
+control estate+reversed cand:a/trigger=counter,dedup=on,check=- True 4714 2.5 491.3
+control estate+reversed cand:a/trigger=watch,dedup=off,check=- True 2652 3.29 599.2
+control estate+shuffle1 cand:a/trigger=counter,dedup=off,check=- True 4366 2.9 477.0
+control estate+shuffle1 cand:a/trigger=counter,dedup=on,check=- True 4366 2.73 477.4
+control estate+shuffle1 cand:a/trigger=watch,dedup=off,check=- True 2652 2.67 585.1
+control estate+shuffle2 cand:a/trigger=counter,dedup=off,check=- True 4760 2.51 479.6
+control estate+shuffle2 cand:a/trigger=counter,dedup=on,check=- True 4760 2.75 479.7
+control estate+shuffle2 cand:a/trigger=watch,dedup=off,check=- True 2652 2.59 587.7
+control estate+shuffle3 cand:a/trigger=counter,dedup=off,check=- True 4302 2.35 480.4
+control estate+shuffle3 cand:a/trigger=counter,dedup=on,check=- True 4302 3.34 480.4
+control estate+shuffle3 cand:a/trigger=watch,dedup=off,check=- True 2652 3.26 588.5
+control v2+dup-records cand:a/trigger=counter,dedup=off,check=- True 12560 8.15 1875.9
+control v2+dup-records cand:a/trigger=counter,dedup=on,check=- True 12560 8.33 1875.9
+control v2+dup-records cand:a/trigger=watch,dedup=off,check=- True 9828 10.62 2423.7
+control v2+dup-premises cand:a/trigger=counter,dedup=off,check=- True 12560 6.77 1021.1
+control v2+dup-premises cand:a/trigger=counter,dedup=on,check=- True 6280 6.98 1021.1
+control v2+dup-premises cand:a/trigger=watch,dedup=off,check=- True 9828 7.19 1289.2
+control v2+filtered cand:a/trigger=counter,dedup=off,check=- True 6643 7.13 1292.8
+control v2+filtered cand:a/trigger=counter,dedup=on,check=- True 6643 7.72 1289.1
+control v2+filtered cand:a/trigger=watch,dedup=off,check=- True 5277 8.26 1608.9
+control v2+reversed cand:a/trigger=counter,dedup=off,check=- True 9828 4.89 1278.2
+control v2+reversed cand:a/trigger=counter,dedup=on,check=- True 9828 5.25 1277.6
+control v2+reversed cand:a/trigger=watch,dedup=off,check=- True 4914 5.13 1529.4
+control v2+shuffle1 cand:a/trigger=counter,dedup=off,check=- True 7628 5.52 1115.6
+control v2+shuffle1 cand:a/trigger=counter,dedup=on,check=- True 7628 8.02 1115.6
+control v2+shuffle1 cand:a/trigger=watch,dedup=off,check=- True 4914 5.97 1388.9
+control v2+shuffle2 cand:a/trigger=counter,dedup=off,check=- True 7974 5.63 1108.6
+control v2+shuffle2 cand:a/trigger=counter,dedup=on,check=- True 7974 5.84 1108.6
+control v2+shuffle2 cand:a/trigger=watch,dedup=off,check=- True 4914 6.15 1381.9
+control v2+shuffle3 cand:a/trigger=counter,dedup=off,check=- True 7104 5.12 1103.3
+control v2+shuffle3 cand:a/trigger=counter,dedup=on,check=- True 7104 5.62 1103.3
+control v2+shuffle3 cand:a/trigger=watch,dedup=off,check=- True 4914 5.75 1376.1
+control refs+dup-records cand:a/trigger=counter,dedup=off,check=- True 3014 1.13 275.0
+control refs+dup-records cand:a/trigger=counter,dedup=on,check=- True 3014 1.34 272.1
+control refs+dup-records cand:a/trigger=watch,dedup=off,check=- True 1324 1.1 337.3
+control refs+dup-premises cand:a/trigger=counter,dedup=off,check=- True 3014 0.75 166.4
+control refs+dup-premises cand:a/trigger=counter,dedup=on,check=- True 1507 0.75 162.1
+control refs+dup-premises cand:a/trigger=watch,dedup=off,check=- True 1223 0.75 197.4
+control refs+filtered cand:a/trigger=counter,dedup=off,check=- True 1552 0.73 200.1
+control refs+filtered cand:a/trigger=counter,dedup=on,check=- True 1552 0.85 196.6
+control refs+filtered cand:a/trigger=watch,dedup=off,check=- True 707 0.68 229.4
+control refs+reversed cand:a/trigger=counter,dedup=off,check=- True 1541 0.67 163.9
+control refs+reversed cand:a/trigger=counter,dedup=on,check=- True 1541 0.71 160.0
+control refs+reversed cand:a/trigger=watch,dedup=off,check=- True 662 0.65 194.0
+control refs+shuffle1 cand:a/trigger=counter,dedup=off,check=- True 1570 0.73 170.1
+control refs+shuffle1 cand:a/trigger=counter,dedup=on,check=- True 1570 0.87 170.1
+control refs+shuffle1 cand:a/trigger=watch,dedup=off,check=- True 662 0.69 195.4
+control refs+shuffle2 cand:a/trigger=counter,dedup=off,check=- True 1565 0.7 170.4
+control refs+shuffle2 cand:a/trigger=counter,dedup=on,check=- True 1565 0.89 170.3
+control refs+shuffle2 cand:a/trigger=watch,dedup=off,check=- True 662 0.73 197.0
+control refs+shuffle3 cand:a/trigger=counter,dedup=off,check=- True 1523 0.7 174.8
+control refs+shuffle3 cand:a/trigger=counter,dedup=on,check=- True 1523 0.84 174.5
+control refs+shuffle3 cand:a/trigger=watch,dedup=off,check=- True 662 0.71 200.2
+control v2-rr+dup-records cand:a/trigger=counter,dedup=off,check=- True 12560 8.78 1875.9
+control v2-rr+dup-records cand:a/trigger=counter,dedup=on,check=- True 12560 7.96 1875.9
+control v2-rr+dup-records cand:a/trigger=watch,dedup=off,check=- True 9828 8.58 2424.0
+control v2-rr+dup-premises cand:a/trigger=counter,dedup=off,check=- True 12560 4.59 1021.1
+control v2-rr+dup-premises cand:a/trigger=counter,dedup=on,check=- True 6280 4.35 1021.1
+control v2-rr+dup-premises cand:a/trigger=watch,dedup=off,check=- True 9828 5.08 1293.3
+control v2-rr+filtered cand:a/trigger=counter,dedup=off,check=- True 6643 6.05 1346.8
+control v2-rr+filtered cand:a/trigger=counter,dedup=on,check=- True 6643 7.45 1346.6
+control v2-rr+filtered cand:a/trigger=watch,dedup=off,check=- True 5277 5.72 1631.0
+control v2-rr+reversed cand:a/trigger=counter,dedup=off,check=- True 9828 4.7 1316.4
+control v2-rr+reversed cand:a/trigger=counter,dedup=on,check=- True 9828 5.46 1316.4
+control v2-rr+reversed cand:a/trigger=watch,dedup=off,check=- True 4914 5.76 1538.2
+control v2-rr+shuffle1 cand:a/trigger=counter,dedup=off,check=- True 7709 6.01 1117.9
+control v2-rr+shuffle1 cand:a/trigger=counter,dedup=on,check=- True 7709 8.03 1117.9
+control v2-rr+shuffle1 cand:a/trigger=watch,dedup=off,check=- True 4914 7.63 1389.9
+control v2-rr+shuffle2 cand:a/trigger=counter,dedup=off,check=- True 7454 6.42 1108.3
+control v2-rr+shuffle2 cand:a/trigger=counter,dedup=on,check=- True 7454 6.36 1108.3
+control v2-rr+shuffle2 cand:a/trigger=watch,dedup=off,check=- True 4914 5.86 1381.5
+control v2-rr+shuffle3 cand:a/trigger=counter,dedup=off,check=- True 7868 5.23 1099.6
+control v2-rr+shuffle3 cand:a/trigger=counter,dedup=on,check=- True 7868 5.88 1099.6
+control v2-rr+shuffle3 cand:a/trigger=watch,dedup=off,check=- True 4914 8.06 1372.9
+heldout campaign-5 decisions done
+heldout campaign-6 decisions done
+lost-on-heldout cand:a/trigger=counter,dedup=off,check=-
+held cand:a/trigger=counter,dedup=on,check=-
+held cand:a/trigger=watch,dedup=off,check=-
+held cand:b1/front=archive
+held cand:b1/front=sortfilter
+held cand:b2/joint=brute,prune=on
+held cand:b2/joint=fold,prune=on
+held cand:b3/select=lex,scope=frontfirst
+held cand:c/stop=bestfirst
+held cand:c/stop=threshold/delta=0.05
+held cand:c/stop=threshold/delta=0.1
+held cand:c/stop=threshold/delta=0.2
+held cand:d/rescoring=archive
+held cand:e/ch,params=solved
+not-applicable-on-heldout cand:f/resolver=enclosing
+records 3737 head a5843af7022b3e3516f9e950c70e50ba2dbee75ad14e1c2c0a5b0ee5b615a8b0
