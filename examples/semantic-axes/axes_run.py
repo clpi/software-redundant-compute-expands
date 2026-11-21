@@ -35,7 +35,7 @@ def meas(S, cand, inp, obj, value, phase, extra=None):
 # ------------------------------------------------------------------
 AXES = {
  "a": {"engine": ["counter", "watch", "rounds"], "undo": ["none", "journal", "snapshot"],
-       "witness": ["on", "off"], "merge": ["propagate", "recompute", "adaptive"]},
+       "witness": ["on", "off"], "merge": ["propagate", "recompute"]},  # round 2 adds merge=adaptive (round2.py)
  "b": {"engine": ["archive", "cold"], "undo": ["none", "residual", "snapshot", "recompute"],
        "witness": ["off", "on", "repoint"]},
  "j": {"compose": ["sequential", "tree"]},
