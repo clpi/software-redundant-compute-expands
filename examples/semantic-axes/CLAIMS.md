@@ -87,7 +87,7 @@ Rerun everything from the raw traces, check every claim and run the proof gate: 
 - That the Python closure engines log exactly the journal entries proved invertible in `proof/Journal.lean` (R3); this link is tested, not proved.
 - Native timings: all wall times are Python.
 
-## Proofs (`proof/Axes.lean`, `proof/Journal.lean`; gate cold, exit 0, 280 axiom printouts in proof/CHECK.log, no sorry, axioms within propext, Classical.choice, Quot.sound)
+## Proofs (`proof/Axes.lean`, `proof/Journal.lean`; gate cold, exit 0, 304 axiom printouts in proof/CHECK.log after merging main, no sorry, axioms within propext, Classical.choice, Quot.sound)
 
 `dom_ext_le`, `front_ext`, `front_union` (archives merge exactly), `undo_residual`, `ins_accept`, `ins_reject`, `seeded_eq`, `merge_spec` (closure merge by seeding equals the closure of the whole log).
 
