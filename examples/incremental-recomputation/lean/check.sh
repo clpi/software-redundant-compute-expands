@@ -1,7 +1,7 @@
 #!/bin/sh
 # Cold gate for the cone rules.
-#   LEAN=/path/to/lean sh check.sh                  Cone.lean only (8 theorems)
-#   LEAN=/path/to/lean sh check.sh <hma proof dir>  also HmaJoin.lean over Hma.lean (5 more)
+#   LEAN=/path/to/lean sh check.sh                  Cone.lean only (9 theorems)
+#   LEAN=/path/to/lean sh check.sh <hma proof dir>  also HmaJoin.lean over Hma.lean (9 more)
 # Warnings are errors; escape tokens are rejected; every printed axiom set must lie
 # within {propext, Classical.choice, Quot.sound}; the printout count must match.
 set -eu
@@ -12,11 +12,11 @@ T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
 export LEAN_PATH="$T"
 "$LEAN" --version
 units=""; want=0
-[ -f "$here/Cone.lean" ] && { units="Cone AuditCone"; want=8; }
+[ -f "$here/Cone.lean" ] && { units="Cone AuditCone"; want=9; }
 if [ -n "$hma" ]; then
   (cd "$hma" && "$LEAN" -DwarningAsError=true -o "$T/Hma.olean" Hma.lean > "$T/hma.out" 2>&1) || { cat "$T/hma.out"; echo "REJECT Hma build"; exit 1; }
   echo "Hma.lean sha256 $(sha256sum "$hma/Hma.lean" | cut -c1-16) (built unchanged)"
-  units="$units HmaJoin AuditHma"; want=$((want + 5))
+  units="$units HmaJoin AuditHma"; want=$((want + 9))
 fi
 for f in $units; do
   case $f in Audit*) ;; *)

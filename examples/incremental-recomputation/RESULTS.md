@@ -132,3 +132,10 @@ What the bar asks that has no object here (proposed as its own task):
 - s2: GAP, open. A query whose cone holds the edited key is re-derived whole, not resumed from the read of that key. Resuming needs decoder checkpoints that the unmodified harness decoder does not expose.
 - s1: not applicable. A join has no downstream chain to stop.
 - Chris's numbers (3 block evaluations vs 515 planned, 32 tests, 98,304 values over 8,192 edits) were not checked here: the replay is not in this project. 515 = 512 + 3 and 98,304 = 8,192 x 12 are arithmetic, like the earlier counts.
+
+## 2026-11-22 ~07:30Z: resume from the edited read (Chris 07:03Z "Finish end to end and improve")
+
+- s2 gap closed: a query whose cone holds the edited key now resumes from the checkpoint taken just before its first read of that key, instead of re-deriving whole. The resumable decoder is a replica of certified_decode that checkpoints heap, tie counter, unresolved bounds, best and cost before every read; the original decoder stays the checker for every fresh and resumed result. Reads before the resume point are carried after their hashes are re-checked.
+- Gate (counts, decoder lookups over all single-key edits): seed 11, 316 edits: 1,863 resumed vs 3,322 whole-query vs 13,718 from scratch; seed 23, 229 edits: 1,251 vs 2,325 vs 7,944. Same queries re-derived as the whole-query engine; every edit and revert agrees; 60 chained edits with checkpoints carried agree after every edit. Cost: checkpoints held 382 and 223 heap entries. A mutant that resumes one read too late is refused by the carried-read hash recheck.
+- Lean: Cone.resume (if the edited table agrees on the first n keys read, the checkpoint after n reads is unchanged and running from it equals a whole re-run). 18 theorems, cold gate pass.
+- Gate: 70 checks PASS.

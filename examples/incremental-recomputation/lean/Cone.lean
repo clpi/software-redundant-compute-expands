@@ -149,6 +149,35 @@ theorem edit_outside [DecidableEq K] (p : Prog K V R) (t : K → Option V)
     simp [this]
   exact ((run_cone p t _ h).1).symm
 
+
+/-- The program left after answering its first n lookups from t
+    (the decoder's checkpoint before its (n+1)-th read). -/
+def after : Prog K V R → (K → Option V) → Nat → Prog K V R
+  | p, _, 0 => p
+  | .ret r, _, _ + 1 => .ret r
+  | .ask k f, t, n + 1 => after (f (t k)) t n
+
+/-- Resume rule: if the edited table agrees with the old one on the first n
+    keys read, the checkpoint after n reads is the same, and running from it
+    on the edited table gives the answer a whole re-run would. -/
+theorem resume (p : Prog K V R) (t t' : K → Option V) (n : Nat)
+    (h : ∀ k ∈ (cone p t).take n, t k = t' k) :
+    after p t n = after p t' n ∧ run p t' = run (after p t n) t' := by
+  induction n generalizing p with
+  | zero => cases p <;> simp [after]
+  | succ n ih =>
+    cases p with
+    | ret r => exact ⟨rfl, rfl⟩
+    | ask k f =>
+      have hk : t k = t' k := h k (by simp [cone])
+      have rest : ∀ k' ∈ (cone (f (t k)) t).take n, t k' = t' k' := by
+        intro k' hk'
+        exact h k' (by simp [cone, List.take_succ_cons, hk'])
+      have := ih (f (t k)) rest
+      simp only [after, run]
+      rw [← hk]
+      exact this
+
 /-- Control: drop the missing-row keys from the cone and the rule fails.
     The program reads key 0 and branches on whether a row is there. -/
 def probe : Prog Nat Nat Nat := .ask 0 (fun o => match o with | none => .ret 0 | some _ => .ret 1)

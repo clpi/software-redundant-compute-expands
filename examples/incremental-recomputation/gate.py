@@ -287,6 +287,78 @@ def s2(run_py):
             chain_ok &= all(eng.verdict(k) == ref[k] for k in eng.keys)
         check(chain_ok, "s2 seed %d: 60 chained edits with carried state never reset agree after every edit"
               % seed)
+    # resume: re-derivation restarts at the first read of the edited key
+    for seed in (11, 23):
+        table = h.build_table(seed)
+        queries = h.queries_for(table, seed)
+        res = SY.ResumeEngine(h, table, queries)
+        res.build()
+        whole = SY.Engine(h, table, queries)
+        whole.build()
+        ref, lk = SY.scratch(h, res.table, res.keys)
+        ok = all(res.verdict(k) == ref[k] for k in res.keys)
+        holders = {}
+        for k in res.keys:
+            for rk in res.state[k][1]:
+                holders.setdefault(rk, set()).add(k)
+        r_tot = w_tot = s_tot = n = 0
+        same_set = True
+        for rk in sorted(holders, key=repr):
+            row = dict.get(res.table, rk)
+            news = ([None] + [SY.overlay(row, tok, m) for tok, _w in row
+                              for m in (Fraction(2), Fraction(1, 2), Fraction(3))]
+                    if row is not None else [[(0, Fraction(1))]])
+            for new in news:
+                cr, cw = res.edit(rk, new), whole.edit(rk, new)
+                ref, ls = SY.scratch(h, res.table, res.keys)
+                ok &= all(res.verdict(k) == ref[k] for k in res.keys)
+                same_set &= set(res.rederived) == set(whole.rederived)
+                r_tot, w_tot, s_tot, n = r_tot + cr, w_tot + cw, s_tot + ls, n + 1
+                res.edit(rk, row)
+                whole.edit(rk, row)
+                ref, _ = SY.scratch(h, res.table, res.keys)
+                ok &= all(res.verdict(k) == ref[k] for k in res.keys)
+        ckpt_entries = sum(len(st[0]) + 1 for ck, _rd in res.trace.values() for _k, st in ck)
+        check(ok and same_set and r_tot <= w_tot,
+              "s2 seed %d resume: %d edits and reverts agree with the decoder run whole, same queries "
+              "re-derived as before; lookups %d resumed vs %d whole-query vs %d from scratch "
+              "(checkpoints held: %d heap entries)" % (seed, n, r_tot, w_tot, s_tot, ckpt_entries))
+        COUNTS["s2 seed %d resume" % seed] = {"edits": n, "lookups_resumed": r_tot,
+                                             "lookups_whole_query": w_tot, "lookups_scratch": s_tot,
+                                             "checkpoint_heap_entries": ckpt_entries}
+        rng = random.Random(seed + 19)
+        chain_ok = True
+        for _ in range(60):
+            rk = rng.choice(sorted(dict.keys(res.table), key=repr))
+            row = dict.get(res.table, rk)
+            res.edit(rk, SY.overlay(row, rng.choice(row)[0], rng.choice([Fraction(2), Fraction(1, 2), Fraction(3)])))
+            ref, _ = SY.scratch(h, res.table, res.keys)
+            chain_ok &= all(res.verdict(k) == ref[k] for k in res.keys)
+        check(chain_ok, "s2 seed %d resume: 60 chained edits, checkpoints carried across edits, agree after every edit"
+              % seed)
+    # mutant: resume one read too late (skips re-reading the edited key)
+    table = h.build_table(11)
+    queries = h.queries_for(table, 11)
+    caught = False
+    for rk0 in sorted({k for k in table}, key=repr)[:12]:
+        mut = SY.ResumeEngine(h, table, queries)
+        mut.build()
+        orig = mut._derive
+        def late(qk, start_at=None, _o=orig, _m=mut):
+            if start_at is not None and start_at + 1 < len(_m.trace[qk][0]):
+                start_at += 1
+            return _o(qk, start_at)
+        mut._derive = late
+        row = dict.get(mut.table, rk0)
+        try:
+            mut.edit(rk0, SY.overlay(row, row[0][0], Fraction(3)))
+        except AssertionError:
+            caught = True  # the carried-read hash recheck refuses the late resume
+            continue
+        ref, _ = SY.scratch(h, mut.table, mut.keys)
+        caught |= any(mut.verdict(k) != ref[k] for k in mut.keys)
+    check(caught, "s2 mutant (resume one checkpoint past the first read of the edited key) is caught "
+                  "(by the carried-read hash recheck)")
     # mutant: missing-row lookups dropped from the cone
     table = h.build_table(11)
     queries = h.queries_for(table, 11)

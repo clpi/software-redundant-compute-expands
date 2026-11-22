@@ -7,3 +7,4 @@ import Cone
 #print axioms Cone.missing_is_a_premise
 #print axioms Cone.pairs_join
 #print axioms Cone.pairs_count
+#print axioms Cone.resume

@@ -67,6 +67,10 @@ to make withdrawal and score change exact at 0 evaluations.
   every hash in its cone is re-checked against the edited table (asserted).
 - Unit of state: a distinct (prefix, bound) query. The harness query list
   repeats the root prefix (8 times at seeds 11 and 23); repeats share a verdict.
+- Resume (ResumeEngine): an affected query restarts at the checkpoint taken just
+  before its first read of the edited key (heap, tie counter, unresolved bounds,
+  best, cost), from a replica decoder that records those checkpoints. Lean:
+  `Cone.resume`.
 - Checker: the decoder run whole on a plain dict copy of the edited table.
 - Lean: `Cone.run_cone` (a lookup program agreeing on its cone gives the same
   answer and the same cone), `Cone.edit_outside`, and the control

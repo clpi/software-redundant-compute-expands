@@ -88,6 +88,13 @@
   "rederived_max": 3,
   "rederived_mean": 1.858
  },
+ "s2 seed 11 resume": {
+  "checkpoint_heap_entries": 382,
+  "edits": 316,
+  "lookups_resumed": 1863,
+  "lookups_scratch": 13718,
+  "lookups_whole_query": 3322
+ },
  "s2 seed 23": {
   "distinct": 14,
   "edits": 229,
@@ -130,6 +137,13 @@
   "rederived_max": 3,
   "rederived_mean": 1.843
  },
+ "s2 seed 23 resume": {
+  "checkpoint_heap_entries": 223,
+  "edits": 229,
+  "lookups_resumed": 1251,
+  "lookups_scratch": 7944,
+  "lookups_whole_query": 2325
+ },
  "s3 dense withdrawal chain": {
   "max": 47,
   "steps": 33,
@@ -155,8 +169,8 @@
   "scratch_pairs": 1770,
   "subsets": 64,
   "wall_ms_indicative": [
-   2.2,
-   47.1
+   1.7,
+   40.2
   ]
  },
  "s3 synthetic-dense": {
@@ -169,8 +183,8 @@
   "scratch_pairs": 24090,
   "subsets": 64,
   "wall_ms_indicative": [
-   7.6,
-   591.5
+   6.4,
+   520.3
   ]
  }
 }
