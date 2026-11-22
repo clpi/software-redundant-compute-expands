@@ -31,6 +31,17 @@ sys.path.insert(0, HERE)
 F = MS = SY = AX = None  # imported per section, so each home carries only its engine
 
 
+def home(path):
+    """Make an engine's own home importable. Each home repo carries its engine in
+    an incremental/ directory next to the checker input: meta.py and harness/run.py
+    have it beside them, the HMA solver dir has it inside. Appended, so a module
+    next to this gate (the work home carries all four) still wins."""
+    d = path if os.path.isdir(path) else os.path.dirname(os.path.abspath(path))
+    inc = os.path.join(d, "incremental")
+    if os.path.isdir(inc) and inc not in sys.path:
+        sys.path.append(inc)
+
+
 def need(*names):
     g = globals()
     for n, mod in (("F", "frontier"), ("MS", "metasearch"), ("SY", "synthesis"), ("AX", "axis")):
@@ -126,6 +137,7 @@ def s1(points_path):
 # ---------------------------------------------------- system 1, meta-search
 
 def s1_meta(meta_path):
+    home(meta_path)
     need("F", "MS")
     meta = MS.load_meta(meta_path)
     cfgs = meta.configurations()
@@ -195,6 +207,7 @@ def s1_meta(meta_path):
 # ---------------------------------------------------------------- system 2
 
 def s2(run_py):
+    home(run_py)
     need("SY")
     h = SY.load_harness(run_py)
     for seed in (11, 23):
@@ -411,6 +424,7 @@ def load_doc(model, doc, path):
 
 
 def s3(solver_dir, tmp):
+    home(solver_dir)
     need("AX")
     model, solver = AX.load_solver(solver_dir)
     fx = os.path.join(solver_dir, "fixtures")
