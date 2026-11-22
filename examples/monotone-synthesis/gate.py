@@ -43,7 +43,7 @@ def spec_ok(d):
 arts = [json.loads(l) for l in open(stream).read().split("\n")[1:] if l]
 def ref_reach(verify):
     reach = set()
-    for ver in ("0be14af", "f754884"):
+    for ver in list(dict.fromkeys(a["version"] for a in arts)):
         A = [a for a in arts if a["version"] == ver]
         g = {a["head"]: set(a["prem"]) for a in A}
         rg = defaultdict(set)
@@ -128,6 +128,39 @@ check("control flip json receipt: spec holds, json capabilities gone",
 fr, _ = run("--order", "history", "--fake-retire")
 check("control non-covering retirement refused", spec_ok(fr) and fr["refusals"].get("not_covering") == 1,
       str(fr["refusals"]))
+if any(a["home"] == "kernel" for a in arts):
+    fs, _ = run("--order", "history", "--flip-home", "sha256")
+    with tempfile.NamedTemporaryFile("r", suffix=".txt", delete=False) as f:
+        dump = f.name
+    run("--order", "history", "--flip-home", "sha256", dump=dump)
+    got = {h for h in open(dump).read().split("\n") if h}
+    os.unlink(dump)
+    kern = {a["head"] for a in arts if a["home"] == "kernel"}
+    need = {a["head"] for a in arts if a["home"] == "kernel" and any(p.startswith("sha256:") for p in a["prem"])}
+    # kernel capabilities that reach sha256 only through other kernel functions are blocked too
+    blocked_ref = kern - ref_reach(lambda a: verify_observed(a) and a["home"] != "sha256")
+    check("cross-home: kernel capabilities admitted only on sha256's (flip sha256 receipt)",
+          spec_ok(fs) and (kern & got) == kern - blocked_ref and need <= blocked_ref,
+          f"kernel admitted {len(kern & got)} of {len(kern)}, blocked {sorted(h.split(':')[1] for h in blocked_ref)}")
+    print_cross = base.get("cross_home_premises")
+    check("cross-home premises present on the live log", (print_cross or 0) > 0, f"{print_cross}")
+if any("generated" in a for a in arts):
+    gs = base["generated"]
+    check("generated: every wrong rewrite (arguments swapped) fails its battery and is refused",
+          gs["controls_offered"] > 0 and gs["controls_admitted"] == 0
+          and all(a["verdict"] == "FAILED" for a in arts if "generated" in a and a["generated"]["kind"] != "inline"),
+          f"controls {gs['controls_offered']}, admitted {gs['controls_admitted']}")
+    with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as f:
+        hdr = open(stream).readline()
+        f.write(hdr + "".join(json.dumps(a, sort_keys=True) + "\n" for a in arts if "generated" not in a))
+        plain = f.name
+    r = subprocess.run([sys.executable, "-I", loop, plain, "--order", "history"], capture_output=True, text=True)
+    os.unlink(plain)
+    p0 = json.loads(r.stdout.strip().split("\n")[-1])
+    check("generated: passing rewrites replace their originals, reach unchanged, depth never longer",
+          len(gs["replaced"]) > 0 and p0["reach_sha256"] == base["reach_sha256"]
+          and all(b is not None and a is not None and b <= a for a, b in gs["depth_changed"].values()),
+          f"replaced {len(gs['replaced'])}, sum depth {gs['sum_depth_before']} -> {gs['sum_depth_after']}, shorter {len(gs['depth_changed'])}")
 raw, _ = run("--order", "history", "--raw")
 check("finding: without grouping, mutual recursion blocks admission",
       raw is not None and raw["pending_at_end"] > 0 and raw["mismatch_log"] == 0,

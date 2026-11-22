@@ -110,10 +110,14 @@ if not args.raw:
 # ---- events: offers, then replacement requests for PR 24's versions
 byhead_old = {a["head"]: a for a in arts if a["version"] == "0be14af"}
 events = []
+byid = {a["id"]: a for a in arts}
 for a in arts:
     events.append(("offer", a))
     if a["version"] == "f754884" and a["head"] in byhead_old and "projection_of" not in a:
         events.append(("retire", byhead_old[a["head"]], a))
+    if "generated" in a:
+        # a generated implementation asks to replace the artifact it was rewritten from
+        events.append(("retire", byid[a["generated"]["replaces"]], a))
 changed = {a["home"] for a in arts if a["version"] == "f754884"}
 newheads = {a["head"] for a in arts if a["version"] == "f754884"}
 last_new = max((k for k, e in enumerate(events) if e[0] == "offer" and e[1]["version"] == "f754884"), default=-1)
@@ -246,6 +250,10 @@ def retire(old, new):
         refusals["moot"] += 1; return "moot"
     if new is None:
         refusals["no_replacement"] += 1; return "refused:no-replacement"
+    if not verified(new):
+        refusals["unverified_replacement"] += 1; return "refused:unverified-replacement"
+    if any(e[0] == "retire" and e[1] == old["id"] for e in log):
+        refusals["already_retired"] += 1; return "moot:already-retired"
     if old["id"] not in live or new["id"] not in live:
         if args.mutant == "eager-retire" and old["id"] in live:
             do_retire(old, new); return "retired"
@@ -430,6 +438,24 @@ compounding = {
 }
 cross_home = sum(1 for (h, ps) in live_rules.values() for p in ps if p.split(":")[0] != h.split(":")[0])
 retire_log = [e for e in log if e[0] == "retire"]
+gen = [a for a in arts if "generated" in a]
+gen_summary = {}
+if gen:
+    by_new = {e[2]: e[1] for e in retire_log}
+    took = [a for a in gen if a["id"] in by_new]
+    before = {i: r for i, r in live_rules.items() if i not in {a["id"] for a in gen}}
+    for a in took:
+        o = byid[by_new[a["id"]]]
+        before[o["id"]] = (o["head"], o["prem"])
+    d0 = min_depths(before, final)
+    gen_summary = {
+        "offered": len(gen), "verified": sum(1 for a in gen if verified(a)),
+        "controls_offered": sum(1 for a in gen if a["generated"]["kind"] != "inline"),
+        "controls_admitted": sum(1 for a in gen if a["generated"]["kind"] != "inline" and any(e[0] == "add" and e[1] == a["id"] for e in log)),
+        "replaced": sorted(a["head"] for a in took),
+        "sum_depth_before": sum(d0.values()), "sum_depth_after": sum(depth.values()),
+        "depth_changed": {h: [d0.get(h), depth.get(h)] for h in sorted(final) if d0.get(h) != depth.get(h)},
+    }
 summary = {
     "order": args.order, "strict": args.strict, "raw": args.raw, "mutant": args.mutant,
     "flip_home": args.flip_home, "fake_retire": args.fake_retire,
@@ -445,7 +471,7 @@ summary = {
     "monotone_breaks": monotone_breaks, "first_mismatches": mismatch[:5],
     "max_depth": max(depth.values(), default=0),
     "depth_hist": {str(k): sum(1 for v in depth.values() if v == k) for k in sorted(set(depth.values()))},
-    "cross_home_premises": cross_home, "compounding": compounding, "abstractions": abstr,
+    "cross_home_premises": cross_home, "generated": gen_summary, "compounding": compounding, "abstractions": abstr,
     "reach_sha_input": sorted(final),
 }
 import hashlib

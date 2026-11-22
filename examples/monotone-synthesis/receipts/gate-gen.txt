@@ -1,0 +1,27 @@
+PASS spec order=history reach=329 live=330 admitted=377 retired=47 deferred=16 inc=1531 cold_wl=295691 cold_naive=159360
+PASS reference final reach = independent closure loop=326 ref=326 diff=0
+PASS spec order=reverse reach=329 live=330 admitted=377 retired=47 deferred=231 inc=2110 cold_wl=251314 cold_naive=514319
+PASS spec order=shuffle:1 reach=329 live=330 admitted=377 retired=47 deferred=184 inc=1978 cold_wl=226636 cold_naive=455752
+PASS spec order=shuffle:2 reach=329 live=330 admitted=377 retired=47 deferred=178 inc=1951 cold_wl=234045 cold_naive=542561
+PASS spec order=shuffle:3 reach=329 live=330 admitted=377 retired=47 deferred=186 inc=1980 cold_wl=219158 cold_naive=499879
+PASS same final reach in every order {'48c42acd2b491cd947f1738554b1630c152ea60c76c0d47fe34b97597497b31a'}
+PASS rerun byte-identical
+PASS abstractions leave reach unchanged rules=552 max_depth 9->5 sum_depth 815->587
+PASS control flip json receipt: spec holds, json capabilities gone reach 329 -> 296 (json verified capabilities 33)
+PASS control non-covering retirement refused {'already_retired': 1, 'evidence': 18, 'moot': 3, 'not_covering': 1, 'unverified_replacement': 6}
+PASS cross-home: kernel capabilities admitted only on sha256's (flip sha256 receipt) kernel admitted 6 of 13, blocked ['cut', 'idlist', 'kernel', 'lastexit', 'sha', 'unitcat', 'verdict']
+PASS cross-home premises present on the live log 4
+PASS generated: every wrong rewrite (arguments swapped) fails its battery and is refused controls 6, admitted 0
+PASS generated: passing rewrites replace their originals, reach unchanged, depth never longer replaced 9, sum depth 824 -> 815, shorter 9
+PASS finding: without grouping, mutual recursion blocks admission pending=10 admitted=364 vs grouped 377
+PASS strict verifier (direct battery application only): spec holds admitted=60 live=55 pending=103 pending_retire=23
+PASS ingest: one process per commit batch, spec holds after each 21 batches, reach=329 live=330 pending=0
+PASS ingest final state = one-shot run (reach and live ids)
+PASS ingest: re-ingesting an applied batch changes nothing
+PASS control: a state that lost a live artifact is refused (reach would shrink) {"batch": "generated", "refused": ["reach != closure of live rules", "reach != closure of verified pool (unsaturated)", 
+PASS mutant no-cover caught first caught at order history
+PASS mutant eager-retire caught first caught at order shuffle:1
+PASS mutant no-premise-check caught first caught at order history
+PASS mutant no-verifier caught first caught at order history (reference)
+PASS mutant no-retry caught first caught at order history
+GATE PASS (26/26)

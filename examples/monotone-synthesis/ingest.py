@@ -130,7 +130,9 @@ class Engine:
 
     def retire(self, old, new):
         self.ops["retire_req"] += 1
-        if not verified(old) or new is None:
+        if not verified(old) or new is None or not verified(new):
+            return
+        if any(e[0] == "retire" and e[1] == old["id"] for e in self.st["log"]):
             return
         self.arts[old["id"]] = old; self.arts[new["id"]] = new
         if old["id"] not in self.live or new["id"] not in self.live:
