@@ -225,7 +225,7 @@ def s2(run_py):
             cost = eng.edit(rk, new)
             ref, lk = SY.scratch(h, eng.table, eng.keys)
             all_ok &= all(eng.verdict(k) == ref[k] for k in eng.keys)
-            scoped_ok &= set(eng.rederived) == holders[rk]
+            scoped_ok &= set(eng.rederived) == holders[rk] or (new == orig and not eng.rederived)
             dist.append((len(eng.rederived), cost, lk))
             eng.edit(rk, orig)  # revert, itself an edit
             ref, _ = SY.scratch(h, eng.table, eng.keys)
@@ -256,6 +256,14 @@ def s2(run_py):
             "rederived_mean": round(sum(r for r, _c, _l in dist) / len(dist), 3),
             "lookups_incremental_total": tot_inc, "lookups_scratch_total": tot_scr,
             "one_rederived_examples": sorted(set(one))[:6]}
+        # early cutoff: an edit that writes back the value every cone saw
+        rk = sorted(holders, key=lambda k: -len(holders[k]))[0]
+        same = dict.get(eng.table, rk)
+        cost = eng.edit(rk, list(same) if same is not None else None)
+        ref, _ = SY.scratch(h, eng.table, eng.keys)
+        check(cost == 0 and not eng.rederived and all(eng.verdict(k) == ref[k] for k in eng.keys),
+              "s2 seed %d: an edit at a key %d cones hold that leaves its value unchanged is cut off early "
+              "(0 re-derived, 0 lookups) and agrees" % (seed, len(holders[rk])))
         # cone-disjoint control: a key no cone holds
         free = [k for k in table if k not in holders]
         if free:

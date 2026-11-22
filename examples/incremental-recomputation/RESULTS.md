@@ -123,3 +123,12 @@ What the bar asks that has no object here (proposed as its own task):
 3. Coverage witnesses checked against the snapshot's mediation path and sensor
    deployment, health and fidelity evidence. No such evidence object exists in
    any repo I searched; it needs a definition before anything can be checked.
+
+## 2026-11-22 ~07:05Z: early cutoff (checked against Chris's 06:51Z early-cutoff result, background)
+
+- Meta-search: has it. An unchanged instance frontier carries every selection; a configuration re-joins the meta frontier only when its measure vector changed.
+- s3: has it at the difference-set layer. A new pair whose components are already in dc[m] stops there; a subset re-measures only if its live set changes.
+- s2: GAP, now closed for the exact case. An edit that left a key's row hash unchanged still re-derived every query whose cone held the key. Now it is cut off (run_cone applies with the key inside the cone). Gate: an equal-value edit at a key 3 cones hold re-derives 0 at 0 lookups at both seeds. Gate 65/65.
+- s2: GAP, open. A query whose cone holds the edited key is re-derived whole, not resumed from the read of that key. Resuming needs decoder checkpoints that the unmodified harness decoder does not expose.
+- s1: not applicable. A join has no downstream chain to stop.
+- Chris's numbers (3 block evaluations vs 515 planned, 32 tests, 98,304 values over 8,192 edits) were not checked here: the replay is not in this project. 515 = 512 + 3 and 98,304 = 8,192 x 12 are arithmetic, like the earlier counts.
