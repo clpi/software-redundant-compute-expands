@@ -1,0 +1,121 @@
+kernel.id sha256 287f79bf29b5f782b32bef03f0c3e068781a0a4d35fff8fe09d3e50408ea0298
+idol sha256 fe5096a4213d3f54bc6ccbf2686df27cbe8ac97c903c56ea30d2347c300d5e36
+== controls
+PASS c01-goodhart | REFUSE line 27 beats: cover (2 of 6 cells lack the contract's repeats, first 10 3); 
+PASS c02-reselect | REFUSE line 24 contract: contractOnce: domain 0 already has the contract at line 7
+PASS c03-tuned-after-reveal | REFUSE line 29 beats: heldout (no held-out revealed after the build at line 24); 
+PASS c04-seal-swap | REFUSE line 16 reveal: revealSeal: bytes of blobs/heldout-swapped.txt do not hash to the contract's seal
+PASS c05-harness-mismatch | REFUSE line 24 run: runHarness: harness blobs/harness-other.txt is not the contract's harness
+PASS c06-transcribed | REFUSE line 25 fact: factGrounded: evidence is not runs or data derived only from runs
+PASS c07-name-match | REFUSE line 24 run: runSubject: subject 99 is not built, a config or the do-nothing subject of domain 0
+PASS c08-fast-but-wrong | REFUSE line 24 beats: correct (1 cells hold a run whose own trace reports a wrong output, first 10 1); 
+PASS c09-do-nothing-passes | REFUSE line 24 beats: nullBase (do-nothing missing, not run, or passed a workload); 
+PASS c10-inside-floor | REFUSE line 24 beats: margin (1 cells where a subject sample plus floor does not beat a correct comparator sample, first 10 1 vs 21); 
+PASS c11-unmeasured-peak | REFUSE line 27 beats: peak (2 cells have no correct comparator run, first 10 4); 
+PASS c12-answer-replay | REFUSE line 24 build: buildLeak: built from a run trace or held-out bytes of contract line 7
+PASS c13-weak-comparator | REFUSE line 24 beats: margin (1 cells where a subject sample plus floor does not beat a correct comparator sample, first 10 1 vs 21); 
+PASS c14-no-heldout | REFUSE line 16 beats: heldout (no held-out revealed after the build at line 8); 
+PASS c15-lucky-run | REFUSE line 24 beats: cover (4 of 4 cells lack the contract's repeats, first 10 1); 
+PASS c16-build-before-contract | REFUSE line 7 build: buildAfterContract: domain 0 has no contract yet, so its seal could be chosen after this build
+PASS c17-unregistered-run | REFUSE line 24 run: runRegistered: workload 12 or dimension 1 is not registered for domain 0
+PASS p0-honest | ACCEPT line 26 fact
+== mutants: each removes one check; the named controls must now fail
+mutant no-contractOnce: controls that now fail: c02-reselect
+mutant no-buildAfterContract: controls that now fail: c16-build-before-contract
+mutant no-buildLeak: controls that now fail: c12-answer-replay
+mutant no-runRegistered: controls that now fail: c17-unregistered-run
+mutant no-runHarness: controls that now fail: c05-harness-mismatch
+mutant no-runSubject: controls that now fail: c07-name-match
+mutant no-revealSeal: controls that now fail: c04-seal-swap
+mutant no-factGrounded: controls that now fail: c06-transcribed
+mutant no-heldout: controls that now fail: c03-tuned-after-reveal c14-no-heldout
+mutant no-cover: controls that now fail: c01-goodhart c15-lucky-run
+mutant no-correct: controls that now fail: c08-fast-but-wrong
+mutant no-peak: controls that now fail: c11-unmeasured-peak
+mutant no-margin: controls that now fail: c10-inside-floor c13-weak-comparator
+mutant no-merged: controls that now fail: c10-inside-floor c13-weak-comparator
+mutant no-nullBase: controls that now fail: c09-do-nothing-passes
+== replay: idol-eyes campaigns (a0 = the campaign's own dimensions, a1 = plus the audit's)
+c1-a0 | records refused: 1 | closed 0 accepted 1215 refused 1
+   claim idol : heldout (no held-out revealed after the build at line 15); correct (9 cells hold a run whose own trace reports a wrong output, first 10 2); peak (6 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+c1-a1 | records refused: 1 | closed 0 accepted 1220 refused 1
+   claim idol : heldout (no held-out revealed after the build at line 20); cover (30 of 54 cells lack the contract's repeats, first 10 5); correct (9 cells hold a run whose own trace reports a wrong output, first 10 2); peak (36 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+c2-a0 | records refused: 454 | closed 0 accepted 2252 refused 454
+   claim idol : heldout (no held-out revealed after the build at line 19); cover (9 of 45 cells lack the contract's repeats, first 10 5); correct (9 cells hold a run whose own trace reports a wrong output, first 10 2); peak (18 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   claim idol-map : subject 102 was never built in domain 0
+   claim idol-v1 : heldout (no held-out revealed after the build at line 20); cover (9 of 45 cells lack the contract's repeats, first 10 5); correct (25 cells hold a run whose own trace reports a wrong output, first 10 2); peak (18 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   other refusals: ['buildLeak', 'runSubject']
+c2-a1 | records refused: 454 | closed 0 accepted 2257 refused 454
+   claim idol : heldout (no held-out revealed after the build at line 24); cover (54 of 90 cells lack the contract's repeats, first 10 5); correct (9 cells hold a run whose own trace reports a wrong output, first 10 2); peak (63 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   claim idol-map : subject 102 was never built in domain 0
+   claim idol-v1 : heldout (no held-out revealed after the build at line 25); cover (54 of 90 cells lack the contract's repeats, first 10 5); correct (25 cells hold a run whose own trace reports a wrong output, first 10 2); peak (63 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   other refusals: ['buildLeak', 'runSubject']
+c3-a0 | records refused: 264 | closed 0 accepted 1301 refused 264
+   claim idol : heldout (no held-out revealed after the build at line 20); cover (10 of 50 cells lack the contract's repeats, first 10 5); correct (10 cells hold a run whose own trace reports a wrong output, first 10 2); peak (20 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   claim idol-map : subject 102 was never built in domain 0
+   claim idol-v1 : heldout (no held-out revealed after the build at line 21); cover (10 of 50 cells lack the contract's repeats, first 10 5); correct (30 cells hold a run whose own trace reports a wrong output, first 10 2); peak (20 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   other refusals: ['buildLeak', 'runSubject']
+c3-a1 | records refused: 264 | closed 0 accepted 1306 refused 264
+   claim idol : heldout (no held-out revealed after the build at line 25); cover (60 of 100 cells lack the contract's repeats, first 10 5); correct (10 cells hold a run whose own trace reports a wrong output, first 10 2); peak (70 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   claim idol-map : subject 102 was never built in domain 0
+   claim idol-v1 : heldout (no held-out revealed after the build at line 26); cover (60 of 100 cells lack the contract's repeats, first 10 5); correct (30 cells hold a run whose own trace reports a wrong output, first 10 2); peak (70 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   other refusals: ['buildLeak', 'runSubject']
+c4-a0 | records refused: 290 | closed 0 accepted 1430 refused 290
+   claim idol : heldout (no held-out revealed after the build at line 21); cover (11 of 55 cells lack the contract's repeats, first 10 5); correct (11 cells hold a run whose own trace reports a wrong output, first 10 2); peak (22 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   claim idol-map : subject 102 was never built in domain 0
+   claim idol-v1 : heldout (no held-out revealed after the build at line 22); cover (11 of 55 cells lack the contract's repeats, first 10 5); correct (35 cells hold a run whose own trace reports a wrong output, first 10 2); peak (22 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   other refusals: ['buildLeak', 'runSubject']
+c4-a1 | records refused: 290 | closed 0 accepted 1435 refused 290
+   claim idol : heldout (no held-out revealed after the build at line 26); cover (66 of 110 cells lack the contract's repeats, first 10 5); correct (11 cells hold a run whose own trace reports a wrong output, first 10 2); peak (77 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   claim idol-map : subject 102 was never built in domain 0
+   claim idol-v1 : heldout (no held-out revealed after the build at line 27); cover (66 of 110 cells lack the contract's repeats, first 10 5); correct (35 cells hold a run whose own trace reports a wrong output, first 10 2); peak (77 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   other refusals: ['buildLeak', 'runSubject']
+c5-a0 | records refused: 304 | closed 0 accepted 1534 refused 304
+   claim idol : heldout (no held-out revealed after the build at line 21); correct (15 cells hold a run whose own trace reports a wrong output, first 10 2); peak (15 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   claim idol-act : heldout (no held-out revealed after the build at line 22); correct (12 cells hold a run whose own trace reports a wrong output, first 10 2); peak (15 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   claim idol-map : subject 103 was never built in domain 0
+   other refusals: ['buildLeak', 'runSubject']
+c5-a1 | records refused: 304 | closed 0 accepted 1539 refused 304
+   claim idol : heldout (no held-out revealed after the build at line 26); cover (60 of 108 cells lack the contract's repeats, first 10 5); correct (15 cells hold a run whose own trace reports a wrong output, first 10 2); peak (75 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   claim idol-act : heldout (no held-out revealed after the build at line 27); cover (60 of 108 cells lack the contract's repeats, first 10 5); correct (12 cells hold a run whose own trace reports a wrong output, first 10 2); peak (75 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   claim idol-map : subject 103 was never built in domain 0
+   other refusals: ['buildLeak', 'runSubject']
+c6-a0 | records refused: 304 | closed 0 accepted 1534 refused 304
+   claim idol : heldout (no held-out revealed after the build at line 21); correct (15 cells hold a run whose own trace reports a wrong output, first 10 2); peak (15 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   claim idol-act : heldout (no held-out revealed after the build at line 22); correct (12 cells hold a run whose own trace reports a wrong output, first 10 2); peak (15 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   claim idol-map : subject 103 was never built in domain 0
+   other refusals: ['buildLeak', 'runSubject']
+c6-a1 | records refused: 304 | closed 0 accepted 1539 refused 304
+   claim idol : heldout (no held-out revealed after the build at line 26); cover (60 of 108 cells lack the contract's repeats, first 10 5); correct (15 cells hold a run whose own trace reports a wrong output, first 10 2); peak (75 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   claim idol-act : heldout (no held-out revealed after the build at line 27); cover (60 of 108 cells lack the contract's repeats, first 10 5); correct (12 cells hold a run whose own trace reports a wrong output, first 10 2); peak (75 cells have no correct comparator run, first 10 2); nullBase (do-nothing missing, not run, or passed a workload); 
+   claim idol-map : subject 103 was never built in domain 0
+   other refusals: ['buildLeak', 'runSubject']
+== replay: level 3 receipts and space data theorems (rung 0 log plus derivations)
+seconds 1.059976056
+head e1e07dca790314a2a7cb04927ac6ece795607c945bf5731113fa539572ce1937
+closed 106 accepted 5 refused 176
+ACCEPT line 752 work
+ACCEPT line 753 derive
+ACCEPT line 754 derive
+ACCEPT line 755 derive
+ACCEPT line 756 fact
+REFUSE line 757 fact: factGrounded: evidence is not runs or data derived only from runs
+REFUSE line 758 fact: factGrounded: evidence is not runs or data derived only from runs
+   174 qualification claims refused: line N of F is not an observed root of run:H
+== rung 0 controls on this kernel (expect.json from /mnt/project-files/rung0/receipts/controls)
+PASS k1-tmpdir | closed 0 accepted 0 refused 2
+PASS k10-premise | closed 0 accepted 0 refused 2
+PASS k1b-perturbed | closed 0 accepted 0 refused 2
+PASS k2-namejoin | closed 0 accepted 0 refused 1
+PASS k3-stale | closed 0 accepted 0 refused 2
+PASS k4-edited | closed 0 accepted 0 refused 2
+PASS k5-rewrite | closed 0 accepted 0 refused 2
+PASS k6-typedin | closed 0 accepted 0 refused 1
+PASS k7-croute | closed 0 accepted 0 refused 1
+PASS k8-trace | closed 0 accepted 0 refused 2
+PASS k9-helper | closed 0 accepted 0 refused 1
+PASS p0-honest | closed 1 accepted 0 refused 0
+
+real	3m12.389s
+user	2m58.959s
+sys	0m9.977s
