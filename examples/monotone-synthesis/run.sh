@@ -70,7 +70,9 @@ mutant retire-uncovered-ok MonotoneSynthesisControls.lean '∧ ¬ Admit P0 V0 L 
 echo "== loop on real data"
 python3 -I gen_idol.py "$IQ" "$IL" > "$OUT/stream.jsonl"
 sha256sum "$OUT/stream.jsonl"
-python3 -I gate.py "$OUT/stream.jsonl" loop.py | tee "$OUT/gate.txt"
+gs=0; python3 -I gate.py "$OUT/stream.jsonl" loop.py > "$OUT/gate.txt" || gs=$?
+cat "$OUT/gate.txt"
+[ "$gs" -eq 0 ] || { echo "GATE FAILED (exit $gs)"; exit 1; }
 for o in history reverse shuffle:1 shuffle:2 shuffle:3; do
   python3 -I loop.py "$OUT/stream.jsonl" --order "$o" --abstractions
 done > "$OUT/summaries.jsonl"

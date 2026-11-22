@@ -358,16 +358,22 @@ for k, ev in enumerate(events):
 # ---- measures
 final = {h for h, n in provides.items() if n > 0} | P
 live_rules = log_rules()
-depth = {}
-def d(h, seen=()):
-    if h in depth:
-        return depth[h]
-    provs = [ps for (hh, ps) in live_rules.values() if hh == h]
-    best = min((1 + max((d(p, seen + (h,)) for p in ps), default=0)) for ps in provs) if provs else 0
-    depth[h] = best
-    return best
-for h in final:
-    d(h)
+def min_depths(rules, heads):
+    """Least derivation depth of each head: a fixed point over the rules (premise-free rule =
+    depth 1, otherwise 1 + max over premises, minimum over providers). Cycle safe: a head on
+    a cycle with no finite derivation stays absent; the iteration only ever lowers depths."""
+    INF = float("inf")
+    dep = {}
+    changed = True
+    while changed:
+        changed = False
+        for (h, ps) in rules.values():
+            v = 1 + max((dep.get(p, INF) for p in ps), default=0)
+            if v < dep.get(h, INF):
+                dep[h] = v; changed = True
+    return {h: dep[h] for h in heads if h in dep}
+
+depth = min_depths(live_rules, final)
 
 abstr = {}
 if args.abstractions:
@@ -387,17 +393,7 @@ if args.abstractions:
                     continue
                 new_rules[nid] = (h, comp); nid += 1
     after, _ = cold_closure(new_rules)
-    depth2 = {}
-    def d2(h):
-        if h in depth2:
-            return depth2[h]
-        depth2[h] = 0
-        provs = [ps for (hh, ps) in new_rules.values() if hh == h]
-        best = min((1 + max((d2(p) for p in ps), default=0)) for ps in provs) if provs else 0
-        depth2[h] = best
-        return best
-    for h in after:
-        d2(h)
+    depth2 = min_depths(new_rules, after)
     abstr = {"rules_added": nid - 10**6, "reach_unchanged": after == final,
              "max_depth_before": max(depth.values(), default=0), "max_depth_after": max(depth2.values(), default=0),
              "sum_depth_before": sum(depth.values()), "sum_depth_after": sum(depth2[h] for h in depth)}
