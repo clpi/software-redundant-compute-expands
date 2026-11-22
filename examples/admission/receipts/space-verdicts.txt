@@ -1,0 +1,9 @@
+ACCEPT line 752 work
+ACCEPT line 753 derive
+ACCEPT line 754 derive
+ACCEPT line 755 derive
+ACCEPT line 756 fact
+REFUSE line 757 fact: factGrounded: evidence is not runs or data derived only from runs
+REFUSE line 758 fact: factGrounded: evidence is not runs or data derived only from runs
+head e1e07dca790314a2a7cb04927ac6ece795607c945bf5731113fa539572ce1937
+closed 106 accepted 5 refused 176

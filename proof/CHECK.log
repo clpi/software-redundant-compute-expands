@@ -1,4 +1,28 @@
 Lean (version 4.19.0, x86_64-unknown-linux-gnu, commit 6caaee842e94, Release)
+'Admission.replay_reach' depends on axioms: [propext]
+'Admission.reach_accepted' depends on axioms: [propext, Quot.sound]
+'Admission.claim_spec' depends on axioms: [propext, Quot.sound]
+'Admission.claims_sound' depends on axioms: [propext, Quot.sound]
+'Admission.grounded_spec' depends on axioms: [propext, Quot.sound]
+'Admission.facts_grounded' depends on axioms: [propext, Quot.sound]
+'Admission.Controls.honest_reach' depends on axioms: [propext]
+'Admission.Controls.goodhart' does not depend on any axioms
+'Admission.Controls.reselect' does not depend on any axioms
+'Admission.Controls.tuned_after_reveal' does not depend on any axioms
+'Admission.Controls.seal_swap' does not depend on any axioms
+'Admission.Controls.harness_mismatch' does not depend on any axioms
+'Admission.Controls.transcribed' does not depend on any axioms
+'Admission.Controls.name_match' does not depend on any axioms
+'Admission.Controls.fast_but_wrong' does not depend on any axioms
+'Admission.Controls.do_nothing_passes' does not depend on any axioms
+'Admission.Controls.inside_floor' does not depend on any axioms
+'Admission.Controls.unmeasured_peak' does not depend on any axioms
+'Admission.Controls.answer_replay' does not depend on any axioms
+'Admission.Controls.weak_comparator' does not depend on any axioms
+'Admission.Controls.no_heldout' does not depend on any axioms
+'Admission.Controls.lucky_run' does not depend on any axioms
+'Admission.Controls.build_before_contract' does not depend on any axioms
+'Admission.Controls.unregistered_run' does not depend on any axioms
 'AlgoSearch.mem_arch' depends on axioms: [propext, Classical.choice, Quot.sound]
 'AlgoSearch.arch_perm' depends on axioms: [propext, Classical.choice, Quot.sound]
 'AlgoSearch.fmin_le_plan' depends on axioms: [propext]
