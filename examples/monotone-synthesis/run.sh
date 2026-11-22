@@ -79,4 +79,10 @@ done > "$OUT/summaries.jsonl"
 python3 -I loop.py "$OUT/stream.jsonl" --strict > "$OUT/summary-strict.json"
 python3 -I loop.py "$OUT/stream.jsonl" --raw > "$OUT/summary-raw.json"
 python3 -I loop.py "$OUT/stream.jsonl" --trace > "$OUT/trace-history.jsonl"
+python3 -I loop.py "$OUT/stream.jsonl" --emit-events "$OUT/events.jsonl" > /dev/null
+rm -f "$tmp/state.json"
+for b in $(python3 -I -c "import json,sys;print('\\n'.join(dict.fromkeys(json.loads(l)['batch'] for l in open(sys.argv[1]))))" "$OUT/events.jsonl"); do
+  python3 -I ingest.py "$tmp/state.json" "$OUT/events.jsonl" --batch "$b"
+done > "$OUT/ingest.jsonl"
+python3 -I ingest.py "$tmp/state.json" --summary >> "$OUT/ingest.jsonl"
 echo "ALL PASS"

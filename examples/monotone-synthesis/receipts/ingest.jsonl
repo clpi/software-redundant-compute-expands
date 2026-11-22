@@ -1,0 +1,20 @@
+{"applied": 8, "batch": "0fd94e80a9d56e53f5ecd96840765b4fb5a83f59", "live": 8, "pending": 0, "reach": 8}
+{"applied": 33, "batch": "4b0641d6328408324eb2f6761396e9329b6e2d84", "live": 41, "pending": 0, "reach": 41}
+{"applied": 31, "batch": "8ae7728e5967f9d9b2170b84d517bc6317518c5b", "live": 66, "pending": 6, "reach": 66}
+{"applied": 2, "batch": "da7327e6e746c93e26087f84d14e6814b689948e", "live": 74, "pending": 0, "reach": 74}
+{"applied": 45, "batch": "50a717e52c2d1e89475d956ca407c3886670944a", "live": 119, "pending": 0, "reach": 119}
+{"applied": 13, "batch": "bb9abc1e14b7081880e214028ec0f6e504f1dbe5", "live": 132, "pending": 0, "reach": 132}
+{"applied": 10, "batch": "a260f4699d2f84b1a72cdf679dd6f02ae435e774", "live": 140, "pending": 2, "reach": 140}
+{"applied": 18, "batch": "b4fbccb91ca083909cd977f21b7a242dbf435881", "live": 153, "pending": 2, "reach": 153}
+{"applied": 27, "batch": "c90b3d3e66b4673cc881f6e54b4e5d849919b43d", "live": 162, "pending": 2, "reach": 162}
+{"applied": 27, "batch": "3d529d27c111ddc7960de9971da182c49429a373", "live": 189, "pending": 2, "reach": 189}
+{"applied": 1, "batch": "93abb81686cf76489d1a0308068bbe946e9598fa", "live": 192, "pending": 0, "reach": 192}
+{"applied": 10, "batch": "63ee928ef09e60ff5de65bc4566cb9679959aaa1", "live": 199, "pending": 0, "reach": 199}
+{"applied": 14, "batch": "85acb8aee60163e9e946a92c00dbbd10e23bc4d2", "live": 213, "pending": 0, "reach": 213}
+{"applied": 17, "batch": "f2dad8b1cef561db55f336755ab3bb58abd3237d", "live": 230, "pending": 0, "reach": 230}
+{"applied": 8, "batch": "a3cbb0049eb26945c6942ff9bbde5c9e8aeebc83", "live": 237, "pending": 1, "reach": 237}
+{"applied": 1, "batch": "3cdec2141f13b482ff8325ebd128308af55a4056", "live": 239, "pending": 0, "reach": 239}
+{"applied": 32, "batch": "f01da7ad715f15d2289b1bf94ca67d8eb7b3d513", "live": 271, "pending": 0, "reach": 271}
+{"applied": 90, "batch": "a76bd4f922a4dc4737d49705248dfbeb9c380fa4", "live": 300, "pending": 0, "reach": 300}
+{"applied": 16, "batch": "20003d3f6e1deb05e399205b3bf1b0a30d1c3066", "live": 316, "pending": 0, "reach": 316}
+{"batches": 19, "live": 316, "live_ids_sha256": "c05f81dc42d28cf2dffedb3a127b84a6e6eb7d579103599aaf99843d05056eb7", "log": 392, "ops": {"offer": 364, "premise_check": 579, "retire_check": 87, "retire_req": 39, "wake": 18}, "pending": 0, "reach": 316, "reach_sha256": "a4d7b48cec6d2826028bf8f8e9db24599f6f735ddea2ebe4ab3d002e3137eb37"}

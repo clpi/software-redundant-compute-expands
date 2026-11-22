@@ -34,6 +34,7 @@ ap.add_argument("--fake-retire", action="store_true", help="control: retire an a
 ap.add_argument("--trace", action="store_true")
 ap.add_argument("--abstractions", action="store_true")
 ap.add_argument("--dump-reach", default="")
+ap.add_argument("--emit-events", default="", help="write the ordered event stream (offers, retire requests) as JSONL for ingest.py")
 args = ap.parse_args()
 
 lines = open(args.stream).read().split("\n")
@@ -129,6 +130,15 @@ if args.order == "reverse":
     events.reverse()
 elif args.order.startswith("shuffle:"):
     random.Random(int(args.order.split(":")[1])).shuffle(events)
+
+if args.emit_events:
+    with open(args.emit_events, "w") as f:
+        for ev in events:
+            rec = {"kind": ev[0], "art": ev[1], "batch": ev[1]["commit"]}
+            if ev[0] == "retire":
+                rec["new"] = ev[2]
+                rec["batch"] = ev[2]["commit"] if ev[2] else ev[1]["commit"]
+            f.write(json.dumps(rec, sort_keys=True) + "\n")
 
 # ---- incremental engine
 P = set()          # host primitives: builtins are unresolved applications, never premises here

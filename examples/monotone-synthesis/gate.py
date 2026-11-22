@@ -137,6 +137,35 @@ check("strict verifier (direct battery application only): spec holds",
       st["mismatch_log"] == 0 and st["unsaturated_prefixes"] == 0 and st["monotone_breaks"] == 0 and not st["cone_vs_full_disagreements"],
       f"admitted={st['admitted']} live={st['live']} pending={st['pending_at_end']} pending_retire={st['pending_retire_at_end']}")
 
+# ---- continuous ingest: one process per commit batch, state persisted, equals the one-shot run
+ingest = os.path.join(os.path.dirname(os.path.abspath(loop)), "ingest.py")
+with tempfile.TemporaryDirectory() as td:
+    evp, stp = os.path.join(td, "events.jsonl"), os.path.join(td, "state.json")
+    subprocess.run([sys.executable, "-I", loop, stream, "--emit-events", evp], capture_output=True, check=True)
+    batches = list(dict.fromkeys(json.loads(l)["batch"] for l in open(evp) if l.strip()))
+    ok_all = True
+    for b in batches:
+        r = subprocess.run([sys.executable, "-I", ingest, stp, evp, "--batch", b], capture_output=True, text=True)
+        ok_all &= r.returncode == 0
+    summ = json.loads(subprocess.run([sys.executable, "-I", ingest, stp, "--summary"], capture_output=True, text=True).stdout)
+    check("ingest: one process per commit batch, spec holds after each", ok_all and summ["batches"] == len(batches),
+          f"{len(batches)} batches, reach={summ['reach']} live={summ['live']} pending={summ['pending']}")
+    check("ingest final state = one-shot run (reach and live ids)",
+          summ["reach_sha256"] == base["reach_sha256"] and summ["live_ids_sha256"] == base["live_ids_sha256"])
+    before = open(stp).read()
+    subprocess.run([sys.executable, "-I", ingest, stp, evp, "--batch", batches[0]], capture_output=True)
+    after = json.loads(open(stp).read()); b0 = json.loads(before)
+    after.pop("batches"); b0.pop("batches")
+    check("ingest: re-ingesting an applied batch changes nothing", after == b0)
+    st = json.loads(before)
+    victim = st["live"][0]
+    st["live"] = st["live"][1:]
+    st["seen"] = [k for k in st["seen"] if not k.startswith("offer:")]  # re-offer: forces a spec check
+    json.dump(st, open(stp, "w"))
+    r = subprocess.run([sys.executable, "-I", ingest, stp, evp, "--batch", batches[-1]], capture_output=True, text=True)
+    check("control: a state that lost a live artifact is refused (reach would shrink)",
+          r.returncode != 0 and "refused" in r.stdout, r.stdout.strip()[:120])
+
 # ---- mutants: each must be caught somewhere
 def caught(mutant, extra=()):
     for o in ORDERS:

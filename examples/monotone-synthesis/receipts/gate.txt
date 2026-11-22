@@ -11,9 +11,13 @@ PASS control flip json receipt: spec holds, json capabilities gone reach 316 -> 
 PASS control non-covering retirement refused {'evidence': 10, 'moot': 1, 'not_covering': 1}
 PASS finding: without grouping, mutual recursion blocks admission pending=10 admitted=341 vs grouped 354
 PASS strict verifier (direct battery application only): spec holds admitted=59 live=54 pending=96 pending_retire=17
+PASS ingest: one process per commit batch, spec holds after each 19 batches, reach=316 live=316 pending=0
+PASS ingest final state = one-shot run (reach and live ids)
+PASS ingest: re-ingesting an applied batch changes nothing
+PASS control: a state that lost a live artifact is refused (reach would shrink) {"batch": "20003d3f6e1deb05e399205b3bf1b0a30d1c3066", "refused": ["reach != closure of live rules", "reach != closure of
 PASS mutant no-cover caught first caught at order history
 PASS mutant eager-retire caught first caught at order shuffle:1
 PASS mutant no-premise-check caught first caught at order history
 PASS mutant no-verifier caught first caught at order history (reference)
 PASS mutant no-retry caught first caught at order history
-GATE PASS (18/18)
+GATE PASS (22/22)

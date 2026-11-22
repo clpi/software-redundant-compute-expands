@@ -26,7 +26,7 @@ What the words mean, and which are theorems:
 | generalizable | an abstraction (composed rule whose head is already derivable from its premises) changes nothing reachable | proved: `abstract_conservative` |
 | autonomous, order free | every saturated run reaches exactly the closure of the verified pool, whatever the order of offers, retries and retirements; saturation persists | proved: `saturated_exact`, `order_independent`, `saturated_persists` |
 | sound | if the verifier is faithful, everything reached is true | proved conditionally: `reach_sound`; faithfulness is a premise |
-| 24/7 | the loop is event driven and saturated after every event; it needs no human for adds and covering replacements | operational claim, measured on one replay, not proved |
+| 24/7 | the loop is event driven and saturated after every event; `ingest.py` runs it as a resumable process (one batch of receipts per invocation, state replaced atomically, re-ingest is a no-op, a state that would lose a capability is refused) | operational claim: measured (19 commit batches in 19 processes equal the one-shot run), not proved; nothing schedules it yet |
 
 Controls (`MonotoneSynthesisControls.lean`), each a kernel-checked pair of refusal and harm:
 uncovered retirement refused although both are live (C1); covering replacement admitted (C2);
@@ -55,3 +55,12 @@ Encoding premises, stated: capability identity is `(home, path)`; the 0be14af by
 the time their name first appeared (receipts exist only for 0be14af and f754884); a mutually
 recursive group is one artifact verified by its home's receipt, with one projection per member
 (without grouping, 10 artifacts stay blocked: the least closure refuses a recursive group with no base).
+
+## Continuous ingest
+
+`ingest.py STATE EVENTS --batch COMMIT` applies one batch (one commit's receipts) to a persisted
+state and refuses to write the state unless reach equals the from-scratch closure of the live
+rules and of the verified pool, and contains the previous reach. `loop.py --emit-events` writes the
+ordered events. `run.sh` replays idol-lib's 19 commit batches as 19 separate processes; the final
+state equals the one-shot run (same reach and live ids). A scheduler that calls `ingest.py` on each
+new set of receipts is what makes it run unattended; none is set up here.
