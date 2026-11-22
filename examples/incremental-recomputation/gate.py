@@ -3,7 +3,8 @@
 
 usage:
   gate.py all <reversible checkout> <prlm checkout> <hma checkout> [counts.json]
-  gate.py s1 [points.json]      system 1, candidate-space frontier
+  gate.py s1 [points.json]      system 1, candidate-space frontier (fixture ships
+                                with the candidate-space home only)
   gate.py meta <meta.py>        system 1, the reversible repo's meta-search
   gate.py s2 <harness/run.py>   system 2, PRLM certified decoder
   gate.py s3 <solver dir>       system 3, HMA solver
@@ -202,6 +203,79 @@ def s1_meta(meta_path):
     ok, nf = agree(insts, cfgs40)
     check(ok and full > 0, "meta: (5, 5) knocks 'balanced' off the frontier: %d selections rescored in full "
                            "(only those it had won), %d changed measures; agrees with meta.py" % (full, changed))
+    # instance joins after configurations: every split of the three instances into
+    # "before the configurations" and "after", in every order
+    import itertools
+    late_ok, late_changes, late_n = True, 0, 0
+    for perm in itertools.permutations(range(len(meta.INSTANCES))):
+        for k in range(len(perm)):
+            e2 = MS.MetaEngine(meta)
+            for i in perm[:k]:
+                e2.add_instance(*meta.INSTANCES[i])
+            for cfg in cfgs:
+                e2.join_config(cfg)
+            try:
+                for i in perm[k:]:
+                    late_changes += e2.add_instance(*meta.INSTANCES[i]) or 0
+                    late_n += 1
+                insts = [meta.INSTANCES[i] for i in perm]
+                ref, _rc, text = MS.checker(meta, insts, cfgs)
+                mine = sorted(lab(c) for c in e2.meta_front.frontier())
+                rows = all(("%-38s %-22s %-22s %-22s %s" % ((lab(c),) + tuple(e2.picks(c)) + (e2.measures[c],)))
+                           in text for c in cfgs)
+                late_ok &= mine == ref and rows
+            except KeyError:
+                late_ok = False  # a selection on the late instance was never computed
+    check(late_ok, "meta: instances joined after the configurations (every order, every split; %d instance "
+                   "joins, %d measure changes re-joined) agree with meta.py in every row and the meta-frontier"
+                   % (late_n, late_changes))
+    # score changes of candidates already present (withdrawal plus join at the selection level)
+    deltas = [(-2, 0), (0, -2), (2, 2), (-3, -3), (5, 0), (-1, 1)]
+
+    def moves(mutant):
+        e = MS.MetaEngine(meta, ignore_moved_mutant=mutant)
+        for n, c, mid in meta.INSTANCES:
+            e.add_instance(n, c, mid)
+        for cfg in cfgs:
+            e.join_config(cfg)
+        cur = [(n, list(c), m) for n, c, m in meta.INSTANCES]
+        n_moves = bad = stay = full_n = s_ev = 0
+        for idx in range(len(cur)):
+            for name, x0, y0 in list(cur[idx][1]):
+                for dx, dy in deltas:
+                    for (x, y) in ((x0 + dx, y0 + dy), (x0, y0)):
+                        cur[idx] = (cur[idx][0], [(n, x, y) if n == name else (n, a, b)
+                                                  for n, a, b in cur[idx][1]], cur[idx][2])
+                        was = set(e.inst_front[idx].frontier())
+                        before = e.score_evals
+                        f, _c = e.join_candidate(idx, name, x, y)
+                        s_ev += e.score_evals - before
+                        full_n += f
+                        stay += was == set(e.inst_front[idx].frontier()) and name in was
+                        n_moves += 1
+                        front = meta.frontier_of(cur[idx][1])
+                        for cfg in cfgs:
+                            pick, win = meta.induced(cfg[0], cfg[1], front)
+                            want = pick if pick is not None else "tie " + "/".join(win)
+                            bad += e.picks(cfg)[idx] != want
+        ref, _rc, text = MS.checker(meta, cur, cfgs)
+        mine = sorted(lab(c) for c in e.meta_front.frontier())
+        rows = all(("%-38s %-22s %-22s %-22s %s" % ((lab(c),) + tuple(e.picks(c)) + (e.measures[c],)))
+                   in text for c in cfgs)
+        return n_moves, bad, stay, full_n, s_ev, mine == ref and rows
+
+    n_moves, bad, stay, full_n, s_ev = moves(False)[:5]
+    end_ok = moves(False)[5]
+    check(bad == 0 and end_ok,
+          "meta: %d score changes of candidates already present (each moved, then restored; %d kept the "
+          "frontier set unchanged) agree with meta.induced in every one of 39 selections after every change, "
+          "and the end state agrees with meta.py; %d full rescores, %d score evaluations"
+          % (n_moves, stay, full_n, s_ev))
+    COUNTS["meta score changes"] = {"moves": n_moves, "membership_unchanged": stay, "full_rescores": full_n,
+                                    "score_evals": s_ev}
+    mbad = moves(True)[1]
+    check(mbad > 0, "meta mutant (a member's own score change ignored when frontier membership is unchanged) "
+                    "is caught: %d stale selections" % mbad)
 
 
 # ---------------------------------------------------------------- system 2
@@ -557,6 +631,29 @@ def s3(solver_dir, tmp):
     except AX.NotAJoin:
         refused = True
     check(refused, "s3: join refuses a changed behavior cell at an existing configuration (it must come as withdrawal plus join)")
+    # a refused batch changes nothing: a valid new row followed by a duplicate, and a
+    # batch that repeats its own new row, are refused before any carried state moves
+    atomic = True
+    for label in ("x", "d"):
+        t = model.load_table(os.path.join(solver_dir, "fixtures", label + ".json"))
+        k = len(t.contract) // 2
+        e = AX.AxisEngine(model, model.Table(t.name, t.axes, t.components, t.contract[:k], t.edges))
+        snap = (list(e.rows), dict(e.dc), dict(e.cnt), dict(e.live), dict(e.measure), e.pairs_computed)
+        for batch in ([t.contract[k], t.contract[0]], [t.contract[k], t.contract[k]]):
+            try:
+                e.join(batch)
+                atomic = False
+            except AX.NotAJoin:
+                pass
+            atomic &= (list(e.rows), dict(e.dc), dict(e.cnt), dict(e.live), dict(e.measure),
+                       e.pairs_computed) == snap
+        try:
+            e.join(t.contract[k:])
+            atomic &= e.result() == solver.solve(t)
+        except AX.NotAJoin:
+            atomic = False  # a half-applied refused batch left a row behind
+    check(atomic, "s3: a refused join batch (a new row then a duplicate; a new row twice) leaves every carried "
+                  "table unchanged, and the engine then joins the rest and agrees with solver.py (x, d)")
     # mutant: re-measure only the subset equal to the mask
     caught = False
     for label in ("dense", "binary"):
@@ -574,21 +671,38 @@ def s3(solver_dir, tmp):
     check(caught, "s3 mutant (supersets of a grown difference set not re-measured) is caught by the checker")
 
 
+FIXTURE = os.path.join(HERE, "fixtures", "semantic-axes-points.json")
+
+
+def points():
+    """The s1 fixture ships with the candidate-space home only
+    (software-redundant-compute-expands, examples/incremental-recomputation/fixtures).
+    Elsewhere s1 needs its path; refuse by name rather than skip."""
+    if not os.path.exists(FIXTURE):
+        sys.exit("s1 needs the semantic-axes points fixture, which is not in this checkout: "
+                 "pass its path (gate.py s1 <points.json>), or run 'all' from "
+                 "software-redundant-compute-expands examples/incremental-recomputation")
+    return FIXTURE
+
+
 def main():
     args = sys.argv[1:]
-    mode = args[0] if args else "s1"
+    if not args:
+        print(__doc__)
+        return 2
+    mode = args[0]
     tmp = os.path.join(HERE, ".gate-tmp")
     os.makedirs(tmp, exist_ok=True)
     out = None
     if mode == "all":
         rev, prlm, hma = args[1:4]
         out = args[4] if len(args) > 4 else None
-        s1(os.path.join(HERE, "fixtures", "semantic-axes-points.json"))
+        s1(points())
         s1_meta(os.path.join(rev, "meta.py"))
         s2(os.path.join(prlm, "harness", "run.py"))
         s3(os.path.join(hma, "solver"), tmp)
     elif mode == "s1":
-        s1(args[1] if len(args) > 1 else os.path.join(HERE, "fixtures", "semantic-axes-points.json"))
+        s1(args[1] if len(args) > 1 else points())
     elif mode == "meta":
         s1_meta(args[1] if len(args) > 1 else os.path.join(HERE, "..", "meta.py"))
     elif mode == "s2":

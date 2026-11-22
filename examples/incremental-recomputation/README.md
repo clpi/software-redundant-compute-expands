@@ -18,3 +18,8 @@ as the checker only (`naive_frontier`).
   reversible repo. `receipts/` holds the full cross-home gate run.
 
 Run: `python3 -B gate.py s1` and `LEAN=/path/to/lean-4.19.0 sh lean/check.sh`.
+
+Randomized check: `python3 -B fuzz/fuzz_s1.py -` compares the frontier engine with the
+from-scratch checker after every operation of random join, re-join and withdrawal
+sequences (1 to 3 axes, ties and duplicate vectors); with a reversible checkout's
+meta.py as its argument it also runs the meta-search engine.
