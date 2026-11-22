@@ -1,0 +1,40 @@
+'MonotoneSynthesis.run_monotone' depends on axioms: [propext]
+'MonotoneSynthesis.capability_never_lost' depends on axioms: [propext, Quot.sound]
+'MonotoneSynthesis.live_heads_reach' depends on axioms: [propext, Quot.sound]
+'MonotoneSynthesis.retire_has_replacement' does not depend on any axioms
+'MonotoneSynthesis.replace_covers' depends on axioms: [propext]
+'MonotoneSynthesis.ready_persists' depends on axioms: [propext]
+'MonotoneSynthesis.enables' depends on axioms: [propext]
+'MonotoneSynthesis.enables_strict' depends on axioms: [propext]
+'MonotoneSynthesis.compose' does not depend on any axioms
+'MonotoneSynthesis.compose_family' does not depend on any axioms
+'MonotoneSynthesis.compose_reach_left' does not depend on any axioms
+'MonotoneSynthesis.abstract_conservative' depends on axioms: [propext]
+'MonotoneSynthesis.saturated_exact' depends on axioms: [propext]
+'MonotoneSynthesis.order_independent' depends on axioms: [propext]
+'MonotoneSynthesis.saturated_persists' depends on axioms: [propext]
+'MonotoneSynthesis.reach_sound' depends on axioms: [propext]
+'MonotoneSynthesis.reach_iff_close' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MonotoneSynthesis.admitAddB_sound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MonotoneSynthesis.replaceB_sound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MonotoneSynthesis.Controls.base_run' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MonotoneSynthesis.Controls.retire_without_cover_refused' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MonotoneSynthesis.Controls.covering_replacement_admitted' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MonotoneSynthesis.Controls.unverified_unsound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MonotoneSynthesis.Controls.ungrounded_refused' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MonotoneSynthesis.Controls.single_pass_not_saturated' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MonotoneSynthesis.Controls.abstraction_needs_derivation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MonotoneSynthesis.Controls.composition_needs_reclosure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MonotoneSynthesis.Controls.composition_needs_reclosure_general' depends on axioms: [propext]
+'MonotoneSynthesis.Controls.admission_enables' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MonotoneSynthesis.Controls.two_orders_same_reach' depends on axioms: [propext, Classical.choice, Quot.sound]
+PASS Lean: 30 theorems printed, axioms within propext, Classical.choice, Quot.sound
+mutant killed drop-coverage
+mutant killed drop-premise-check
+mutant killed drop-verifier
+mutant killed drop-never-retired
+mutant killed replace-any-head
+mutant killed unsaturated-exact
+mutant killed abstraction-underived
+mutant killed single-pass-saturated
+mutant killed retire-uncovered-ok

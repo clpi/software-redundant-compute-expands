@@ -1,0 +1,19 @@
+PASS spec order=history reach=316 live=316 admitted=354 retired=38 deferred=16 inc=1201 cold_wl=236537 cold_naive=130394
+PASS reference final reach = independent closure loop=313 ref=313 diff=0
+PASS spec order=reverse reach=316 live=316 admitted=354 retired=38 deferred=213 inc=1728 cold_wl=223459 cold_naive=432119
+PASS spec order=shuffle:1 reach=316 live=316 admitted=354 retired=38 deferred=162 inc=1620 cold_wl=189437 cold_naive=387155
+PASS spec order=shuffle:2 reach=316 live=316 admitted=354 retired=38 deferred=159 inc=1595 cold_wl=191283 cold_naive=398789
+PASS spec order=shuffle:3 reach=316 live=316 admitted=354 retired=38 deferred=172 inc=1613 cold_wl=185065 cold_naive=431387
+PASS same final reach in every order {'a4d7b48cec6d2826028bf8f8e9db24599f6f735ddea2ebe4ab3d002e3137eb37'}
+PASS rerun byte-identical
+PASS abstractions leave reach unchanged rules=517 max_depth 9->5 sum_depth 787->568
+PASS control flip json receipt: spec holds, json capabilities gone reach 316 -> 283 (json verified capabilities 33)
+PASS control non-covering retirement refused {'evidence': 10, 'moot': 1, 'not_covering': 1}
+PASS finding: without grouping, mutual recursion blocks admission pending=10 admitted=341 vs grouped 354
+PASS strict verifier (direct battery application only): spec holds admitted=59 live=54 pending=96 pending_retire=17
+PASS mutant no-cover caught first caught at order history
+PASS mutant eager-retire caught first caught at order shuffle:1
+PASS mutant no-premise-check caught first caught at order history
+PASS mutant no-verifier caught first caught at order history (reference)
+PASS mutant no-retry caught first caught at order history
+GATE PASS (18/18)
