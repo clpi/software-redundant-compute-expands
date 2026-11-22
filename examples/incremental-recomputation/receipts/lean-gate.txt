@@ -1,0 +1,25 @@
+Lean (version 4.19.0, x86_64-unknown-linux-gnu, commit 6caaee842e94, Release)
+Hma.lean sha256 1a737519a2e496d1 (built unchanged)
+Cone.lean sha256 ebc7950d8d94123a built
+AuditCone.lean sha256 8d8409a24016de97 built
+HmaJoin.lean sha256 8c06c0fcf7633cfd built
+AuditHma.lean sha256 f3bbb64c6cdd4aec built
+'Cone.front_join' depends on axioms: [propext]
+'Cone.front_withdraw' depends on axioms: [propext, Quot.sound]
+'Cone.any_dup' depends on axioms: [propext, Quot.sound]
+'Cone.run_cone' does not depend on any axioms
+'Cone.edit_outside' depends on axioms: [propext]
+'Cone.missing_is_a_premise' depends on axioms: [propext]
+'Cone.pairs_join' depends on axioms: [propext]
+'Cone.pairs_count' depends on axioms: [propext, Quot.sound]
+'Cone.resume' depends on axioms: [propext]
+'HmaJoin.agreeoff_iff_diff' does not depend on any axioms
+'HmaJoin.join_live' depends on axioms: [propext, Classical.choice, Quot.sound]
+'HmaJoin.scoped_live' depends on axioms: [propext, Classical.choice, Quot.sound]
+'HmaJoin.witness_mono' does not depend on any axioms
+'HmaJoin.scoped_rho' depends on axioms: [propext, Quot.sound]
+'HmaJoin.delete_live' depends on axioms: [propext]
+'HmaJoin.scoped_delete' depends on axioms: [propext]
+'HmaJoin.survives_of_witness' depends on axioms: [propext]
+'HmaJoin.scoped_rho_delete' depends on axioms: [propext, Quot.sound]
+LEAN GATE: PASS (18 theorems, axioms within propext, Classical.choice, Quot.sound)
