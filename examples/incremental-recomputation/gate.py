@@ -216,6 +216,7 @@ def s2(run_py):
             if row is None:
                 edits.append((rk, None, [(0, Fraction(1))]))
             else:
+                edits.append((rk, row, None))  # withdrawal of the row
                 for tok, _w in row:
                     for mult in (Fraction(2), Fraction(1, 2), Fraction(3)):
                         edits.append((rk, row, SY.overlay(row, tok, mult)))
@@ -235,8 +236,10 @@ def s2(run_py):
                 for r2 in eng.state[k][1]:
                     holders.setdefault(r2, set()).add(k)
         miss_edits = sum(1 for e in edits if e[1] is None)
-        check(all_ok, "s2 seed %d: all %d single-key edits (%d of them insert a row where a cone saw none) "
-                      "and their reverts agree with the from-scratch decoder" % (seed, len(edits), miss_edits))
+        del_edits = sum(1 for e in edits if e[2] is None)
+        check(all_ok, "s2 seed %d: all %d single-key edits (%d insert a row where a cone saw none, %d withdraw "
+                      "a row) and their reverts agree with the from-scratch decoder"
+              % (seed, len(edits), miss_edits, del_edits))
         check(scoped_ok, "s2 seed %d: every edit re-derived exactly the queries whose cones hold its key"
               % seed)
         tot_inc = sum(c for _r, c, _l in dist)
@@ -396,14 +399,70 @@ def s3(solver_dir, tmp):
     check(e.result() == solver.solve(t1) and rem == 2,
           "s3 two-axis: a join re-measures %d of 4 subsets ({b} and {a,b}; the empty subset can never be live, "
           "so 3 of 4 is the maximum, not evidence of scoping); agrees with solver.py" % rem)
+    # deletions: support counts keep alternate supports; cone-scoped re-measure
+    for f in sorted(os.listdir(fx)):
+        t = model.load_table(os.path.join(fx, f))
+        e = AX.AxisEngine(model, t)
+        ok = True
+        for r in list(t.contract)[::-1]:
+            e.withdraw([r.configuration])
+            ok &= e.result() == solver.solve(e.table())
+        check(ok, "s3 %s: withdrawing rows one by one back to empty agrees with solver.py after every step" % f)
+    t = model.load_table(os.path.join(tmp, "s3-staged.json"))
+    e = AX.AxisEngine(model, t)
+    released, rem = e.withdraw([r.configuration for r in t.contract[120:]])
+    e120 = AX.AxisEngine(model, model.Table(t.name, t.axes, t.components, t.contract[:120], t.edges))
+    only_f = all(S & (1 << 5) for S in e.remeasured)
+    check(e.result() == solver.solve(e.table()) and e.live == e120.live and 0 < rem and only_f,
+          "s3 staged: withdrawing the 20 f-varying rows releases %d pairs, re-measures %d subsets (all containing f) "
+          "and returns exactly the 120-row state; agrees with solver.py" % (released, rem))
+    COUNTS["s3 staged withdrawal"] = {"pairs_released": released, "remeasured": rem}
+    t = model.load_table(os.path.join(tmp, "s3-dense.json"))
+    e = AX.AxisEngine(model, t)
+    rng = random.Random(17)
+    cfgs = [r.configuration for r in t.contract]
+    ok, rems, steps = True, [], 0
+    while cfgs:
+        pick = rng.sample(cfgs, min(len(cfgs), rng.randint(1, 12)))
+        for c in pick:
+            cfgs.remove(c)
+        _p, r = e.withdraw(pick)
+        rems.append(r)
+        steps += 1
+        ok &= e.result() == solver.solve(e.table())
+    check(ok, "s3 synthetic-dense: %d random withdrawals from 220 rows to empty agree after every step; "
+              "subsets re-measured per step: %d zero, max %d, total %d (full rebuild would re-measure 64 each)"
+              % (steps, rems.count(0), max(rems), sum(rems)))
+    COUNTS["s3 dense withdrawal chain"] = {"steps": steps, "zero_steps": rems.count(0), "max": max(rems),
+                                           "total_remeasured": sum(rems)}
+    # changed behavior cell = withdrawal plus join, named
+    t = model.load_table(os.path.join(tmp, "s3-staged.json"))
+    e = AX.AxisEngine(model, t)
+    row = t.contract[0]
+    beh = dict(row.behavior)
+    beh["p3"] = 1 - beh["p3"] if beh["p3"] in (0, 1) else 0
+    newrow = model.Row(dict(row.configuration), beh)
+    e.withdraw([row.configuration])
+    e.join([newrow])
+    doc2 = json.load(open(os.path.join(tmp, "s3-staged.json")))
+    doc2["contract"] = doc2["contract"][1:] + [{"configuration": newrow.configuration, "behavior": beh}]
+    check(e.result() == solver.solve(load_doc(model, doc2, os.path.join(tmp, "s3-changed.json"))),
+          "s3: a changed behavior cell handled as withdrawal plus join agrees with solver.py")
+    # mutant: overdelete without rederive (alternate supports ignored)
+    t = model.load_table(os.path.join(tmp, "s3-dense.json"))
+    m = AX.AxisEngine(model, t)
+    m.withdraw([r.configuration for r in t.contract[:5]], count_mutant=True)
+    check(m.result() != solver.solve(m.table()),
+          "s3 mutant (a component dropped at its first lost support, alternate supports ignored) is caught")
     # refusal: changed behavior at an existing configuration is not a join
     bad = model.Row({"a": 1, "b": 1}, {"p": 0, "q": 0})
+    e = AX.AxisEngine(model, t1)
     try:
         e.join([bad])
         refused = False
     except AX.NotAJoin:
         refused = True
-    check(refused, "s3: a changed behavior cell at an existing configuration is refused as not a join")
+    check(refused, "s3: join refuses a changed behavior cell at an existing configuration (it must come as withdrawal plus join)")
     # mutant: re-measure only the subset equal to the mask
     caught = False
     for label in ("dense", "binary"):

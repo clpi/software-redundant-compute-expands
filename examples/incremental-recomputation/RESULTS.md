@@ -1,8 +1,8 @@
 # Incremental recomputation: results and the record's claims checked
 
-Run: 2026-11-22, this container. `receipts/gate.txt` (55 checks, GATE: PASS,
-repeated byte-identical apart from wall-clock), `receipts/lean-gate.txt` (13
-theorems, LEAN GATE: PASS), `receipts/counts.json`, `receipts/SHA256SUMS.txt`.
+Run: 2026-11-22, this container. `receipts/gate.txt` (63 checks, GATE: PASS;
+the first 55 repeated byte-identical apart from wall-clock), `receipts/lean-gate.txt`
+(17 theorems, LEAN GATE: PASS), `receipts/counts.json`, `receipts/SHA256SUMS.txt`.
 Pins are in SPEC.md. Counts are the claims; wall times are single runs and
 indicative.
 
@@ -79,3 +79,47 @@ in-flight branch (codex/hma-solver-lean-agreement-20261121, 0f8b8c3, off
 63d9d3f) that replaces solver.py and model.py with solve.py and verify.py and
 adds an arena; the s3 landing wraps main's solver.py and would need
 re-pointing if that branch lands.
+
+## 2026-11-22 ~05:20Z: Chris's update/checker bar (04:53Z), applied where it has an object
+
+Status of the claim: the incremental engines agree with their from-scratch
+checkers on every instance the gate runs, and the cone rules are proved for the
+models. An incremental certificate (Verify(C_k) implying Q_k = leastClosure and
+coverage) is a design target, not established: none of these engines has roots,
+serialized deltas, a closure fixed point or coverage witnesses.
+
+Added under the bar:
+- Deletions, s3: support counts per (difference set, component). A component
+  leaves dc[m] only when its count reaches zero, so alternate supports are kept;
+  liveness is one non-recursive layer over pairs, so there are no cycles and
+  counting is complete. Withdrawn rows re-measure only subsets containing a
+  shrunk difference set, rebuilt from carried dc (no pair rescan). Gate: every
+  registered instance withdrawn row by row to empty agrees after every step;
+  the staged 20 f-varying rows withdrawn release 2,590 pairs, re-measure 24
+  subsets (all containing f) and return exactly the 120-row state; 33 random
+  withdrawals from 220 rows to empty agree after every step (26 steps
+  re-measure 0, max 47, total 87, against 64 per step for a rebuild); a changed
+  behavior cell as withdrawal plus join agrees; a mutant that drops a component
+  at its first lost support (overdelete, no rederive) is caught.
+- Deletions, s2: 22 and 17 row withdrawals at seeds 11 and 23 added to the
+  single-key edits; all 316 and 229 edits and reverts agree; each re-derives
+  exactly its cone holders. run_cone already covers any edit, removal included.
+- Deletions, s1: front_withdraw (proved) with the carried matrix; gated.
+- Lean, over Hma.lean unchanged: delete_live (live after a withdrawal iff a
+  witness pair survives), scoped_delete (the conservative cone for deletions),
+  survives_of_witness, scoped_rho_delete. 17 theorems in all.
+
+What the bar asks that has no object here (proposed as its own task):
+1. ValidDelta as a byte-exact parent-root to child-root transition with
+   tombstones, revocations and scope/version changes, parser and executable
+   checker proved against Lean semantics with versions bound. These engines
+   read in-memory tables, not a rooted log. The rooted log is srce's canonical
+   chain (proof/Canon.lean, Admission.lean).
+2. Cold closure as the least fixed point and incremental closure equal to it,
+   additions then DRed deletions with cycles. srce already has closure
+   soundness, run_closed, Canon.least and refine_append for appends; there is
+   no deletion or DRed proof anywhere I found. Recursive closure is not what
+   these three engines compute.
+3. Coverage witnesses checked against the snapshot's mediation path and sensor
+   deployment, health and fidelity evidence. No such evidence object exists in
+   any repo I searched; it needs a definition before anything can be checked.
