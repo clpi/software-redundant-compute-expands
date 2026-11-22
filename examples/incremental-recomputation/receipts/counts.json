@@ -1,0 +1,166 @@
+{
+ "meta build": {
+  "configs": 39,
+  "frontier": 6,
+  "full": 1482,
+  "meta_evals": 1482
+ },
+ "meta join candidate": {
+  "changed": 2,
+  "full_rescores": 0,
+  "meta_evals": 156,
+  "score_evals": 40,
+  "scratch_meta_evals": 1560,
+  "scratch_score_evals": 400
+ },
+ "meta join config": {
+  "full_meta": 1560,
+  "meta_evals": 78,
+  "score_evals": 9
+ },
+ "s1 ax-a|dev": {
+  "build_first_n_minus_1": 1056,
+  "frontier": 24,
+  "full": 1122,
+  "items": 34,
+  "last_join": 66
+ },
+ "s1 ax-a|heldout": {
+  "build_first_n_minus_1": 272,
+  "frontier": 18,
+  "full": 306,
+  "items": 18,
+  "last_join": 34
+ },
+ "s1 ax-b|dev": {
+  "build_first_n_minus_1": 380,
+  "frontier": 11,
+  "full": 420,
+  "items": 21,
+  "last_join": 40
+ },
+ "s1 ax-b|heldout": {
+  "build_first_n_minus_1": 30,
+  "frontier": 6,
+  "full": 42,
+  "items": 7,
+  "last_join": 12
+ },
+ "s2 seed 11": {
+  "distinct": 15,
+  "edits": 294,
+  "lookups_incremental_total": 3113,
+  "lookups_scratch_total": 12784,
+  "missing_row_edits": 3,
+  "one_rederived_examples": [
+   [
+    1,
+    1,
+    44
+   ],
+   [
+    1,
+    2,
+    42
+   ],
+   [
+    1,
+    3,
+    43
+   ],
+   [
+    1,
+    3,
+    44
+   ],
+   [
+    1,
+    4,
+    44
+   ],
+   [
+    1,
+    5,
+    44
+   ]
+  ],
+  "queries": 22,
+  "rederived_max": 3,
+  "rederived_mean": 1.861
+ },
+ "s2 seed 23": {
+  "distinct": 14,
+  "edits": 212,
+  "lookups_incremental_total": 2167,
+  "lookups_scratch_total": 7366,
+  "missing_row_edits": 2,
+  "one_rederived_examples": [
+   [
+    1,
+    1,
+    35
+   ],
+   [
+    1,
+    3,
+    35
+   ],
+   [
+    1,
+    4,
+    35
+   ],
+   [
+    1,
+    8,
+    31
+   ],
+   [
+    1,
+    10,
+    33
+   ],
+   [
+    1,
+    11,
+    34
+   ]
+  ],
+  "queries": 21,
+  "rederived_max": 3,
+  "rederived_mean": 1.844
+ },
+ "s3 staged": {
+  "pairs": 2590,
+  "remeasured": 24,
+  "subsets_containing_f": 32
+ },
+ "s3 synthetic-binary": {
+  "join_pairs": 990,
+  "remeasured": 0,
+  "rows": [
+   40,
+   60
+  ],
+  "scratch_pairs": 1770,
+  "subsets": 64,
+  "wall_ms_indicative": [
+   2.4,
+   59.9
+  ]
+ },
+ "s3 synthetic-dense": {
+  "join_pairs": 4190,
+  "remeasured": 0,
+  "rows": [
+   200,
+   220
+  ],
+  "scratch_pairs": 24090,
+  "subsets": 64,
+  "wall_ms_indicative": [
+   6.0,
+   715.3
+  ]
+ }
+}

@@ -1,0 +1,58 @@
+PASS s1 ax-a|dev: frontier agrees with the from-scratch checker at all 34 append prefixes (frontier 24)
+PASS s1 ax-a|dev: join k costs 2(k-1) ordered evaluations (last join 66, build 1056) vs 1122 for one full recompute
+PASS s1 ax-a|dev: a shuffled join order gives the same frontier and the same dominance matrix
+PASS s1 ax-a|dev: unchanged re-join carries at 0 evaluations
+PASS s1 ax-a|dev: withdrawing 24 frontier members one by one re-admits exactly the right items at 0 evaluations
+PASS s1 ax-a|dev: a score change is logged as withdrawal plus join and agrees with the checker
+PASS s1 ax-a|dev: every carried premise hash matches its vector
+PASS s1 ax-a|heldout: frontier agrees with the from-scratch checker at all 18 append prefixes (frontier 18)
+PASS s1 ax-a|heldout: join k costs 2(k-1) ordered evaluations (last join 34, build 272) vs 306 for one full recompute
+PASS s1 ax-a|heldout: a shuffled join order gives the same frontier and the same dominance matrix
+PASS s1 ax-a|heldout: unchanged re-join carries at 0 evaluations
+PASS s1 ax-a|heldout: withdrawing 16 frontier members one by one re-admits exactly the right items at 0 evaluations
+PASS s1 ax-a|heldout: a score change is logged as withdrawal plus join and agrees with the checker
+PASS s1 ax-a|heldout: every carried premise hash matches its vector
+PASS s1 ax-b|dev: frontier agrees with the from-scratch checker at all 21 append prefixes (frontier 11)
+PASS s1 ax-b|dev: join k costs 2(k-1) ordered evaluations (last join 40, build 380) vs 420 for one full recompute
+PASS s1 ax-b|dev: a shuffled join order gives the same frontier and the same dominance matrix
+PASS s1 ax-b|dev: unchanged re-join carries at 0 evaluations
+PASS s1 ax-b|dev: withdrawing 11 frontier members one by one re-admits exactly the right items at 0 evaluations
+PASS s1 ax-b|dev: a score change is logged as withdrawal plus join and agrees with the checker
+PASS s1 ax-b|dev: every carried premise hash matches its vector
+PASS s1 ax-b|heldout: frontier agrees with the from-scratch checker at all 7 append prefixes (frontier 6)
+PASS s1 ax-b|heldout: join k costs 2(k-1) ordered evaluations (last join 12, build 30) vs 42 for one full recompute
+PASS s1 ax-b|heldout: a shuffled join order gives the same frontier and the same dominance matrix
+PASS s1 ax-b|heldout: unchanged re-join carries at 0 evaluations
+PASS s1 ax-b|heldout: withdrawing 5 frontier members one by one re-admits exactly the right items at 0 evaluations
+PASS s1 ax-b|heldout: a score change is logged as withdrawal plus join and agrees with the checker
+PASS s1 ax-b|heldout: every carried premise hash matches its vector
+PASS s1 mutant (reverse dominance never evaluated) is caught by the checker
+PASS meta: 39 configurations joined; meta-frontier (6) and every configuration row agree with meta.py; build cost 1482 meta evaluations, equal to one full recompute (39 x 38): building by joins saves nothing
+PASS meta: 40th configuration (overlay balance k=4 on linear (1, 1)) joins at 78 meta evaluations and 9 score evaluations vs 1560 meta evaluations for a full recompute; agrees with meta.py
+PASS meta: a dominated decoding candidate leaves the instance frontier unchanged; 0 selections rescored, 0 meta evaluations; agrees with meta.py
+PASS meta: a frontier-entering decoding candidate (3, 8): 0 full rescores, 40 score evaluations, 2 configurations changed measures, 156 meta evaluations; meta-frontier 6 agrees with meta.py
+PASS meta: (5, 5) knocks 'balanced' off the frontier: 12 selections rescored in full (only those it had won), 18 changed measures; agrees with meta.py
+PASS s2 seed 11: 22 queries (15 distinct): every verdict agrees with the from-scratch decoder (44 lookups either way)
+PASS s2 seed 11: all 294 single-key edits (3 of them insert a row where a cone saw none) and their reverts agree with the from-scratch decoder
+PASS s2 seed 11: every edit re-derived exactly the queries whose cones hold its key
+     s2 seed 11 edit distribution: re-derived per edit min 1 max 3 mean 1.86 of 15; lookups per edit min 1 max 19; total 3113 vs 12784 from scratch over the same 294 edits
+PASS s2 seed 11: an edit at a row no cone holds re-derives 0 queries at 0 lookups and agrees
+PASS s2 seed 11: 60 chained edits with carried state never reset agree after every edit
+PASS s2 seed 23: 21 queries (14 distinct): every verdict agrees with the from-scratch decoder (35 lookups either way)
+PASS s2 seed 23: all 212 single-key edits (2 of them insert a row where a cone saw none) and their reverts agree with the from-scratch decoder
+PASS s2 seed 23: every edit re-derived exactly the queries whose cones hold its key
+     s2 seed 23 edit distribution: re-derived per edit min 1 max 3 mean 1.84 of 14; lookups per edit min 1 max 21; total 2167 vs 7366 from scratch over the same 212 edits
+PASS s2 seed 23: an edit at a row no cone holds re-derives 0 queries at 0 lookups and agrees
+PASS s2 seed 23: 60 chained edits with carried state never reset agree after every edit
+PASS s2 mutant (missing-row lookups not taken as premises) is caught by the checker
+PASS s3 d.json: incremental result equals solver.py's from scratch at every one of 3 row-append prefixes (full JSON result)
+PASS s3 e-empty.json: incremental result equals solver.py's from scratch at every one of 1 row-append prefixes (full JSON result)
+PASS s3 e-singleton.json: incremental result equals solver.py's from scratch at every one of 2 row-append prefixes (full JSON result)
+PASS s3 x.json: incremental result equals solver.py's from scratch at every one of 9 row-append prefixes (full JSON result)
+PASS s3 synthetic-dense 6 axes, 200 -> 220 rows: join computed 4190 new pairs vs 24090 from scratch, re-measured 0 of 64 subsets; agrees with solver.py (wall 6.0 ms vs 715.3 ms, single run, indicative)
+PASS s3 synthetic-binary 6 axes, 40 -> 60 rows: join computed 990 new pairs vs 1770 from scratch, re-measured 0 of 64 subsets; agrees with solver.py (wall 2.4 ms vs 59.9 ms, single run, indicative)
+PASS s3 staged: 20 rows that first vary axis f re-measure 24 subsets, all containing f (at most 32 can); agrees with solver.py
+PASS s3 two-axis: a join re-measures 2 of 4 subsets ({b} and {a,b}; the empty subset can never be live, so 3 of 4 is the maximum, not evidence of scoping); agrees with solver.py
+PASS s3: a changed behavior cell at an existing configuration is refused as not a join
+PASS s3 mutant (supersets of a grown difference set not re-measured) is caught by the checker
+GATE: PASS (55 checks, 0 failed)

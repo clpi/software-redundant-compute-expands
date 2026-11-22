@@ -1,0 +1,20 @@
+Lean (version 4.19.0, x86_64-unknown-linux-gnu, commit 6caaee842e94, Release)
+Hma.lean sha256 1a737519a2e496d1 (built unchanged)
+Cone.lean sha256 b4f530b38b0e559b built
+AuditCone.lean sha256 dd6f9b8c8ba51c46 built
+HmaJoin.lean sha256 89fb4596172b9b81 built
+AuditHma.lean sha256 d476ab32838d0404 built
+'Cone.front_join' depends on axioms: [propext]
+'Cone.front_withdraw' depends on axioms: [propext, Quot.sound]
+'Cone.any_dup' depends on axioms: [propext, Quot.sound]
+'Cone.run_cone' does not depend on any axioms
+'Cone.edit_outside' depends on axioms: [propext]
+'Cone.missing_is_a_premise' depends on axioms: [propext]
+'Cone.pairs_join' depends on axioms: [propext]
+'Cone.pairs_count' depends on axioms: [propext, Quot.sound]
+'HmaJoin.agreeoff_iff_diff' does not depend on any axioms
+'HmaJoin.join_live' depends on axioms: [propext, Classical.choice, Quot.sound]
+'HmaJoin.scoped_live' depends on axioms: [propext, Classical.choice, Quot.sound]
+'HmaJoin.witness_mono' does not depend on any axioms
+'HmaJoin.scoped_rho' depends on axioms: [propext, Quot.sound]
+LEAN GATE: PASS (13 theorems, axioms within propext, Classical.choice, Quot.sound)
