@@ -1,0 +1,101 @@
+{
+  "records": [
+    {
+      "id": "0",
+      "kind": "fact",
+      "head": "artifact",
+      "scope": "tiny",
+      "receipt": "fixture:artifact"
+    },
+    {
+      "id": "1",
+      "kind": "hypothesis",
+      "head": "bench",
+      "scope": "tiny",
+      "action": "replay"
+    },
+    {
+      "id": "2",
+      "kind": "hypothesis",
+      "head": "bench",
+      "scope": "tiny",
+      "action": "transport"
+    },
+    {
+      "id": "3",
+      "kind": "hypothesis",
+      "head": "order",
+      "scope": "tiny",
+      "action": "replay"
+    },
+    {
+      "id": "4",
+      "kind": "hypothesis",
+      "head": "order",
+      "scope": "tiny",
+      "action": "observe"
+    },
+    {
+      "id": "5",
+      "kind": "hypothesis",
+      "head": "risk",
+      "scope": "tiny",
+      "action": "bad"
+    },
+    {
+      "id": "6",
+      "kind": "rule",
+      "head": "release",
+      "scope": "tiny",
+      "premises": [
+        "artifact",
+        "bench",
+        "order"
+      ]
+    },
+    {
+      "id": "7",
+      "kind": "rule",
+      "head": "blocked",
+      "scope": "tiny",
+      "premises": [
+        "risk"
+      ]
+    }
+  ],
+  "query": {
+    "scope": "tiny",
+    "goals": [
+      "release"
+    ],
+    "forbidden": [
+      "blocked"
+    ],
+    "dimensions": [
+      "t",
+      "cpu"
+    ],
+    "costs": {
+      "replay": [
+        5,
+        1
+      ],
+      "transport": [
+        1,
+        2
+      ],
+      "observe": [
+        1,
+        2
+      ],
+      "bad": [
+        0,
+        0
+      ]
+    }
+  },
+  "weights": [
+    1,
+    1
+  ]
+}
