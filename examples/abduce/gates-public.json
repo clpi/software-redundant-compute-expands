@@ -1,0 +1,135 @@
+[
+ {
+  "name": "srce/monotone-synthesis",
+  "cwd": "theses/redundant-compute-expands/examples/monotone-synthesis",
+  "cmd": [
+   "bash",
+   "run.sh"
+  ],
+  "script": "run.sh",
+  "env": {
+   "OUT": "/tmp/abduction-out/ms"
+  },
+  "false": [
+   {
+    "name": "env_unset:ABDUCTION_UNREAD",
+    "predicts": [
+     "unset:ABDUCTION_UNREAD"
+    ],
+    "spec": {
+     "kind": "placebo",
+     "env": {
+      "ABDUCTION_UNREAD": "1"
+     }
+    }
+   }
+  ]
+ },
+ {
+  "name": "srce/admission",
+  "cwd": "theses/redundant-compute-expands/examples/admission",
+  "cmd": [
+   "sh",
+   "run.sh"
+  ],
+  "script": "run.sh"
+ },
+ {
+  "name": "planted/lean-off-path",
+  "cwd": "theses/redundant-compute-expands/proof",
+  "cmd": [
+   "sh",
+   "check.sh"
+  ],
+  "script": "check.sh",
+  "inject": {
+   "path_without": "lean",
+   "unset_env": [
+    "LEAN"
+   ]
+  },
+  "planted": "tool_missing:lean",
+  "false": [
+   {
+    "name": "env_unset:ABDUCTION_UNREAD",
+    "predicts": [
+     "unset:ABDUCTION_UNREAD"
+    ],
+    "spec": {
+     "kind": "placebo",
+     "env": {
+      "ABDUCTION_UNREAD": "1"
+     }
+    }
+   }
+  ]
+ },
+ {
+  "name": "planted/ms-without-IQ",
+  "cwd": "theses/redundant-compute-expands/examples/monotone-synthesis",
+  "cmd": [
+   "bash",
+   "run.sh"
+  ],
+  "script": "run.sh",
+  "env": {
+   "OUT": "/tmp/abduction-out/ms2",
+   "OPT": "@ABD_OPT",
+   "IL": "@ABD_IL"
+  },
+  "inject": {
+   "unset_env": [
+    "IQ"
+   ]
+  },
+  "planted": "env_unset:IQ",
+  "false": [
+   {
+    "name": "file_absent:/tmp/abduction-unrelated",
+    "predicts": [
+     "nofile:/tmp/abduction-unrelated"
+    ],
+    "spec": {
+     "kind": "placebo",
+     "env": {}
+    }
+   }
+  ]
+ },
+ {
+  "name": "planted/gate-script-removed",
+  "cwd": "theses/redundant-compute-expands/examples/monotone-synthesis",
+  "cmd": [
+   "bash",
+   "run.sh"
+  ],
+  "script": "run.sh",
+  "env": {
+   "OUT": "/tmp/abduction-out/ms3",
+   "OPT": "@ABD_OPT",
+   "IL": "@ABD_IL",
+   "IQ": "@ABD_IQ"
+  },
+  "inject": {
+   "remove": [
+    "gate.py"
+   ]
+  },
+  "planted": "file_absent:<gate.py>"
+ },
+ {
+  "name": "planted/lean-source-removed",
+  "cwd": "theses/redundant-compute-expands/proof",
+  "cmd": [
+   "sh",
+   "check.sh"
+  ],
+  "script": "check.sh",
+  "inject": {
+   "remove": [
+    "Canon.lean"
+   ]
+  },
+  "planted": "out-of-vocabulary (a Lean module removed: no rule names it)"
+ }
+]

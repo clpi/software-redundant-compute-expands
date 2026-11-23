@@ -1,0 +1,11 @@
+killed no-consistency :: Abduce.lean:119:45: error: unsolved goals
+killed no-abducible-check :: Abduce.lean:119:45: error: unsolved goals
+killed no-erase-minimality :: Abduce.lean:182:8: error: tactic 'rewrite' failed, did not find instance of the pattern in
+killed no-nodup :: Abduce.lean:180:12: error: application type mismatch
+killed cone-unclosed :: Abduce.lean:295:14: error: tactic 'rewrite' failed, did not find instance of the pattern i
+killed closed-skips-roots :: Abduce.lean:363:16: error: type mismatch
+killed trace-accepts-anything :: Abduce.lean:396:27: error: application type mismatch
+killed admit-ignores-verdict :: Abduce.lean:482:73: error: unsolved goals
+killed dom-not-strict :: Abduce.lean:526:2: error: omega could not prove the goal:
+killed cert-skips-bot :: Abduce.lean:427:56: error: application type mismatch
+mutants survived: 0

@@ -1,0 +1,1 @@
+'Canon.AbduceCert.minimal_explanation' depends on axioms: [propext, Classical.choice, Quot.sound]
