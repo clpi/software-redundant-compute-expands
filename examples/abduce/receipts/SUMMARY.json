@@ -1,0 +1,217 @@
+{
+ "admission": {
+  "admitted": 44,
+  "append_only": true,
+  "head": "457b82b24be3d45326b9c6a3bf6df3f575bdddeef71de1019bf0b4addb1e2f1f",
+  "monotone": true,
+  "refused": 11,
+  "store_records": 2180
+ },
+ "certificates": {
+  "certified": 36,
+  "false_of": 6,
+  "false_refused": 6,
+  "of": 36,
+  "seconds_total": 738.0
+ },
+ "d0_planted": {
+  "agree_every_prefix": 123,
+  "core_rank_hist": {
+   "1": 103,
+   "2": 16,
+   "3": 4
+  },
+  "core_recovered": 123,
+  "core_unique_cheapest": 91,
+  "false_by_kind": {
+   "does-not-explain": [
+    122,
+    122
+   ],
+   "inconsistent": [
+    46,
+    46
+   ],
+   "not-minimal": [
+    123,
+    123
+   ]
+  },
+  "false_rejected": 291,
+  "false_total": 291,
+  "incremental_ops": 47532,
+  "instances": 200,
+  "prefixes_checked": 5260,
+  "scratch_ops": 536292,
+  "skipped": 77,
+  "unique_by_observations": {
+   "1": [
+    53,
+    74
+   ],
+   "2": [
+    18,
+    24
+   ],
+   "3": [
+    12,
+    14
+   ],
+   "4": [
+    8,
+    11
+   ]
+  },
+  "used": 123
+ },
+ "d1_raw": {
+  "covers": 10,
+  "explanation": [
+   "assume:cbor:get",
+   "assume:flatbuf:verify",
+   "assume:msgpack:get"
+  ],
+  "kind": [
+   "cycle"
+  ],
+  "pending": 10
+ },
+ "d1_strict": {
+  "components": 29,
+  "front_size": 29,
+  "no_explanation_at_k3": 4,
+  "pending_all": 96,
+  "pending_live": 79,
+  "plan_final": {
+   "cost": 169,
+   "cover": 79,
+   "hyp_count": 163
+  },
+  "plan_first": {
+   "cost": 4,
+   "cover": 10,
+   "hyp_count": 2
+  }
+ },
+ "gates_planted": {
+  "planted/gate-script-removed": {
+   "first_verified": "file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py",
+   "planted": "file_absent:<gate.py>",
+   "status": "REPAIRED",
+   "trials": [
+    [
+     0,
+     "file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py",
+     "REPAIRED",
+     "restore from history bd50330a7ada:theses/redundant-compute-expands/examples/monotone-synthesis/gate.py"
+    ]
+   ]
+  },
+  "planted/lean-off-path": {
+   "first_verified": "tool_missing:lean",
+   "planted": "tool_missing:lean",
+   "status": "REPAIRED",
+   "trials": [
+    [
+     0,
+     "tool_missing:lean",
+     "REPAIRED",
+     "put lean on PATH"
+    ],
+    [
+     0,
+     "env_unset:ABDUCTION_UNREAD",
+     "REFUTED",
+     "planted false cause"
+    ]
+   ]
+  },
+  "planted/lean-source-removed": {
+   "first_verified": null,
+   "planted": "out-of-vocabulary (a Lean module removed: no rule names it)",
+   "status": "FAILING",
+   "trials": []
+  },
+  "planted/ms-without-IQ": {
+   "first_verified": "env_unset:IQ",
+   "planted": "env_unset:IQ",
+   "status": "REPAIRED",
+   "trials": [
+    [
+     0,
+     "env_unset:IQ",
+     "REPAIRED",
+     "IQ=/mnt/project-files/idol-qualification"
+    ],
+    [
+     0,
+     "file_absent:/tmp/abduction-unrelated",
+     "REFUTED",
+     "planted false cause"
+    ]
+   ]
+  }
+ },
+ "gates_real": {
+  "srce/admission": {
+   "status": "FAILING",
+   "trials": [
+    [
+     0,
+     "arg_missing:2",
+     "VERIFIED",
+     "positional ['/tmp/claude-0/abd/work/cache/bin-idol', '/home/user/idol-lib', '']"
+    ],
+    [
+     0,
+     "file_absent:/sha256/sha256.id",
+     "VERIFIED",
+     "copy /home/user/idol-lib/sha256/sha256.id"
+    ]
+   ]
+  },
+  "srce/monotone-synthesis": {
+   "status": "REPAIRED",
+   "trials": [
+    [
+     0,
+     "env_unset:OPT",
+     "VERIFIED",
+     "OPT=/tmp/claude-0/abd/work/cache/clpi_software-optimality@3418711"
+    ],
+    [
+     0,
+     "env_unset:ABDUCTION_UNREAD",
+     "REFUTED",
+     "planted false cause"
+    ],
+    [
+     1,
+     "env_unset:IL",
+     "VERIFIED",
+     "IL=/tmp/claude-0/abd/work/cache/clpi_idol-lib"
+    ],
+    [
+     1,
+     "env_unset:ABDUCTION_UNREAD",
+     "REFUTED",
+     "planted false cause"
+    ],
+    [
+     2,
+     "env_unset:IQ",
+     "REPAIRED",
+     "IQ=/mnt/project-files/idol-qualification"
+    ],
+    [
+     2,
+     "env_unset:ABDUCTION_UNREAD",
+     "REFUTED",
+     "planted false cause"
+    ]
+   ]
+  }
+ },
+ "planted_false_refuted": 5,
+ "planted_false_tested": 5
+}
