@@ -42,9 +42,44 @@ erase-one minimality, drop duplicate freedom, unclosed cone, closed set skipping
 accepting anything, admission ignoring the verdict, non-strict dominance, certificate skipping
 `bot`); each breaks a proof.
 
-## Measured
+## Measured (`receipts/SUMMARY.json`, written by `summary.py`)
 
-See `receipts/SUMMARY.json` (written by `summary.py`; every number here comes from it).
+**D0, planted causes on 200 random logs** (123 used; 77 skipped because the planted cause
+derives nothing observable). Incremental ATMS = scratch rebuild = brute mirror of `abduce` after
+every one of 5,260 appends. Planted core recovered 123/123; unique cheapest explanation 91/123
+(53/74 with one observation, 8/11 with four: more observations discriminate more). Planted
+false hypotheses rejected 291/291 (does not explain 122/122, inconsistent 46/46, not minimal
+123/123). Work: 47,532 label operations incrementally vs 536,292 rebuilding after every append.
+
+**D1, monotone-synthesis stream** (`../monotone-synthesis/receipts/stream.jsonl`, 1,044 records).
+Strict verifier: 96 pending (loop.py's count), 79 of them live artifacts. Every one of the 79 is
+explained; 29 independent components: 26 (54 artifacts) by qualifying artifacts only, and the
+3 cycle components (cbor, msgpack, flatbuf; 25 artifacts) also need one assumed capability each. Cheapest first step: 2
+hypotheses unblock 10 artifacts; the whole set: 163 hypotheses (160 direct battery checks, 3
+cycle breaks). Raw mode (no cycle grouping): the 10 pending artifacts are explained by exactly
+3 assumptions, `cbor:get`, `flatbuf:verify`, `msgpack:get`, one per mutual-recursion group,
+typed `cycle`. Lean certificates on the whole 1,044-record log: 36/36 (1 raw, 29 strict
+components, 6 planted cores); 6/6 planted false hypotheses refused by the kernel.
+
+**D2, gates of this repository** (`gates-public.json`; 2 repeats of control, intervention and
+placebo each). `examples/monotone-synthesis/run.sh` fails with no inputs; the engine abduces
+`OPT` unset (the only consistent cause: `IL`, `IQ`, every tool are refuted by absent
+symptoms), sets it from the message's own pin (a clone of software-optimality at 3418711),
+sees `IL`, then `IQ`, and ends REPAIRED: exit 0 in both intervention runs. The planted unread
+variable is refuted in every round. `examples/admission/run.sh`: missing positional argument 2
+VERIFIED as the cause of `/sha256/sha256.id`; the next failure (the compiler aborts) is outside
+the vocabulary and stays unexplained. Planted faults: `lean` off PATH, `IQ` removed, `gate.py`
+removed: each recovered as the top hypothesis and REPAIRED; a removed Lean module: no
+hypothesis (out of vocabulary), as expected; planted false causes refuted in 5/5 tests.
+
+**Admission**: only re-decided verdicts and clean certificates are appended; the store is
+hash-chained, append only and monotone; 8/8 tamper controls caught (relabeled verdict,
+fabricated run symptoms, certificate output with `sorryAx`, claim naming another H, planted
+false hypothesis whose refusal was replaced, history rewrite, re-admission appends nothing).
+
+The same apparatus was also run over the 9 gates that fail in the consolidated
+`clpi/software-*` tree; those receipts stay out of this public repository because some of
+those repositories may be private.
 
 ## Premises and limits
 

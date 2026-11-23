@@ -1,0 +1,8 @@
+receipts/certs/d0-seed7-false-not-minimal.lean:103:68: error: tactic 'decide' proved that the proposition
+  certB
+      (let __src := P;
+      { ch := __src.ch, L := Lc, r := __src.r, q := __src.q, bot := __src.bot, A := __src.A, O := __src.O })
+      H tr Sbot Sx =
+    true
+is false
+'Canon.AbductionCert.minimal_explanation' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

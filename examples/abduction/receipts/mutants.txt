@@ -1,0 +1,11 @@
+killed no-consistency :: Abduction.lean:119:45: error: unsolved goals
+killed no-abducible-check :: Abduction.lean:119:45: error: unsolved goals
+killed no-erase-minimality :: Abduction.lean:182:8: error: tactic 'rewrite' failed, did not find instance of the pattern
+killed no-nodup :: Abduction.lean:180:12: error: application type mismatch
+killed cone-unclosed :: Abduction.lean:295:14: error: tactic 'rewrite' failed, did not find instance of the patter
+killed closed-skips-roots :: Abduction.lean:363:16: error: type mismatch
+killed trace-accepts-anything :: Abduction.lean:396:27: error: application type mismatch
+killed admit-ignores-verdict :: Abduction.lean:482:73: error: unsolved goals
+killed dom-not-strict :: Abduction.lean:526:2: error: omega could not prove the goal:
+killed cert-skips-bot :: Abduction.lean:427:56: error: application type mismatch
+mutants survived: 0

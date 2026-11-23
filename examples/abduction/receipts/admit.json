@@ -1,0 +1,104 @@
+{
+ "admitted": [
+  "minimal_explanation(d1-raw-front)",
+  "minimal_explanation(d1-strict-comp00)",
+  "minimal_explanation(d1-strict-comp01)",
+  "minimal_explanation(d1-strict-comp02)",
+  "minimal_explanation(d1-strict-comp03)",
+  "minimal_explanation(d1-strict-comp04)",
+  "minimal_explanation(d1-strict-comp05)",
+  "minimal_explanation(d1-strict-comp06)",
+  "minimal_explanation(d1-strict-comp07)",
+  "minimal_explanation(d1-strict-comp08)",
+  "minimal_explanation(d1-strict-comp09)",
+  "minimal_explanation(d1-strict-comp10)",
+  "minimal_explanation(d1-strict-comp11)",
+  "minimal_explanation(d1-strict-comp12)",
+  "minimal_explanation(d1-strict-comp13)",
+  "minimal_explanation(d1-strict-comp14)",
+  "minimal_explanation(d1-strict-comp15)",
+  "minimal_explanation(d1-strict-comp16)",
+  "minimal_explanation(d1-strict-comp17)",
+  "minimal_explanation(d1-strict-comp18)",
+  "minimal_explanation(d1-strict-comp19)",
+  "minimal_explanation(d1-strict-comp20)",
+  "minimal_explanation(d1-strict-comp21)",
+  "minimal_explanation(d1-strict-comp22)",
+  "minimal_explanation(d1-strict-comp23)",
+  "minimal_explanation(d1-strict-comp24)",
+  "minimal_explanation(d1-strict-comp25)",
+  "minimal_explanation(d1-strict-comp26)",
+  "minimal_explanation(d1-strict-comp27)",
+  "minimal_explanation(d1-strict-comp28)",
+  "minimal_explanation(d0-seed6-core)",
+  "minimal_explanation(d0-seed7-core)",
+  "minimal_explanation(d0-seed8-core)",
+  "minimal_explanation(d0-seed10-core)",
+  "minimal_explanation(d0-seed11-core)",
+  "minimal_explanation(d0-seed12-core)",
+  "cause(srce/monotone-synthesis, env_unset:OPT -> unset:OPT)",
+  "cause(srce/monotone-synthesis, env_unset:IL -> unset:IL)",
+  "repaired(srce/monotone-synthesis, env_unset:IQ -> unset:IQ)",
+  "cause(srce/admission, arg_missing:2 -> nofile:/sha256/sha256.id)",
+  "cause(srce/admission, file_absent:/sha256/sha256.id -> nofile:/sha256/sha256.id)",
+  "repaired(planted/lean-off-path, tool_missing:lean -> notfound:lean)",
+  "repaired(planted/ms-without-IQ, env_unset:IQ -> unset:IQ)",
+  "repaired(planted/gate-script-removed, file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py -> nofile:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py)"
+ ],
+ "append_only": true,
+ "head": "bcfb4824924d286744df0587d51bc5be675eaeaf3065e9a245f1bdaeb3327341",
+ "monotone": true,
+ "refused": [
+  {
+   "claim": "d0-seed6-false-does-not-explain",
+   "reason": "planted false: kernel refused (as required)"
+  },
+  {
+   "claim": "d0-seed6-false-not-minimal",
+   "reason": "planted false: kernel refused (as required)"
+  },
+  {
+   "claim": "d0-seed7-false-does-not-explain",
+   "reason": "planted false: kernel refused (as required)"
+  },
+  {
+   "claim": "d0-seed7-false-not-minimal",
+   "reason": "planted false: kernel refused (as required)"
+  },
+  {
+   "claim": "d0-seed8-false-does-not-explain",
+   "reason": "planted false: kernel refused (as required)"
+  },
+  {
+   "claim": "d0-seed8-false-not-minimal",
+   "reason": "planted false: kernel refused (as required)"
+  },
+  {
+   "claim": "srce/monotone-synthesis:env_unset:ABDUCTION_UNREAD",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "srce/monotone-synthesis:env_unset:ABDUCTION_UNREAD",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "srce/monotone-synthesis:env_unset:ABDUCTION_UNREAD",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/lean-off-path:env_unset:ABDUCTION_UNREAD",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/ms-without-IQ:file_absent:/tmp/abduction-unrelated",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  }
+ ],
+ "store_after": 2180,
+ "store_before": 0
+}
