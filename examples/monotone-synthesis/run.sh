@@ -4,6 +4,8 @@
 #   IL   checkout of clpi/idol-lib containing 0be14af and f754884
 #   IQ   the idol-qualification receipts directory (graphs, resolve, receipts; hashes below)
 #   LEAN lean 4.19.0
+#   IDOL (optional) the Idol compiler built from clpi/idol bf96bd3 (sha256 822dcb04...); with it,
+#        IL must be checked out at 4ff0c5d and the cross-home and generated steps run too
 set -eu
 cd "$(dirname "$0")"
 LEAN="${LEAN:-lean}"
@@ -70,11 +72,34 @@ mutant retire-uncovered-ok MonotoneSynthesisControls.lean '∧ ¬ Admit P0 V0 L 
 echo "== loop on real data"
 python3 -I gen_idol.py "$IQ" "$IL" > "$OUT/stream.jsonl"
 sha256sum "$OUT/stream.jsonl"
-python3 -I gate.py "$OUT/stream.jsonl" loop.py | tee "$OUT/gate.txt"
+gs=0; python3 -I gate.py "$OUT/stream.jsonl" loop.py > "$OUT/gate.txt" || gs=$?
+cat "$OUT/gate.txt"
+[ "$gs" -eq 0 ] || { echo "GATE FAILED (exit $gs)"; exit 1; }
 for o in history reverse shuffle:1 shuffle:2 shuffle:3; do
   python3 -I loop.py "$OUT/stream.jsonl" --order "$o" --abstractions
 done > "$OUT/summaries.jsonl"
 python3 -I loop.py "$OUT/stream.jsonl" --strict > "$OUT/summary-strict.json"
 python3 -I loop.py "$OUT/stream.jsonl" --raw > "$OUT/summary-raw.json"
 python3 -I loop.py "$OUT/stream.jsonl" --trace > "$OUT/trace-history.jsonl"
+python3 -I loop.py "$OUT/stream.jsonl" --emit-events "$OUT/events.jsonl" > /dev/null
+rm -f "$tmp/state.json"
+for b in $(python3 -I -c "import json,sys;print('\\n'.join(dict.fromkeys(json.loads(l)['batch'] for l in open(sys.argv[1]))))" "$OUT/events.jsonl"); do
+  python3 -I ingest.py "$tmp/state.json" "$OUT/events.jsonl" --batch "$b"
+done > "$OUT/ingest.jsonl"
+python3 -I ingest.py "$tmp/state.json" --summary >> "$OUT/ingest.jsonl"
+if [ -n "${IDOL:-}" ]; then
+  echo "== cross-home composition and generated replacements (Idol compiler)"
+  isha=$(sha256sum "$IDOL" | cut -d' ' -f1)
+  [ "$isha" = 822dcb048f613618b5c1791e8f66b3ced4edb1b8a135f78ac6033b09a89deeb8 ] || { echo "WRONG IDOL $isha (want bf96bd3 build 822dcb04)"; exit 1; }
+  case "$(git -C "$IL" rev-parse HEAD)" in 4ff0c5d*) ;; *) echo "IL must be checked out at 4ff0c5d"; exit 1;; esac
+  python3 -I gen_cross.py "$OUT/stream.jsonl" "$IL" "$IDOL" "$tmp/cross" > "$OUT/stream-cross.jsonl"
+  python3 -I gen_rewrite.py "$OUT/stream-cross.jsonl" "$IL" "$IDOL" "$tmp/gen" > "$OUT/stream-gen.jsonl"
+  sha256sum "$OUT/stream-cross.jsonl" "$OUT/stream-gen.jsonl"
+  gs=0; python3 -I gate.py "$OUT/stream-gen.jsonl" loop.py > "$OUT/gate-gen.txt" || gs=$?
+  cat "$OUT/gate-gen.txt"
+  [ "$gs" -eq 0 ] || { echo "GATE FAILED on generated stream (exit $gs)"; exit 1; }
+  python3 -I loop.py "$OUT/stream-gen.jsonl" --order history --abstractions > "$OUT/summary-gen.json"
+else
+  echo "IDOL not set: cross-home and generated steps skipped"
+fi
 echo "ALL PASS"

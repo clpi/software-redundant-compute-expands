@@ -34,6 +34,7 @@ ap.add_argument("--fake-retire", action="store_true", help="control: retire an a
 ap.add_argument("--trace", action="store_true")
 ap.add_argument("--abstractions", action="store_true")
 ap.add_argument("--dump-reach", default="")
+ap.add_argument("--emit-events", default="", help="write the ordered event stream (offers, retire requests) as JSONL for ingest.py")
 args = ap.parse_args()
 
 lines = open(args.stream).read().split("\n")
@@ -109,10 +110,14 @@ if not args.raw:
 # ---- events: offers, then replacement requests for PR 24's versions
 byhead_old = {a["head"]: a for a in arts if a["version"] == "0be14af"}
 events = []
+byid = {a["id"]: a for a in arts}
 for a in arts:
     events.append(("offer", a))
     if a["version"] == "f754884" and a["head"] in byhead_old and "projection_of" not in a:
         events.append(("retire", byhead_old[a["head"]], a))
+    if "generated" in a:
+        # a generated implementation asks to replace the artifact it was rewritten from
+        events.append(("retire", byid[a["generated"]["replaces"]], a))
 changed = {a["home"] for a in arts if a["version"] == "f754884"}
 newheads = {a["head"] for a in arts if a["version"] == "f754884"}
 last_new = max((k for k, e in enumerate(events) if e[0] == "offer" and e[1]["version"] == "f754884"), default=-1)
@@ -129,6 +134,15 @@ if args.order == "reverse":
     events.reverse()
 elif args.order.startswith("shuffle:"):
     random.Random(int(args.order.split(":")[1])).shuffle(events)
+
+if args.emit_events:
+    with open(args.emit_events, "w") as f:
+        for ev in events:
+            rec = {"kind": ev[0], "art": ev[1], "batch": ev[1]["commit"]}
+            if ev[0] == "retire":
+                rec["new"] = ev[2]
+                rec["batch"] = ev[2]["commit"] if ev[2] else ev[1]["commit"]
+            f.write(json.dumps(rec, sort_keys=True) + "\n")
 
 # ---- incremental engine
 P = set()          # host primitives: builtins are unresolved applications, never premises here
@@ -236,6 +250,10 @@ def retire(old, new):
         refusals["moot"] += 1; return "moot"
     if new is None:
         refusals["no_replacement"] += 1; return "refused:no-replacement"
+    if not verified(new):
+        refusals["unverified_replacement"] += 1; return "refused:unverified-replacement"
+    if any(e[0] == "retire" and e[1] == old["id"] for e in log):
+        refusals["already_retired"] += 1; return "moot:already-retired"
     if old["id"] not in live or new["id"] not in live:
         if args.mutant == "eager-retire" and old["id"] in live:
             do_retire(old, new); return "retired"
@@ -358,16 +376,22 @@ for k, ev in enumerate(events):
 # ---- measures
 final = {h for h, n in provides.items() if n > 0} | P
 live_rules = log_rules()
-depth = {}
-def d(h, seen=()):
-    if h in depth:
-        return depth[h]
-    provs = [ps for (hh, ps) in live_rules.values() if hh == h]
-    best = min((1 + max((d(p, seen + (h,)) for p in ps), default=0)) for ps in provs) if provs else 0
-    depth[h] = best
-    return best
-for h in final:
-    d(h)
+def min_depths(rules, heads):
+    """Least derivation depth of each head: a fixed point over the rules (premise-free rule =
+    depth 1, otherwise 1 + max over premises, minimum over providers). Cycle safe: a head on
+    a cycle with no finite derivation stays absent; the iteration only ever lowers depths."""
+    INF = float("inf")
+    dep = {}
+    changed = True
+    while changed:
+        changed = False
+        for (h, ps) in rules.values():
+            v = 1 + max((dep.get(p, INF) for p in ps), default=0)
+            if v < dep.get(h, INF):
+                dep[h] = v; changed = True
+    return {h: dep[h] for h in heads if h in dep}
+
+depth = min_depths(live_rules, final)
 
 abstr = {}
 if args.abstractions:
@@ -387,17 +411,7 @@ if args.abstractions:
                     continue
                 new_rules[nid] = (h, comp); nid += 1
     after, _ = cold_closure(new_rules)
-    depth2 = {}
-    def d2(h):
-        if h in depth2:
-            return depth2[h]
-        depth2[h] = 0
-        provs = [ps for (hh, ps) in new_rules.values() if hh == h]
-        best = min((1 + max((d2(p) for p in ps), default=0)) for ps in provs) if provs else 0
-        depth2[h] = best
-        return best
-    for h in after:
-        d2(h)
+    depth2 = min_depths(new_rules, after)
     abstr = {"rules_added": nid - 10**6, "reach_unchanged": after == final,
              "max_depth_before": max(depth.values(), default=0), "max_depth_after": max(depth2.values(), default=0),
              "sum_depth_before": sum(depth.values()), "sum_depth_after": sum(depth2[h] for h in depth)}
@@ -424,6 +438,24 @@ compounding = {
 }
 cross_home = sum(1 for (h, ps) in live_rules.values() for p in ps if p.split(":")[0] != h.split(":")[0])
 retire_log = [e for e in log if e[0] == "retire"]
+gen = [a for a in arts if "generated" in a]
+gen_summary = {}
+if gen:
+    by_new = {e[2]: e[1] for e in retire_log}
+    took = [a for a in gen if a["id"] in by_new]
+    before = {i: r for i, r in live_rules.items() if i not in {a["id"] for a in gen}}
+    for a in took:
+        o = byid[by_new[a["id"]]]
+        before[o["id"]] = (o["head"], o["prem"])
+    d0 = min_depths(before, final)
+    gen_summary = {
+        "offered": len(gen), "verified": sum(1 for a in gen if verified(a)),
+        "controls_offered": sum(1 for a in gen if a["generated"]["kind"] != "inline"),
+        "controls_admitted": sum(1 for a in gen if a["generated"]["kind"] != "inline" and any(e[0] == "add" and e[1] == a["id"] for e in log)),
+        "replaced": sorted(a["head"] for a in took),
+        "sum_depth_before": sum(d0.values()), "sum_depth_after": sum(depth.values()),
+        "depth_changed": {h: [d0.get(h), depth.get(h)] for h in sorted(final) if d0.get(h) != depth.get(h)},
+    }
 summary = {
     "order": args.order, "strict": args.strict, "raw": args.raw, "mutant": args.mutant,
     "flip_home": args.flip_home, "fake_retire": args.fake_retire,
@@ -439,7 +471,7 @@ summary = {
     "monotone_breaks": monotone_breaks, "first_mismatches": mismatch[:5],
     "max_depth": max(depth.values(), default=0),
     "depth_hist": {str(k): sum(1 for v in depth.values() if v == k) for k in sorted(set(depth.values()))},
-    "cross_home_premises": cross_home, "compounding": compounding, "abstractions": abstr,
+    "cross_home_premises": cross_home, "generated": gen_summary, "compounding": compounding, "abstractions": abstr,
     "reach_sha_input": sorted(final),
 }
 import hashlib
