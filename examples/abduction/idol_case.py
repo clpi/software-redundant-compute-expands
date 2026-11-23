@@ -1,4 +1,4 @@
-"""Construct abductions from the actual merged #12 continuation discrepancy."""
+"""Replay the current and historical Idol continuation witnesses separately."""
 import argparse
 import json
 from pathlib import Path
@@ -8,7 +8,7 @@ from tempfile import TemporaryDirectory
 from abduction import Ledger,Query
 from check_abduction import replay
 
-def fixture(source):
+def fixture(source, expect="either"):
     with TemporaryDirectory() as folder:
         lab=Path(folder)
         def cmd(path,*args):
@@ -21,6 +21,16 @@ def fixture(source):
         warm,cold=[json.loads((lab/(s+".json")).read_text()) for s in ("warm","cold")]
     missing=set(cold["reach"])-set(warm["reach"])
     absent={i for i,v in cold["pool"].items() if v not in warm["pool"].values()}
+    def active_payloads(state):
+        return sorted(json.dumps({k:v for k,v in state["arts"][str(i)].items() if k!="id"},sort_keys=True) for i in state["live"])
+    if ("arts" in warm and "arts" in cold and "live" in warm and "live" in cold
+        and warm["reach"]==cold["reach"] and active_payloads(warm)==active_payloads(cold)
+        and len(cold["reach"])==329
+        and len(cold["live"])==330 and not warm.get("pending") and not cold.get("pending")):
+        assert expect!="historical", "expected the pinned historical discrepancy"
+        return dict(status="aligned", reachable=329, activePayloads=330,
+                    missing=[], remedies=[], authority=False)
+    assert expect!="repaired", "expected exact current continuation"
     assert (len(warm["reach"]),len(cold["reach"]),len(missing),len(absent))==(321,329,8,3)
     scope="merged-12-receipt-recovery"
     def rec(i,k,h,**kw):return dict(id=i,kind=k,scope=scope,head=h,**kw)
@@ -41,8 +51,13 @@ if __name__=="__main__":
     ap=argparse.ArgumentParser()
     ap.add_argument("--example-dir",type=Path,default=Path(__file__).resolve().parent.parent/"monotone-synthesis")
     ap.add_argument("--emit-input",action="store_true")
+    ap.add_argument("--expect",choices=("either","historical","repaired"),default="either")
     a=ap.parse_args()
-    x=fixture(a.example_dir.resolve())
+    x=fixture(a.example_dir.resolve(),a.expect)
+    if x.get("status")=="aligned":
+        if a.emit_input: ap.error("repaired continuation has no abduction input; use the historical pin")
+        print(json.dumps(x,sort_keys=True))
+        raise SystemExit(0)
     if a.emit_input:
         print(json.dumps(x,sort_keys=True))
     else:

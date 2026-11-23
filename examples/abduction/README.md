@@ -27,14 +27,18 @@ execution grants, or constructors of canonical progress.
   eight-capability continuation gap from two executions. It discovers two
   incomparable hypothetical explanations. Its two resource axes are
   illustrative costs, not measured resource use. If the old ledger is
-  repaired, the historical example must run against its original pin.
+  repaired, the historical example must run against its original pin. The
+  repaired default reports the exact warm/cold agreement and no hypothetical
+  action. Use `--expect repaired` to require that outcome, or `--expect historical`
+  to require the original discrepancy.
 
 ```sh
 python3 abduction.py example.json > example.cert.json
 python3 check_abduction.py example.json example.cert.json
 python3 verify.py
 python3 test_native.py /absolute/path/to/idol
-python3 idol_case.py --example-dir /path/to/merged-12/examples/monotone-synthesis
+python3 idol_case.py --expect repaired
+python3 idol_case.py --expect historical --example-dir /path/to/merged-12/examples/monotone-synthesis
 ```
 
 The proof imports the actual `Canon` definitions. It validates assumption
