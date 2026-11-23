@@ -37,3 +37,23 @@ compiler/target capture, graph extraction completeness and operational signing
 remain outside the proof. New components, systems and cost axes must be
 described by the same exact input and observation interface. Pareto closure
 is exact for the represented candidate pool, not a proof about unseen code.
+
+## Exact receipt scope
+
+`proof/ProgressBinding.lean` adds a versioned witness format on the same
+`Canon.Rec`. The ordered premise vector contains a lossless, length-framed
+encoding of the contract, check identity, predecessor and candidate, including
+both ordered observation sequences and cost vectors. The original three
+anchor terms remain first; payload terms use a disjoint residue. The
+encoding is injective over the exact finite model and requires no hash
+assumption. Proofs use the full anchored edge, not a projection that drops the
+body. An exact receipt remains valid for that same claim at every append
+prefix; no additional current authority is inferred.
+
+Standing kernel controls demonstrate that the prior constructor reuses one
+receipt after substituting a cost vector, observation row order, or contract
+payload with unchanged IDs. The new constructor admits the original exact
+body and refuses all three substitutions and the legacy record. This does
+not claim that a physical measurement is authentic or that production callers
+already use the new constructor. Physical producer validation and operational
+adoption are separate.
