@@ -6,7 +6,7 @@ import json
 def need(ok, error):
     if not ok: raise ValueError(error)
 
-def replay(raw, query, cert, weights):
+def replay(raw, query, cert, weights, *, _return_policy=False):
     byid={}
     for r in raw:
         i=r['id']
@@ -96,11 +96,34 @@ def replay(raw, query, cert, weights):
     def cost(s):
         return [sum(costs[a][i] for a in s) for i in range(len(axes))]
     pairs=sorted([[sorted(s),cost(s)] for s in plans])
-    right=[p for p in pairs if not any(q[1]!=p[1] and all(x<=y for x,y in zip(q[1],p[1])) for q in pairs)]
+    # Lexicographic order places every strict componentwise dominator first.
+    # Retaining only earlier nondominated vectors is valid by transitivity.
+    live=[]
+    for vector in sorted({tuple(v) for _,v in pairs}):
+        if not any(all(x<=y for x,y in zip(prior,vector)) for prior in live):
+            live.append(vector)
+    live_set=set(live)
+    right=[p for p in pairs if tuple(p[1]) in live_set]
     need(cert['frontier']==right,'wrong Pareto front')
     win=min(right,key=lambda p:(sum(x*y for x,y in zip(p[1],weights)),p[0]))[0] if right else None
     need(cert['selected']==win,'wrong policy winner')
-    return {"verified":True,"supports":len(plans),"nondominated":len(right),"authority":False}
+    report={"verified":True,"supports":len(plans),"nondominated":len(right),"authority":False}
+    if not _return_policy:return report
+    # Only immutable values verified by the cold replay enter the handle.
+    representatives={}
+    for p,v in right: representatives.setdefault(tuple(v),tuple(p))
+    frozen=tuple((p,v) for v,p in representatives.items())
+    def verify(update):
+        need(set(update)=={'projection','axes','weights','selected'},'invalid policy update')
+        ws=update['weights']
+        need(update['projection']==binding and tuple(update['axes'])==axis_key
+            and type(ws) is list and len(ws)==len(axis_key)
+            and all(type(w) is int and w>=0 for w in ws),'wrong checked snapshot or policy')
+        best=min(frozen,key=lambda row:(sum(x*y for x,y in zip(ws,row[1])),row[0])) if frozen else None
+        need(update['selected']==(list(best[0]) if best is not None else None),'wrong policy winner')
+        return {**report,"projection":binding}
+    axis_key=tuple(axes)
+    return report,verify
 
 def cli():
     ap=argparse.ArgumentParser()

@@ -1,14 +1,13 @@
 """Exact, scoped, proof-producing abduction on the existing Horn projection."""
 import argparse
 from collections import defaultdict
-from copy import deepcopy
 from functools import lru_cache
 from hashlib import sha256
 import json
 from pathlib import Path
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent / "action-vector"))
-from action_support import Edge, Supports, key, frontier, choose
+from action_support import Edge, Supports, key, choose
 
 def canonical(value):
     return json.dumps(value, separators=(",", ":"), sort_keys=True, allow_nan=False)
@@ -102,6 +101,7 @@ class Ledger:
         self._records={}
         self._indices={}
         self._projection_cache={}
+        self._current={}
     @property
     def records(self):
         return [json.loads(s) for s in self._records.values()]
@@ -113,8 +113,14 @@ class Ledger:
             if (k in self._records and self._records[k]!=s) or (k in incoming and incoming[k]!=s):
                 raise ValueError("record ID reused with different contents")
             incoming[k]=s
+        if any(k not in self._records for k in incoming):
+            self._current.clear()
         self._records.update(incoming)
-    def query(self, query, weights):
+    def prepare(self, query):
+        """Return an immutable, explicitly historical prepared policy surface."""
+        identity=canonical(query.identity())
+        if identity in self._current:
+            return self._current[identity], True
         records = self.records
         rules, ww = qualify(records,query.scope)
         rules, ww = cone(rules,{a:s for a,s in ww.items() if a in query.costs},query.goals|query.forbidden)
@@ -160,18 +166,65 @@ class Ledger:
                 if i==len(universe):raise ValueError("incomplete support family")
                 return ["split",universe[i],cover(lo,i+1),cover(lo|{universe[i]},i+1)]
             certificate=cover(frozenset(),0)
-            state=(valid,certificate,idx.evaluations,bounds[0])
+            groups=defaultdict(list)
+            for support,_ in valid:
+                groups[query.cost(support)].append(support)
+            vectors=tuple(sorted(groups))
+            comparisons=0
+            front=[]
+            for v in vectors:
+                for u in vectors:
+                    if u==v:continue
+                    comparisons+=1
+                    if all(x<=y for x,y in zip(u,v)):break
+                else:
+                    front.extend((p,v) for p in groups[v])
+            ordered=tuple(sorted(front,key=lambda r:key(r[0])))
+            representatives={}
+            for plan,vector in ordered:
+                representatives.setdefault(vector,plan)
+            state=Prepared(hasher,universe,query.dimensions,tuple(valid),
+                           canonical(certificate),ordered,tuple((plan,v) for v,plan in representatives.items()),
+                           idx.evaluations,bounds[0],comparisons)
             self._projection_cache[hasher]=state
-        valid,certificate,evaluations,boxes=state
-        pareto=frontier((p for p,_ in valid),query.cost)
-        winner=choose(pareto,tuple(weights))
-        return {"kind":"hypothetical-not-authority","projection":hasher,
-                "universe":list(universe),"axes":list(query.dimensions),"weights":list(weights),
+        self._current[identity]=state
+        return state, same
+
+    def query(self, query, weights):
+        model, reused=self.prepare(query)
+        return model.certificate(weights,reused)
+
+from typing import NamedTuple
+
+class Prepared(NamedTuple):
+    projection: str
+    universe: tuple
+    axes: tuple
+    supports: tuple
+    cover: str
+    front: tuple
+    representatives: tuple
+    rule_evaluations: int
+    boxes: int
+    comparisons: int
+
+    def reweight(self, weights):
+        weights=tuple(weights)
+        if len(weights)!=len(self.axes) or any(type(w) is not int or w<0 for w in weights):
+            raise ValueError("invalid weight vector")
+        winner=choose(self.representatives,weights)
+        return {"projection":self.projection,"axes":list(self.axes),"weights":list(weights),
+                "selected":None if winner is None else list(key(winner[0]))}
+
+    def certificate(self,weights,reused=False):
+        return {**self.reweight(weights),"kind":"hypothetical-not-authority",
+                "universe":list(self.universe),
                 "supports":[{"assumptions":list(key(s)),"proof":[list(row) for row in p]}
-                            for s,p in valid],
-                "cover":deepcopy(certificate),"frontier":[[list(key(s)),list(v)] for s,v in pareto],
-                "selected":None if winner is None else list(key(winner[0])),
-                "work":{"ruleEvaluationsTotal":evaluations,"coverNodes":boxes,"projectionReused":same}}
+                            for s,p in self.supports],
+                "cover":json.loads(self.cover),"frontier":[[list(key(s)),list(v)] for s,v in self.front],
+                "work":{"ruleEvaluationsTotal":self.rule_evaluations,"coverNodes":self.boxes,
+                        "projectionReused":reused,
+                        "frontierComparisonsThisCall":0 if reused else self.comparisons}}
 
 def read_input(path):
     with open(path) as f:

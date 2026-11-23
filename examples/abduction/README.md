@@ -46,3 +46,33 @@ nonnegative additive costs are the only optimization model in this example.
 Worst-case search and output can both be exponential. There is no
 unbounded/timeout completeness claim. New graph evidence is retained, but
 a certificate is usable only for the exact query projection it binds.
+
+### Weight-only replay
+
+`Ledger.prepare(query)` returns a historical immutable snapshot. Call
+`snapshot.reweight(weights)` for a small policy update instead of resending
+the supports and cover. The independent checker exposes a process-local
+verifier when called with `replay(..., _return_policy=True)` after it has
+checked the full certificate. Neither handle is a release receipt, a network
+protocol, or a statement that this projection remains current after an append.
+
+The grouping is exact: equal cost vectors mutually fail strict dominance;
+a vector's dominance status applies to every support in that group. The
+checker independently visits unique vectors in lexicographic order. A
+strict componentwise dominator must be earlier; if discarded, it has an
+earlier surviving dominator by transitivity. Policy selection uses only the
+lexicographically first support of each surviving vector because all
+supports at that vector receive the same weighted score. The complete
+frontier still retains all tied supports, including undominated vectors
+unsupported by a positive linear weighting.
+
+A relevant graph, cost or axis change requires a new binding and a new cold
+checker pass. An append clears the fast current-query index; exact projection
+identity may still reuse state once re-established. The current-index check
+serializes the query identity, but touches no graph on a weight-only request.
+Old verified policy handles explicitly certify only the old digest.
+`verify_reweight.py` tests 4,096 policies and attacks this boundary.
+`benchmark_reweight.py --baseline <previous-abduction.py>` reports raw
+paired warm timings. The old API materializes a full certificate because
+it has no policy-only route; the new API checks a policy delta instead.
+This is a scoped Python replay, not an Idol-native performance claim.
