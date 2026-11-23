@@ -2,9 +2,9 @@
 
 Each invocation loads the persisted state, applies one batch of new events (offers and
 retirement requests, e.g. the receipts of one commit), checks the spec on the result, and
-replaces the state file atomically. Nothing already admitted is revisited; a pending
+replaces the state file atomically while holding the same per-state writer lock. Nothing already admitted is revisited; a pending
 candidate is retried exactly when its last missing premise lands, in this batch or a later
-one. Re-ingesting a batch already applied changes nothing (events are keyed).
+one. An exact event replay is a no-op. Reusing a key for different evidence is refused.
 
 Spec checked after every batch (refuses to write state otherwise):
   reach = least closure of the log's live rules from scratch
@@ -18,7 +18,9 @@ This is a second implementation, written apart from loop.py; gate.py checks they
 usage: ingest.py STATE EVENTS.jsonl [--batch COMMIT]   (no --batch: every batch in order)
        ingest.py STATE --summary
 """
-import argparse, hashlib, json, os, sys
+import argparse, fcntl, hashlib, json, os, sys, tempfile
+from contextlib import contextmanager
+from pathlib import Path
 from collections import defaultdict
 
 ap = argparse.ArgumentParser()
@@ -27,6 +29,7 @@ ap.add_argument("events", nargs="?")
 ap.add_argument("--batch", default="")
 ap.add_argument("--summary", action="store_true")
 args = ap.parse_args()
+state_path = Path(args.state).resolve()
 
 def key(ev):
     a = ev["art"]
@@ -36,20 +39,99 @@ def key(ev):
 def verified(a):
     return a["verdict"] == "PASSED" and a["observed"] in ("root", "reached")
 
+def canonical(value):
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
+
+def payload(ev):
+    # Batch is scheduling metadata, not a second identity for the content.
+    # Artifact bodies are checked against the immutable state table, not
+    # duplicated in every event binding. Keep null-versus-absent distinctions.
+    return canonical({k: (v["id"] if k in ("art", "new") and v is not None else v)
+                      for k, v in ev.items() if k != "batch"})
+
+def artifact_payload(a):
+    return json.dumps({k: v for k, v in a.items() if k != "id"},
+                      sort_keys=True, separators=(",", ":"), allow_nan=False)
+
+def bind_ids(st, events):
+    # Producer IDs name artifacts only in one incoming event file. Saved IDs
+    # are append-only slots: historical log and pending references never move.
+    incoming, indexed, used = {}, {}, set()
+    for key, a in st["arts"].items():
+        i = int(key)
+        q = artifact_payload(a)
+        if i != a["id"] or q in indexed:
+            raise ValueError("ambiguous stored artifact identity")
+        indexed[q] = i
+        used.add(i)
+    for ev in events:
+        for a in (ev["art"], ev.get("new")):
+            if a is None:
+                continue
+            i, q = a["id"], artifact_payload(a)
+            if type(i) is not int or i < 0:
+                raise ValueError("invalid producer artifact ID")
+            if i in incoming and incoming[i] != q:
+                raise ValueError("conflicting producer artifact ID: " + str(i))
+            incoming[i] = q
+    nxt = max(used | incoming.keys(), default=-1) + 1
+    mapped = {}
+    for i, q in sorted(incoming.items()):
+        if q not in indexed:
+            j = i
+            if j in used:
+                j = nxt
+                nxt += 1
+            indexed[q] = j
+            used.add(j)
+        mapped[i] = indexed[q]
+    def remap(a):
+        return dict(a, id=mapped[a["id"]]) if a is not None else None
+    return [dict(ev, art=remap(ev["art"]),
+                 **({"new": remap(ev["new"])} if "new" in ev else {}))
+            for ev in events]
+
 def fresh_state():
     return {"log": [], "arts": {}, "live": [], "pending": {}, "retire_waits": {},
-            "pool": {}, "seen": [], "batches": [], "ops": {}, "reach": []}
+            "pool": {}, "seen": {}, "batches": [], "ops": {}, "reach": []}
 
 def load():
-    if os.path.exists(args.state):
-        return json.load(open(args.state))
-    return fresh_state()
+    if not state_path.exists():
+        return fresh_state()
+    with state_path.open() as f:
+        st = json.load(f)
+    if isinstance(st["seen"], list):
+        if st["seen"] or st["log"] or st["batches"] or st["arts"]:
+            raise ValueError("legacy state lacks event payloads; reconstruct to a new state")
+        st["seen"] = {}
+    if not isinstance(st["seen"], dict) or any(not isinstance(v, str) for v in st["seen"].values()):
+        raise ValueError("invalid event binding store")
+    return st
+
+@contextmanager
+def writer():
+    # Never unlink the lock: a waiting process must share the same inode.
+    with (state_path.parent / (state_path.name + ".lock")).open("a+b") as lock:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+        yield
 
 def save(st):
-    tmp = args.state + ".tmp"
-    with open(tmp, "w") as f:
-        json.dump(st, f, sort_keys=True)
-    os.replace(tmp, args.state)
+    fd, tmp = tempfile.mkstemp(prefix=state_path.name + ".", suffix=".tmp",
+                               dir=state_path.parent)
+    try:
+        with os.fdopen(fd, "w") as f:
+            json.dump(st, f, sort_keys=True, allow_nan=False)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, state_path)
+        directory = os.open(state_path.parent, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+    finally:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
 
 def closure(rules):
     have, cnt, wait, q = set(), {}, defaultdict(list), []
@@ -113,6 +195,19 @@ class Engine:
             for old, new in self.retire_waits.pop(i, []):
                 self.retire(self.arts[old], self.arts[new])
 
+    def bind(self, a, replay):
+        if a is None:
+            return
+        i = a["id"]
+        if type(i) is not int or i < 0:
+            raise ValueError("artifact identity must be a nonnegative integer")
+        before = self.arts.get(i)
+        if replay and before is None:
+            raise ValueError(f"missing evidence for artifact {i} during replay")
+        if before is not None and canonical(before) != canonical(a):
+            raise ValueError(f"conflicting evidence for artifact {i}")
+        self.arts[i] = a
+
     def offer(self, a):
         self.arts[a["id"]] = a
         self.ops["offer"] += 1
@@ -130,9 +225,7 @@ class Engine:
 
     def retire(self, old, new):
         self.ops["retire_req"] += 1
-        if not verified(old) or new is None or not verified(new):
-            return
-        if any(e[0] == "retire" and e[1] == old["id"] for e in self.st["log"]):
+        if not verified(old) or new is None:
             return
         self.arts[old["id"]] = old; self.arts[new["id"]] = new
         if old["id"] not in self.live or new["id"] not in self.live:
@@ -181,8 +274,13 @@ def spec(st, prev):
         errs.append("reach shrank")
     return errs
 
-st = load()
 if args.summary:
+    # Rename exposes one complete prefix to readers; it is not a write.
+    try:
+        st = load()
+    except ValueError as error:
+        print(json.dumps({"refused": [str(error)]}), file=sys.stderr)
+        sys.exit(1)
     print(json.dumps({"batches": len(st["batches"]), "log": len(st["log"]), "live": len(st["live"]),
                       "reach": len(st["reach"]), "pending": len(st["pending"]), "ops": st["ops"],
                       "reach_sha256": hashlib.sha256("\n".join(st["reach"]).encode()).hexdigest(),
@@ -196,27 +294,45 @@ for ev in events:
     if not order or order[-1] != ev["batch"]:
         order.append(ev["batch"])
 targets = [args.batch] if args.batch else list(dict.fromkeys(order))
-for b in targets:
-    prev = list(st["reach"])
-    eng = Engine(st)
-    seen = set(st["seen"])
-    applied = 0
-    for ev in events:
-        if ev["batch"] != b or key(ev) in seen:
-            continue
-        seen.add(key(ev)); applied += 1
-        if ev["kind"] == "offer":
-            eng.offer(ev["art"])
-        else:
-            eng.retire(ev["art"], ev.get("new"))
-    st = eng.dump()
-    st["seen"] = sorted(seen)
-    errs = spec(st, prev)
-    if errs:
-        print(json.dumps({"batch": b, "refused": errs}))
-        sys.exit(1)
-    if applied:
-        st["batches"].append(b)
-    save(st)
-    print(json.dumps({"batch": b, "applied": applied, "reach": len(st["reach"]),
-                      "live": len(st["live"]), "pending": len(st["pending"])}, sort_keys=True))
+try:
+    with writer():
+        st = load()
+        events = bind_ids(st, events)
+        for b in targets:
+            prev = list(st["reach"])
+            eng = Engine(st)
+            seen = st["seen"]
+            applied = 0
+            for ev in events:
+                if ev["batch"] != b:
+                    continue
+                if ev["kind"] not in ("offer", "retire"):
+                    raise ValueError("unknown event kind")
+                k = key(ev)
+                replay = k in seen
+                eng.bind(ev["art"], replay)
+                eng.bind(ev.get("new"), replay)
+                body = payload(ev)
+                if replay:
+                    if seen[k] != body:
+                        raise ValueError(f"conflicting replay for event {k}")
+                    continue
+                seen[k] = body
+                applied += 1
+                if ev["kind"] == "offer":
+                    eng.offer(ev["art"])
+                else:
+                    eng.retire(ev["art"], ev.get("new"))
+            st = eng.dump()
+            errs = spec(st, prev)
+            if errs:
+                print(json.dumps({"batch": b, "refused": errs}))
+                sys.exit(1)
+            if applied:
+                st["batches"].append(b)
+                save(st)
+            print(json.dumps({"batch": b, "applied": applied, "reach": len(st["reach"]),
+                              "live": len(st["live"]), "pending": len(st["pending"])}, sort_keys=True))
+except (ValueError, KeyError, TypeError, OSError) as error:
+    print(json.dumps({"refused": [str(error)]}), file=sys.stderr)
+    sys.exit(1)
