@@ -1,0 +1,3 @@
+$ (cd theses/redundant-compute-expands/examples/abduce/planted/first-run && true)
+
+==> exit 0

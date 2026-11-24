@@ -1,0 +1,4 @@
+usage: ingest.py [-h] [--batch BATCH] [--summary] state [events]
+ingest.py: error: the following arguments are required: state
+
+==> exit 2

@@ -1,0 +1,4 @@
+$ (cd theses/redundant-compute-expands/examples/monotone-synthesis && bash run.sh)
+run.sh: line 14: IQ: idol-qualification receipts directory
+
+==> exit 1

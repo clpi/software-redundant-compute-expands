@@ -1,2 +1,0 @@
-$ (cd theses/redundant-compute-expands/examples/monotone-synthesis && bash run.sh)
-run.sh: line 13: IL: checkout of clpi/idol-lib

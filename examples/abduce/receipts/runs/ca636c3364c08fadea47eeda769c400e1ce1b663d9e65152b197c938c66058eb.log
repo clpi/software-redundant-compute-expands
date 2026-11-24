@@ -1,0 +1,8 @@
+$ (cd theses/redundant-compute-expands/examples/abduce/planted/needs-producer/tools && python3 report.py)
+Traceback (most recent call last):
+  File "$MONO/theses/redundant-compute-expands/examples/abduce/planted/needs-producer/tools/report.py", line 3, in <module>
+    print(json.load(open("../data/out.json")))
+                    ~~~~^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '../data/out.json'
+
+==> exit 1

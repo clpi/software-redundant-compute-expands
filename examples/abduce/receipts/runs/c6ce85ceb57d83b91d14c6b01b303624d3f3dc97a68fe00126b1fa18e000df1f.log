@@ -1,2 +1,0 @@
-$ (cd theses/redundant-compute-expands/examples/abduce/planted/first-run && sh check.sh)
-cold start

@@ -54,10 +54,21 @@
   "minimal_prerequisite(planted/first-run, examples/abduce/planted/first-run/.cache/warm)",
   "repaired(planted/flaky, pre:build:. -> fails)",
   "repaired(planted/flaky, artifact_absent:examples/abduce/planted/flaky/gen/ok -> fails)",
-  "minimal_prerequisite(planted/flaky, examples/abduce/planted/flaky/gen/ok)"
+  "minimal_prerequisite(planted/flaky, examples/abduce/planted/flaky/gen/ok)",
+  "fail_point(planted/needs-producer, file_absent:data/out.json -> nofile:data/out.json)",
+  "repaired(planted/needs-producer, pre:produce:examples/abduce/planted/needs-producer/tools/gen.py -> fails)",
+  "repaired(planted/needs-producer, artifact_absent:examples/abduce/planted/needs-producer/data/out.json -> fails)",
+  "minimal_prerequisite(planted/needs-producer, examples/abduce/planted/needs-producer/data/out.json)",
+  "repaired(planted/needs-producer > produce:examples/abduce/planted/needs-producer/tools/gen.py, module_missing:planted_helper -> nomodule:planted_helper)",
+  "fail_point(planted/needs-producer > produce:examples/abduce/planted/needs-producer/tools/report.py, file_absent:../data/out.json -> nofile:../data/out.json)",
+  "cause(planted/stray-input, argv_missing:1 -> argv:1)",
+  "repaired(planted/stray-input, stray:theses/redundant-compute-expands/examples/abduce/planted/stray-input/results/a after produce:examples/abduce/planted/stray-input/gen.py a -> fails)",
+  "cause(planted/stray-input, pre:produce:examples/abduce/planted/stray-input/gen.py a -> ends:KeyError: 'log_file')",
+  "repaired(planted/stray-input, stray_files:theses/redundant-compute-expands/examples/abduce/planted/stray-input/results/a/summary-compact.json after produce:examples/abduce/planted/stray-input/gen.py a -> fails)",
+  "minimal_prerequisite(planted/stray-input, theses/redundant-compute-expands/examples/abduce/planted/stray-input/results/a/summary-compact.json)"
  ],
  "append_only": true,
- "head": "96b380f7e4396b405c6da51463296fa6c79de8b380cd8409cb058662055d1964",
+ "head": "a846c045ea0b1332b608b8ddbbf5dab323857ff7247f6693d45cf7eb5af34dc8",
  "monotone": true,
  "refused": [
   {
@@ -145,6 +156,41 @@
    "reason": "recomputed: not verified"
   },
   {
+   "claim": "planted/gate-script-removed:pre:produce:examples/incremental-recomputation/gate.py",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/gate-script-removed:pre:produce:examples/monotone-synthesis/gate.py",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/gate-script-removed:pre:produce:examples/monotone-synthesis/ingest.py",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/gate-script-removed > produce:examples/incremental-recomputation/gate.py:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/gate-script-removed > produce:examples/monotone-synthesis/gate.py:argv_missing:2",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/gate-script-removed > produce:examples/monotone-synthesis/gate.py:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/gate-script-removed > produce:examples/monotone-synthesis/ingest.py:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
    "claim": "planted/lean-source-removed:pre:self",
    "claimed_verdict": "REFUTED",
    "reason": "recomputed: not verified"
@@ -161,10 +207,35 @@
   },
   {
    "claim": "planted/flaky:pre:self",
-   "claimed_verdict": "INCONCLUSIVE",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/needs-producer:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/needs-producer:pre:produce:examples/abduce/planted/needs-producer/tools/report.py",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/needs-producer > produce:examples/abduce/planted/needs-producer/tools/report.py:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/stray-input:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/stray-input:pre:self",
+   "claimed_verdict": "REFUTED",
    "reason": "recomputed: not verified"
   }
  ],
- "store_after": 2197,
+ "store_after": 2218,
  "store_before": 0
 }

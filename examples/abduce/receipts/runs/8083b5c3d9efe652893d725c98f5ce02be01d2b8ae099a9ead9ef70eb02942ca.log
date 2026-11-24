@@ -1,2 +1,0 @@
-$ (cd theses/redundant-compute-expands/examples/admission && sh run.sh)
-cat: /sha256/sha256.id: No such file or directory

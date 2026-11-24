@@ -1,0 +1,4 @@
+$ (cd theses/redundant-compute-expands/examples/abduce/planted/flaky && sh check.sh)
+race lost
+
+==> exit 1

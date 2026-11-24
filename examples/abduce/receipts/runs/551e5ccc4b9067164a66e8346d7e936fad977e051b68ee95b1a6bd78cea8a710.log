@@ -1,0 +1,4 @@
+$ (cd theses/redundant-compute-expands/examples/abduce/planted/flaky && make)
+mkdir -p gen && echo ok > gen/ok
+
+==> exit 0

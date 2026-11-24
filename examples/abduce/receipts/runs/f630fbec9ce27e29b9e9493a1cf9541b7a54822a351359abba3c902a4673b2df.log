@@ -1,0 +1,21 @@
+checked 3 runs
+
+==> results/a/run-0.json <==
+{"run": 0, "log_file": "run-0.log"}
+==> results/a/run-0.log <==
+ok
+
+==> results/a/run-1.json <==
+{"run": 1, "log_file": "run-1.log"}
+==> results/a/run-1.log <==
+ok
+ok
+
+==> results/a/run-2.json <==
+{"run": 2, "log_file": "run-2.log"}
+==> results/a/run-2.log <==
+ok
+ok
+ok
+
+==> exit 0

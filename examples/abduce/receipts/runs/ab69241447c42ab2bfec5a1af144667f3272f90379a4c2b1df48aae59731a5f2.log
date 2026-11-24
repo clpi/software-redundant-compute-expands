@@ -1,0 +1,5 @@
+$ (cd theses/redundant-compute-expands/examples/monotone-synthesis && python3 ingest.py)
+usage: ingest.py [-h] [--batch BATCH] [--summary] state [events]
+ingest.py: error: the following arguments are required: state
+
+==> exit 2

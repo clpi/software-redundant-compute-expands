@@ -1,18 +1,18 @@
 {
  "admission": {
-  "admitted": 55,
+  "admitted": 66,
   "append_only": true,
-  "head": "96b380f7e4396b405c6da51463296fa6c79de8b380cd8409cb058662055d1964",
+  "head": "a846c045ea0b1332b608b8ddbbf5dab323857ff7247f6693d45cf7eb5af34dc8",
   "monotone": true,
-  "refused": 22,
-  "store_records": 2197
+  "refused": 34,
+  "store_records": 2218
  },
  "certificates": {
   "certified": 36,
   "false_of": 6,
   "false_refused": 6,
   "of": 36,
-  "seconds_total": 938.3
+  "seconds_total": 815.4
  },
  "crosscheck_pr16": {
   "agree_all": 123,
@@ -114,7 +114,8 @@
      ],
      "ddmin_runs": 2,
      "first_run_only": [
-      "cold start"
+      "cold start",
+      "==> exit 1"
      ],
      "minimal": [
       "examples/abduce/planted/first-run/.cache/warm"
@@ -140,7 +141,7 @@
      "artifact_verdicts": [
       "REPAIRED"
      ],
-     "ddmin_runs": 4,
+     "ddmin_runs": 2,
      "first_run_only": null,
      "minimal": [
       "examples/abduce/planted/flaky/gen/ok"
@@ -153,7 +154,7 @@
     [
      0,
      "pre:self",
-     "INCONCLUSIVE",
+     "REFUTED",
      "run self first (from the gate itself)"
     ],
     [
@@ -182,6 +183,72 @@
      "REPAIRED",
      "restore tracked examples/monotone-synthesis/gate.py from HEAD"
     ],
+    [
+     0,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ],
+    [
+     0,
+     "pre:produce:examples/incremental-recomputation/gate.py",
+     "REFUTED",
+     "run produce:examples/incremental-recomputation/gate.py first (from its source names gate.py)"
+    ],
+    [
+     0,
+     "pre:produce:examples/monotone-synthesis/gate.py",
+     "REFUTED",
+     "run produce:examples/monotone-synthesis/gate.py first (from its source names gate.py)"
+    ],
+    [
+     0,
+     "pre:produce:examples/monotone-synthesis/ingest.py",
+     "REFUTED",
+     "run produce:examples/monotone-synthesis/ingest.py first (from its source names gate.py)"
+    ]
+   ]
+  },
+  "planted/gate-script-removed > produce:examples/incremental-recomputation/gate.py": {
+   "first_verified": null,
+   "planted": null,
+   "prerequisites": [],
+   "status": "FAILING",
+   "trials": [
+    [
+     0,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ]
+   ]
+  },
+  "planted/gate-script-removed > produce:examples/monotone-synthesis/gate.py": {
+   "first_verified": null,
+   "planted": null,
+   "prerequisites": [],
+   "status": "FAILING",
+   "trials": [
+    [
+     0,
+     "argv_missing:2",
+     "REFUTED",
+     "argv placeholder"
+    ],
+    [
+     0,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ]
+   ]
+  },
+  "planted/gate-script-removed > produce:examples/monotone-synthesis/ingest.py": {
+   "first_verified": null,
+   "planted": null,
+   "prerequisites": [],
+   "status": "FAILING",
+   "trials": [
     [
      0,
      "pre:self",
@@ -299,6 +366,134 @@
      "run doc:touch decoy.txt first (from README.md)"
     ]
    ]
+  },
+  "planted/needs-producer": {
+   "first_verified": "pre:produce:examples/abduce/planted/needs-producer/tools/gen.py",
+   "planted": "producer chain: data/out.json is written only by tools/gen.py, which needs planted_helper from lib/; tools/report.py only reads it",
+   "prerequisites": [
+    {
+     "artifact_verdicts": [
+      "REPAIRED"
+     ],
+     "ddmin_runs": 3,
+     "first_run_only": null,
+     "minimal": [
+      "examples/abduce/planted/needs-producer/data/out.json"
+     ],
+     "round": 0
+    }
+   ],
+   "status": "REPAIRED",
+   "trials": [
+    [
+     0,
+     "file_absent:data/out.json",
+     "VERIFIED",
+     "empty placeholder (tests the fail point only)"
+    ],
+    [
+     0,
+     "pre:produce:examples/abduce/planted/needs-producer/tools/gen.py",
+     "REPAIRED",
+     "run produce:examples/abduce/planted/needs-producer/tools/gen.py first (from its source names out.json, repaired with {\"PYTHONPATH\": \"/tmp/claude-0/abd9/mono/theses/redundant-compute-expands/examples/abduce/planted/needs-producer/lib\"})"
+    ],
+    [
+     0,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ],
+    [
+     0,
+     "pre:produce:examples/abduce/planted/needs-producer/tools/report.py",
+     "REFUTED",
+     "run produce:examples/abduce/planted/needs-producer/tools/report.py first (from its source names out.json)"
+    ]
+   ]
+  },
+  "planted/needs-producer > produce:examples/abduce/planted/needs-producer/tools/gen.py": {
+   "first_verified": "module_missing:planted_helper",
+   "planted": null,
+   "prerequisites": [],
+   "status": "REPAIRED",
+   "trials": [
+    [
+     0,
+     "module_missing:planted_helper",
+     "REPAIRED",
+     "put theses/redundant-compute-expands/examples/abduce/planted/needs-producer/lib on PYTHONPATH (holds planted_helper.py)"
+    ]
+   ]
+  },
+  "planted/needs-producer > produce:examples/abduce/planted/needs-producer/tools/report.py": {
+   "first_verified": null,
+   "planted": null,
+   "prerequisites": [],
+   "status": "FAILING",
+   "trials": [
+    [
+     0,
+     "file_absent:../data/out.json",
+     "VERIFIED",
+     "empty placeholder (tests the fail point only)"
+    ],
+    [
+     0,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ]
+   ]
+  },
+  "planted/stray-input": {
+   "first_verified": "argv_missing:1",
+   "planted": "check.py NAME reads every .json in results/NAME as a run; the runs are written by gen.py NAME and not kept in git, and the tracked results/a/summary-compact.json is not a run; results/a/notes.txt is tracked too but check.py skips it",
+   "prerequisites": [
+    {
+     "artifact_verdicts": [
+      "REPAIRED"
+     ],
+     "ddmin_runs": 3,
+     "first_run_only": null,
+     "minimal": [
+      "theses/redundant-compute-expands/examples/abduce/planted/stray-input/results/a/summary-compact.json"
+     ],
+     "round": 1
+    }
+   ],
+   "status": "REPAIRED",
+   "trials": [
+    [
+     0,
+     "argv_missing:1",
+     "VERIFIED",
+     "argv[1]=a"
+    ],
+    [
+     0,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ],
+    [
+     1,
+     "stray:theses/redundant-compute-expands/examples/abduce/planted/stray-input/results/a after produce:examples/abduce/planted/stray-input/gen.py a",
+     "REPAIRED",
+     "set aside notes.txt, summary-compact.json in theses/redundant-compute-expands/examples/abduce/planted/stray-input/results/a (tracked, not written by produce:examples/abduce/planted/stray-input/gen.py a, run first)"
+    ],
+    [
+     1,
+     "pre:produce:examples/abduce/planted/stray-input/gen.py a",
+     "VERIFIED",
+     "run produce:examples/abduce/planted/stray-input/gen.py a first (from writes into theses/redundant-compute-expands/examples/abduce/planted/stray-input/results/ARG, the directory the gate reads)"
+    ],
+    [
+     1,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ]
+   ]
   }
  },
  "gates_real": {
@@ -310,7 +505,7 @@
      0,
      "arg_missing:2",
      "VERIFIED",
-     "positional ['/tmp/claude-0/abd6/cache/bin-idol', '/home/user/idol-lib', '']"
+     "positional ['/tmp/claude-0/abd9/cache/bin-idol', '/home/user/idol-lib', '']"
     ],
     [
      0,
@@ -334,7 +529,7 @@
      0,
      "env_unset:OPT",
      "VERIFIED",
-     "OPT=/tmp/claude-0/abd6/cache/clpi_software-optimality@3418711"
+     "OPT=/tmp/claude-0/abd9/cache/clpi_software-optimality@3418711"
     ],
     [
      0,
@@ -352,7 +547,7 @@
      1,
      "env_unset:IL",
      "VERIFIED",
-     "IL=/tmp/claude-0/abd6/cache/clpi_idol-lib"
+     "IL=/tmp/claude-0/abd9/cache/clpi_idol-lib"
     ],
     [
      1,
@@ -387,6 +582,6 @@
    ]
   }
  },
- "planted_false_refuted": 6,
- "planted_false_tested": 6
+ "planted_false_refuted": 7,
+ "planted_false_tested": 7
 }

@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "$MONO/theses/redundant-compute-expands/examples/abduce/planted/stray-input/check.py", line 23, in <module>
+    check(os.path.join(base, sys.argv[1]))
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$MONO/theses/redundant-compute-expands/examples/abduce/planted/stray-input/check.py", line 14, in check
+    lines = open(os.path.join(bdir, summ["log_file"])).read().splitlines()
+                                    ~~~~^^^^^^^^^^^^
+KeyError: 'log_file'
+
+==> exit 1
