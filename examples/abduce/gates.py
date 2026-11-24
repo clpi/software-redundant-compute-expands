@@ -184,6 +184,10 @@ def run(g, iv=None, tag=""):
             os.makedirs(os.environ["RUNLOGS"], exist_ok=True)
             open(os.path.join(os.environ["RUNLOGS"], sha(pout) + ".log"), "w").write(pout)
         pre_out.append({"rc": prc, "log_sha256": sha(pout)})
+    for q in iv.get("hide", []):  # tracked files set aside after the prerequisite steps (restored by the reset below)
+        hp = os.path.join(MONO, q)
+        if os.path.isfile(hp):
+            os.remove(hp)
     cmd = list(iv.get("cmd") or g["cmd"]) + list(iv.get("args", []))
     t = time.time()
     try:
@@ -299,7 +303,8 @@ def static(g):
         st["usage"] = u.group(1)
     for m in re.finditer(r"sys\.argv\[(\d+)\]", src):
         st["argv"].append(m.group(1))
-    b = re.search(r"os\.path\.join\((\w+),\s*sys\.argv\[1\]\)", src)
+    av = re.findall(r"^\s*(\w+)\s*=\s*sys\.argv\[1\]\s*$", src, re.M)  # which = sys.argv[1]
+    b = re.search(r"os\.path\.join\((\w+),\s*(?:sys\.argv\[1\]" + "".join("|" + re.escape(v) for v in av) + r")\)", src)
     if b:
         mb = re.search(b.group(1) + r'\s*=\s*os\.path\.join\(os\.path\.dirname\(os\.path\.abspath\(__file__\)\),\s*"([^"]+)"\)', src)
         if mb:
@@ -333,6 +338,9 @@ def theory(g, obs, st, pre=()):
     def cause(name, cost, preds, spec):
         causes[name] = (cost, sorted(set(preds)), spec)
 
+    for d_, files, act in g.get("_strays", []):  # tracked files the regenerating step did not write: set them aside
+        nm = f"stray:{d_}" + (f" after {act['name']}" if act else "")
+        cause(nm, 2 + (act is not None), ["fails"], {"kind": "hide", "paths": files, "dir": d_, "act": act})
     for path in g.get("_deleted", []):  # tracked files missing from the tree: restore from the commit
         base = os.path.basename(path).split(".")[0]
         cause(f"tracked_deleted:{path}", 1, ["fails"] + ([f"mentions:{base}"] if f"mentions:{base}" in obs else []), {"kind": "tracked", "path": path})
@@ -532,6 +540,13 @@ def interventions(spec, g, st):
         a = spec["act"]
         return [{"pre": [{"cwd": a["cwd"], "cmd": a["cmd"], **({"env": a["env"]} if a.get("env") else {})}],
                  "why": f"run {a['name']} first (from {a['src']}{', repaired with ' + json.dumps(a['env']) if a.get('env') else ''})"}]
+    if k == "hide":
+        a = spec.get("act")
+        iv = {"hide": list(spec["paths"]), "why": f"set aside {', '.join(os.path.basename(q) for q in spec['paths'])} in {spec['dir']} (tracked, not written by "
+              + (f"{a['name']}, run first" if a else "the kept step") + ")"}
+        if a:
+            iv["pre"] = [{"cwd": a["cwd"], "cmd": a["cmd"], **({"env": a["env"]} if a.get("env") else {})}]
+        return [iv]
     if k == "restore":
         return [{"files": spec["files"], "why": f"restore only {', '.join(spec['units'])} from the {spec['act']} snapshot"}]
     return []
@@ -606,11 +621,87 @@ def producers(g, obs, cap=3):
     return acts
 
 
-def harvest(g, obs=()):
+def siblings(g, keep):
+    """Scripts that take the same argument and write into the same directory the gate reads from.
+
+    When the gate reads `base/ARG` (its argv joined to a directory next to the script) and was
+    given ARG, another script in the thesis whose argv is joined to the same directory and which
+    writes files is a candidate producer of what the gate reads, run with the same ARG."""
+    args = list(keep.get("args", []))
+    if not args or not g.get("script"):
+        return []
+    try:
+        base = static(g).get("argv_base")
+    except OSError:
+        return []
+    if not base:
+        return []
+    root = thesis_root(g)
+    gate_script = os.path.realpath(os.path.join(MONO, g["cwd"], g["script"]))
+    acts = []
+    for dp, dns, fns in os.walk(root):
+        dns[:] = sorted(x for x in dns if not x.startswith(".") and x not in SKIPDIR)
+        for f in sorted(fns):
+            path = os.path.join(dp, f)
+            if not f.endswith(".py") or os.path.realpath(path) == gate_script:
+                continue
+            rel = os.path.relpath(dp, MONO)
+            try:
+                st2 = static({"cwd": rel, "script": f})
+                src = open(path, errors="replace").read()
+            except OSError:
+                continue
+            b2 = st2.get("argv_base")
+            writes = re.search(r"""open\([^)]*,\s*["'][wa]b?["']""", src) or "json.dump(" in src
+            if b2 and os.path.realpath(b2) == os.path.realpath(base) and writes:
+                acts.append({"name": f"produce:{os.path.relpath(path, root)} {' '.join(args)}", "cwd": rel,
+                             "cmd": ["python3", f] + args, "cost": 2, "script": f, "args": args,
+                             "src": f"writes into {os.path.relpath(base, MONO)}/ARG, the directory the gate reads"})
+    return acts[:3]
+
+
+def strays(g, st, keep, pre=()):
+    """Tracked files in the directory the gate reads (its argv joined to argv_base) that a step
+    regenerating that directory does not write. After the step runs, a file it did not write is
+    not one of its products, and the gate may misread it as one. The step is a kept prerequisite,
+    or a sibling producer found this round (then the cause is the pair: run it, set the files aside)."""
+    args, base = list(keep.get("args", [])), st.get("argv_base")
+    if not args or not base:
+        return []
+    d = os.path.join(base, args[0])
+    if not os.path.isdir(d):
+        return []
+    root = thesis_root(g)
+    tracked = subprocess.run(["git", "-C", d, "ls-files", "--full-name", "."], capture_output=True, text=True).stdout.split()
+    top = subprocess.run(["git", "-C", d, "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+    tracked = [os.path.relpath(os.path.join(top, q), MONO) for q in tracked]
+
+    drel = os.path.relpath(d, MONO)
+
+    def left(pr):
+        w = set(pr.get("modified", [])) | {os.path.relpath(os.path.join(root, q), MONO) for q in pr["paths"]}
+        if not any(x == drel or x.startswith(drel + "/") or drel.startswith(x.rstrip("/") + "/") for x in w if x not in tracked):
+            return []  # the step writes nothing new into the directory: setting files aside would only empty it
+        return [q for q in tracked if q not in w and not any(q.startswith(x.rstrip("/") + "/") for x in w)]
+    out = []
+    if keep.get("pre"):
+        for a in keep["pre"]:
+            pr = probe(g, {"name": "kept", "cwd": a["cwd"], "cmd": a["cmd"], **({"env": a["env"]} if a.get("env") else {})}, {})
+            if left(pr):
+                out.append((os.path.relpath(d, MONO), left(pr), None))
+    else:
+        for a, pr, _ in pre:
+            if a.get("args") == args and pr["rc"] == 0 and left(pr):
+                out.append((os.path.relpath(d, MONO), left(pr), a))
+    return out[:2]
+
+
+def harvest(g, obs=(), keep=None):
     root, cwd = thesis_root(g), os.path.join(MONO, g["cwd"])
-    acts = [{"name": "self", "cwd": g["cwd"], "cmd": list(g["cmd"]), "cost": 1, "src": "the gate itself"}]
+    acts = [{"name": "self", "cwd": g["cwd"], "cmd": list(g["cmd"]) + list((keep or {}).get("args", [])), "cost": 1, "src": "the gate itself"}]
     if g.get("_depth", 0) < 1:
         acts += producers(g, obs)
+        acts += siblings(g, keep or {})
     dirs = []
     d = cwd
     while True:  # ancestors up to the thesis root
@@ -701,12 +792,26 @@ def probe(g, a, keep):
         return PROBES[key]
     git_reset(root)
     env = dict(os.environ); env.update(keep.get("env", {})); env.update(a.get("env", {}))
+    t0 = time.time() - 1
     try:
         p = subprocess.run(a["cmd"], cwd=os.path.join(MONO, a["cwd"]), env=env, capture_output=True, text=True, timeout=TIMEOUT)
         rc = p.returncode
     except subprocess.TimeoutExpired:
         rc = 124
     paths = created(root)
+    st_out = subprocess.run(["git", "-C", root, "status", "--porcelain", "--", "."], capture_output=True, text=True).stdout
+    top_ = subprocess.run(["git", "-C", root, "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+    modified = {os.path.relpath(os.path.join(top_, l[3:].strip()), MONO) for l in st_out.splitlines() if "M" in l[:2]}
+    for dp, dns, fns in os.walk(root):  # tracked files rewritten with the same bytes show in no git status: use mtimes
+        dns[:] = [x for x in dns if x not in SKIPDIR and not x.startswith(".")]
+        for f in fns:
+            q = os.path.join(dp, f)
+            try:
+                if os.path.getmtime(q) >= t0:
+                    modified.add(os.path.relpath(q, MONO))
+            except OSError:
+                pass
+    modified = sorted(modified)
     snap = os.path.join(CACHE, "snap-" + sha(json.dumps(key))[:16])
     shutil.rmtree(snap, ignore_errors=True)
     for q in paths:
@@ -717,7 +822,7 @@ def probe(g, a, keep):
         elif os.path.lexists(src):
             shutil.copy2(src, dst, follow_symlinks=False)
     git_reset(root)
-    PROBES[key] = {"rc": rc, "snap": snap, "paths": paths, "names": names_in(snap, paths)}
+    PROBES[key] = {"rc": rc, "snap": snap, "paths": paths, "names": names_in(snap, paths), "modified": modified}
     if rc != 0 and a["name"].startswith("produce:") and g.get("_depth", 0) < 1:
         # the producer itself fails: abduce why, as a gate of its own, one level down
         sub = {"name": f"{g['name']} > {a['name']}", "cwd": a["cwd"], "cmd": a["cmd"], "script": a["script"],
@@ -737,7 +842,7 @@ def mentions(g, ctrl, keep):
     """For each candidate action: the names it creates that the failing log mentions."""
     text = LOGS.get(ctrl[0]["log_sha256"], ctrl[0]["tail"])
     res = []
-    for a in harvest(g, ctrl[0]["symptoms"]):
+    for a in harvest(g, ctrl[0]["symptoms"], keep):
         pr = probe(g, a, keep)
         if pr.get("env"):
             a = dict(a, env=pr["env"])
@@ -897,7 +1002,7 @@ def abduce_round(g, ctrl, st, keep=None):
         base = os.path.basename(path).split(".")[0]
         if len(base) >= 3 and re.search(r"(?<![\w-])" + re.escape(base) + r"(?![\w-])", text):
             obs = sorted(set(obs) | {f"mentions:{base}"})
-    g = dict(g, _deleted=ctrl[0].get("tree_deleted", []))
+    g = dict(g, _deleted=ctrl[0].get("tree_deleted", []), _strays=strays(g, st, keep or {}, pre) if PREREQ else [])
     lg, A, O, causes = theory(g, obs, st, pre)
     at = ATMS(A, 2)
     for r in lg.recs:
@@ -927,7 +1032,7 @@ def abduce_round(g, ctrl, st, keep=None):
 
 
 def experiment(g, cname, spec, st, ctrl, keep):
-    if spec["kind"] in ("pre", "restore", "tracked", "regress", "regress_files"):  # symptom free: the gate's own exit status
+    if spec["kind"] in ("pre", "restore", "tracked", "regress", "regress_files", "hide"):  # symptom free: the gate's own exit status
         target = ["fails"]
     else:
         target = [p for p in theory(g, ctrl[0]["symptoms"], st)[3][cname][1] if p in ctrl[0]["symptoms"] and p != "fails"]
@@ -947,7 +1052,7 @@ def experiment(g, cname, spec, st, ctrl, keep):
         sig = None
         if iv.get("acquire"):
             verdict, stat = "ACQUIRED", None
-        elif spec["kind"] in ("pre", "restore", "tracked", "regress", "regress_files"):
+        elif spec["kind"] in ("pre", "restore", "tracked", "regress", "regress_files", "hide"):
             verdict, stat, sig = decide_tree(ctrl, ivr, pl)
         else:
             verdict, stat = decide(target, ctrl, ivr, pl)
@@ -1001,9 +1106,9 @@ def gate(g):
         reproducible = len({tuple(r["symptoms"]) for r in ctrl}) == 1 and len({r["rc"] for r in ctrl}) == 1
         ab, causes = abduce_round(g, ctrl, st, keep)
         tested, verified = [], None
-        tree = ("pre:", "tracked_deleted:")  # causes read from the tree, tested symptom free
+        tree = ("pre:", "tracked_deleted:", "stray:")  # causes read from the tree, tested symptom free
         order = [h[0] for h in ab["front"] if len(h) == 1 and not h[0].startswith(tree)] + [c for c in ab["abducibles"] if c in {f["name"] for f in g.get("false", [])}]
-        prs = sorted((c for c in causes if c.startswith(tree)), key=lambda c: (not c.startswith("tracked_deleted:"), -len(causes[c][1]), causes[c][0], c))
+        prs = sorted((c for c in causes if c.startswith(tree)), key=lambda c: (not c.startswith(("tracked_deleted:", "stray:")), -len(causes[c][1]), causes[c][0], c))
         exhaustive = bool(g.get("planted") or g.get("false") or g.get("exhaustive"))
         for cname in dict.fromkeys(order + prs):
             if verified is not None and cname.startswith("pre:") and not exhaustive:
@@ -1049,6 +1154,28 @@ def gate(g):
                 warm = set(LOGS.get(t["intervention"][0]["log_sha256"], "").splitlines())
                 cold = LOGS.get(ctrl[0]["log_sha256"], "").splitlines()
                 rd["first_run_only"] = [l for l in cold if l not in warm and l.strip()][:12]
+        if cname.startswith("stray:"):
+            hspec = causes[cname][2]
+            # The producer run is held fixed: it is what makes a file a stray. Without it, setting
+            # files aside can leave the gate nothing to check, and an empty check passes.
+            files = list(hspec["paths"])
+            nlog = []
+
+            def htest(s_):
+                iv_ = {"hide": list(s_)}
+                if hspec.get("act"):
+                    a_ = hspec["act"]
+                    iv_["pre"] = [{"cwd": a_["cwd"], "cmd": a_["cmd"], **({"env": a_["env"]} if a_.get("env") else {})}]
+                r = run(g, merge(keep, iv_), "narrow")
+                nlog.append({"units": sorted(s_), "rc": r["rc"], "log_sha256": r["log_sha256"]})
+                return r["rc"] == 0
+            m, _, complete = ddmin(files, htest, 12) if len(files) > 1 else (files, 0, True)
+            rd["narrowed"] = {"units": files, "minimal": sorted(m), "tests": nlog, "complete": complete}
+            if complete and sorted(m) != sorted(files):
+                hs = dict(hspec, paths=sorted(m))
+                nm_ = "stray_files:" + ",".join(hs["paths"]) + (f" after {hs['act']['name']}" if hs.get("act") else "")
+                rd["artifact"] = {"cause": nm_, "produced_by": cname,
+                                  "trials": experiment(g, "hide", hs, st, ctrl, keep)}
         if t["verdict"] == "ACQUIRED":
             # the hidden step's own output becomes the observation for the next round
             g = dict(g, cmd=t["iv"]["cmd"], script=g["script"])

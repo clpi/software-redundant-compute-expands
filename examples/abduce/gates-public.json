@@ -181,5 +181,16 @@
    "pre:produce:examples/abduce/planted/needs-producer/tools/report.py"
   ],
   "exhaustive": true
+ },
+ {
+  "name": "planted/stray-input",
+  "cwd": "theses/redundant-compute-expands/examples/abduce/planted/stray-input",
+  "cmd": [
+   "python3",
+   "check.py"
+  ],
+  "script": "check.py",
+  "planted": "check.py NAME reads every .json in results/NAME as a run; the runs are written by gen.py NAME and not kept in git, and the tracked results/a/summary-compact.json is not a run; results/a/notes.txt is tracked too but check.py skips it",
+  "exhaustive": true
  }
 ]
