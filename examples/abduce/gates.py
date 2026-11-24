@@ -41,6 +41,26 @@ def fisher_greater(a, n1, b, n2):
     return sum(comb(n1, i) * comb(n2, k - i) for i in range(a, min(n1, k) + 1) if 0 <= k - i <= n2) / comb(n, k)
 
 
+def signature(r):
+    """What a run ended on: its symptom set and its last non-empty output line."""
+    lines = [l for l in LOGS.get(r["log_sha256"], r.get("tail", "")).splitlines() if l.strip()]
+    return [sorted(r["symptoms"]), lines[-1].strip() if lines else ""]
+
+
+def decide_tree(ctrl, ivr, pl):
+    """For causes read from the tree, whose test has no predicted symptom: REPAIRED as by decide on
+    "fails"; otherwise VERIFIED when every control and placebo run ends on one signature and every
+    intervention run ends on another, shared one (the cause was removed and the next failure shows)."""
+    v, stat = decide(["fails"], ctrl, ivr, pl)
+    if v != "REFUTED" or stat is not None:
+        return v, stat, None
+    S = [signature(r) for r in ctrl + pl]
+    T = [signature(r) for r in ivr]
+    if all(x == S[0] for x in S) and all(y == T[0] for y in T) and T[0] != S[0]:
+        return "VERIFIED", None, {"before": S[0], "after": T[0]}
+    return v, None, None
+
+
 def decide(target, ctrl, ivr, pl):
     """Verdict from run records. Deterministic gates: target in every control and placebo run, in no
     intervention run. When the controls disagree (a flaky gate): the intervention must show the
@@ -117,6 +137,11 @@ def run(g, iv=None, tag=""):
             else:
                 shutil.copy(src, d)
             placed.append(d)
+    # tracked files the tree is missing just before the run (read from git, not from any output)
+    troot = os.path.join(MONO, *g["cwd"].split("/")[:2])
+    deleted = sorted(os.path.relpath(os.path.join(subprocess.run(["git", "-C", troot, "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip(), l[3:]), troot)
+                     for l in subprocess.run(["git", "-C", troot, "status", "--porcelain", "--", "."], capture_output=True, text=True).stdout.splitlines()
+                     if l[:2] in (" D", "D "))
     pre_out = []
     for a in iv.get("pre", []):  # prerequisite actions, run before the gate on the same fresh tree
         try:
@@ -167,6 +192,8 @@ def run(g, iv=None, tag=""):
     r = {"rc": rc, "secs": secs, "log_sha256": sha(out), "tail": out[-1500:], "symptoms": symptoms(out, rc, g), "tag": tag}
     if pre_out:
         r["pre"] = pre_out
+    if deleted:
+        r["tree_deleted"] = deleted
     return r
 
 # ------------------------------------------------------------------ symptoms
@@ -270,6 +297,9 @@ def theory(g, obs, st, pre=()):
     def cause(name, cost, preds, spec):
         causes[name] = (cost, sorted(set(preds)), spec)
 
+    for path in g.get("_deleted", []):  # tracked files missing from the tree: restore from the commit
+        base = os.path.basename(path).split(".")[0]
+        cause(f"tracked_deleted:{path}", 1, ["fails"] + ([f"mentions:{base}"] if f"mentions:{base}" in obs else []), {"kind": "tracked", "path": path})
     for a, pr, hit in pre:  # prerequisite actions read from the tree; they predict what they create
         cause(f"pre:{a['name']}", a["cost"], ["fails"] + [f"mentions:{h}" for h in hit], {"kind": "pre", "act": a})
 
@@ -436,6 +466,10 @@ def interventions(spec, g, st):
         return [{"cmd": ["sh", "-c", spec["cmd"]], "why": f"run the hidden step visibly: {spec['cmd']}", "acquire": True}]
     if k == "placebo":
         return [{"env": spec.get("env", {}), "why": "planted false cause"}]
+    if k == "tracked":
+        troot = os.path.join(MONO, *g["cwd"].split("/")[:2])
+        rel = os.path.relpath(os.path.join(troot, spec["path"]), MONO)
+        return [{"files": [(("HEAD", rel), os.path.join(troot, spec["path"]))], "why": f"restore tracked {spec['path']} from HEAD"}]
     if k == "pre":
         a = spec["act"]
         return [{"pre": [{"cwd": a["cwd"], "cmd": a["cmd"]}], "why": f"run {a['name']} first (from {a['src']})"}]
@@ -677,6 +711,12 @@ def runs(g, iv, n, tag):
 def abduce_round(g, ctrl, st, keep=None):
     pre = mentions(g, ctrl, keep or {}) if PREREQ else []
     obs = sorted(set(ctrl[0]["symptoms"]) | {f"mentions:{h}" for _, _, hit in pre for h in hit})
+    text = LOGS.get(ctrl[0]["log_sha256"], ctrl[0]["tail"])
+    for path in ctrl[0].get("tree_deleted", []):
+        base = os.path.basename(path).split(".")[0]
+        if len(base) >= 3 and re.search(r"(?<![\w-])" + re.escape(base) + r"(?![\w-])", text):
+            obs = sorted(set(obs) | {f"mentions:{base}"})
+    g = dict(g, _deleted=ctrl[0].get("tree_deleted", []))
     lg, A, O, causes = theory(g, obs, st, pre)
     at = ATMS(A, 2)
     for r in lg.recs:
@@ -706,7 +746,7 @@ def abduce_round(g, ctrl, st, keep=None):
 
 
 def experiment(g, cname, spec, st, ctrl, keep):
-    if spec["kind"] in ("pre", "restore"):  # symptom free: the gate's own exit status
+    if spec["kind"] in ("pre", "restore", "tracked"):  # symptom free: the gate's own exit status
         target = ["fails"]
     else:
         target = [p for p in theory(g, ctrl[0]["symptoms"], st)[3][cname][1] if p in ctrl[0]["symptoms"] and p != "fails"]
@@ -721,7 +761,13 @@ def experiment(g, cname, spec, st, ctrl, keep):
         if spec["kind"] == "pre":  # same slot, no effect
             placebo["pre"] = [{"cwd": spec["act"]["cwd"], "cmd": ["true"]}]
         pl = runs(g, merge(keep, placebo), n, "placebo")
-        verdict, stat = ("ACQUIRED", None) if iv.get("acquire") else decide(target, ctrl, ivr, pl)
+        sig = None
+        if iv.get("acquire"):
+            verdict, stat = "ACQUIRED", None
+        elif spec["kind"] in ("pre", "restore", "tracked"):
+            verdict, stat, sig = decide_tree(ctrl, ivr, pl)
+        else:
+            verdict, stat = decide(target, ctrl, ivr, pl)
         extra = []
         hit = lambda r: all(t in r["symptoms"] for t in target)
         if verdict == "INCONCLUSIVE" and stat is None and 0 < sum(map(hit, pl)) < len(pl):
@@ -730,7 +776,7 @@ def experiment(g, cname, spec, st, ctrl, keep):
             ivr += runs(g, merged, FLAKY_N - len(ivr), "intervention")
             pl += runs(g, merge(keep, placebo), FLAKY_N - len(pl), "placebo")
             verdict, stat = decide(target, ctrl + extra, ivr, pl)
-        trials.append({"why": iv["why"], "verdict": verdict, "target": target, "intervention": ivr, "placebo": pl, "iv": iv, "stat": stat,
+        trials.append({"why": iv["why"], "verdict": verdict, "target": target, "intervention": ivr, "placebo": pl, "iv": iv, "stat": stat, "signature": sig,
                        **({"control_extra": extra} if extra else {})})
         if verdict in ("REPAIRED", "VERIFIED", "ACQUIRED") and not iv.get("why", "").startswith("empty placeholder"):
             break
@@ -767,8 +813,9 @@ def gate(g):
         reproducible = len({tuple(r["symptoms"]) for r in ctrl}) == 1 and len({r["rc"] for r in ctrl}) == 1
         ab, causes = abduce_round(g, ctrl, st, keep)
         tested, verified = [], None
-        order = [h[0] for h in ab["front"] if len(h) == 1 and not h[0].startswith("pre:")] + [c for c in ab["abducibles"] if c in {f["name"] for f in g.get("false", [])}]
-        prs = sorted((c for c in causes if c.startswith("pre:")), key=lambda c: (-len(causes[c][1]), causes[c][0], c))
+        tree = ("pre:", "tracked_deleted:")  # causes read from the tree, tested symptom free
+        order = [h[0] for h in ab["front"] if len(h) == 1 and not h[0].startswith(tree)] + [c for c in ab["abducibles"] if c in {f["name"] for f in g.get("false", [])}]
+        prs = sorted((c for c in causes if c.startswith(tree)), key=lambda c: (not c.startswith("tracked_deleted:"), -len(causes[c][1]), causes[c][0], c))
         exhaustive = bool(g.get("planted") or g.get("false") or g.get("exhaustive"))
         for cname in dict.fromkeys(order + prs):
             if verified is not None and cname.startswith("pre:") and not exhaustive:

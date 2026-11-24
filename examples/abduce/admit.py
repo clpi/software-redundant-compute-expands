@@ -180,6 +180,14 @@ def main():
                     pc = all(map(hit, ctrl)) and len(ctrl) >= 2
                     gone = all(not any(s in r["symptoms"] for s in target) for r in tr["intervention"]) and len(tr["intervention"]) >= 2
                     pp = all(map(hit, tr["placebo"])) and len(tr["placebo"]) >= 2
+                    if tr.get("signature") and pc and pp and not gone:  # a tree cause that exposes the next failure
+                        def sig_(r):
+                            txt = open(os.path.join(runlogs, r["log_sha256"] + ".log")).read()
+                            ls = [l for l in txt.splitlines() if l.strip()]
+                            return [sorted(r["symptoms"]), ls[-1].strip() if ls else ""]
+                        S, T = [sig_(r) for r in ctrl + tr["placebo"]], [sig_(r) for r in tr["intervention"]]
+                        gone = all(x == S[0] for x in S) and all(y == T[0] for y in T) and T[0] != S[0] and len(T) >= 2
+                        target = [f"ends:{S[0][1][:60]}"]
                     if not pc and any(map(hit, ctrl)) and gone:  # flaky gate: the statistical rule
                         c, q, ni = sum(map(hit, ctrl)), sum(map(hit, tr["placebo"])), len(tr["intervention"])
                         pc = fisher_greater(c, len(ctrl), 0, ni) < 0.05
