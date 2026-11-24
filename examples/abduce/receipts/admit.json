@@ -38,22 +38,13 @@
   "minimal_explanation(d0-seed12-core)",
   "cause(srce/monotone-synthesis, env_unset:OPT -> unset:OPT)",
   "cause(srce/monotone-synthesis, env_unset:IL -> unset:IL)",
-  "cause(srce/monotone-synthesis, env_unset:IQ -> unset:IQ)",
-  "repaired(srce/monotone-synthesis, regressed_at:df1d7795a358 -> fails)",
-  "repaired(srce/monotone-synthesis, regressed_files:theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py -> fails)",
-  "minimal_prerequisite(srce/monotone-synthesis, theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py)",
+  "repaired(srce/monotone-synthesis, env_unset:IQ -> unset:IQ)",
   "cause(srce/admission, arg_missing:2 -> nofile:/sha256/sha256.id)",
   "cause(srce/admission, file_absent:/sha256/sha256.id -> nofile:/sha256/sha256.id)",
   "repaired(planted/lean-off-path, tool_missing:lean -> notfound:lean)",
-  "cause(planted/ms-without-IQ, env_unset:IQ -> unset:IQ)",
-  "repaired(planted/ms-without-IQ, regressed_at:df1d7795a358 -> fails)",
-  "repaired(planted/ms-without-IQ, regressed_files:theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py -> fails)",
-  "minimal_prerequisite(planted/ms-without-IQ, theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py)",
-  "cause(planted/gate-script-removed, file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py -> nofile:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py)",
-  "cause(planted/gate-script-removed, tracked_deleted:examples/monotone-synthesis/gate.py -> ends:python3: can't open file '$MONO/theses/redundant-compute-exp)",
-  "repaired(planted/gate-script-removed, regressed_at:df1d7795a358 -> fails)",
-  "repaired(planted/gate-script-removed, regressed_files:theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py -> fails)",
-  "minimal_prerequisite(planted/gate-script-removed, theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py)",
+  "repaired(planted/ms-without-IQ, env_unset:IQ -> unset:IQ)",
+  "repaired(planted/gate-script-removed, file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py -> nofile:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py)",
+  "repaired(planted/gate-script-removed, tracked_deleted:examples/monotone-synthesis/gate.py -> fails)",
   "repaired(planted/lean-source-removed, tracked_deleted:proof/Canon.lean -> fails)",
   "repaired(planted/needs-build, pre:build:. -> fails)",
   "repaired(planted/needs-build, artifact_absent:examples/abduce/planted/needs-build/gen/table.txt -> fails)",
@@ -66,7 +57,7 @@
   "minimal_prerequisite(planted/flaky, examples/abduce/planted/flaky/gen/ok)"
  ],
  "append_only": true,
- "head": "75e75db300acb6457e7331ed491e210ea76cd66a70f168644d365a08e16c2dd3",
+ "head": "96b380f7e4396b405c6da51463296fa6c79de8b380cd8409cb058662055d1964",
  "monotone": true,
  "refused": [
   {
@@ -124,16 +115,6 @@
    "reason": "recomputed: not verified"
   },
   {
-   "claim": "srce/monotone-synthesis:env_unset:ABDUCTION_UNREAD",
-   "claimed_verdict": "REFUTED",
-   "reason": "recomputed: not verified"
-  },
-  {
-   "claim": "srce/monotone-synthesis:pre:self",
-   "claimed_verdict": "REFUTED",
-   "reason": "recomputed: not verified"
-  },
-  {
    "claim": "srce/admission:pre:self",
    "claimed_verdict": "REFUTED",
    "reason": "recomputed: not verified"
@@ -159,21 +140,6 @@
    "reason": "recomputed: not verified"
   },
   {
-   "claim": "planted/ms-without-IQ:file_absent:/tmp/abduction-unrelated",
-   "claimed_verdict": "REFUTED",
-   "reason": "recomputed: not verified"
-  },
-  {
-   "claim": "planted/ms-without-IQ:pre:self",
-   "claimed_verdict": "REFUTED",
-   "reason": "recomputed: not verified"
-  },
-  {
-   "claim": "planted/gate-script-removed:pre:self",
-   "claimed_verdict": "REFUTED",
-   "reason": "recomputed: not verified"
-  },
-  {
    "claim": "planted/gate-script-removed:pre:self",
    "claimed_verdict": "REFUTED",
    "reason": "recomputed: not verified"
@@ -195,10 +161,10 @@
   },
   {
    "claim": "planted/flaky:pre:self",
-   "claimed_verdict": "REFUTED",
+   "claimed_verdict": "INCONCLUSIVE",
    "reason": "recomputed: not verified"
   }
  ],
- "store_after": 2209,
+ "store_after": 2197,
  "store_before": 0
 }

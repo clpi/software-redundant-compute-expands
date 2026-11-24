@@ -1,18 +1,18 @@
 {
  "admission": {
-  "admitted": 64,
+  "admitted": 55,
   "append_only": true,
-  "head": "75e75db300acb6457e7331ed491e210ea76cd66a70f168644d365a08e16c2dd3",
+  "head": "96b380f7e4396b405c6da51463296fa6c79de8b380cd8409cb058662055d1964",
   "monotone": true,
-  "refused": 27,
-  "store_records": 2209
+  "refused": 22,
+  "store_records": 2197
  },
  "certificates": {
   "certified": 36,
   "false_of": 6,
   "false_refused": 6,
   "of": 36,
-  "seconds_total": 738.6
+  "seconds_total": 938.3
  },
  "crosscheck_pr16": {
   "agree_all": 123,
@@ -153,7 +153,7 @@
     [
      0,
      "pre:self",
-     "REFUTED",
+     "INCONCLUSIVE",
      "run self first (from the gate itself)"
     ],
     [
@@ -167,31 +167,19 @@
   "planted/gate-script-removed": {
    "first_verified": "file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py",
    "planted": "file_absent:<gate.py>",
-   "prerequisites": [
-    {
-     "artifact_verdicts": [
-      "REPAIRED"
-     ],
-     "ddmin_runs": 4,
-     "first_run_only": null,
-     "minimal": [
-      "theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py"
-     ],
-     "round": 1
-    }
-   ],
+   "prerequisites": [],
    "status": "REPAIRED",
    "trials": [
     [
      0,
      "file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py",
-     "VERIFIED",
-     "restore from history 21f906e4803e:theses/redundant-compute-expands/examples/monotone-synthesis/gate.py"
+     "REPAIRED",
+     "restore from history a4b936dc21fa:theses/redundant-compute-expands/examples/monotone-synthesis/gate.py"
     ],
     [
      0,
      "tracked_deleted:examples/monotone-synthesis/gate.py",
-     "VERIFIED",
+     "REPAIRED",
      "restore tracked examples/monotone-synthesis/gate.py from HEAD"
     ],
     [
@@ -199,18 +187,6 @@
      "pre:self",
      "REFUTED",
      "run self first (from the gate itself)"
-    ],
-    [
-     1,
-     "pre:self",
-     "REFUTED",
-     "run self first (from the gate itself)"
-    ],
-    [
-     1,
-     "regressed_at:df1d7795a358",
-     "REPAIRED",
-     "the gate's folder as it was before df1d7795a358 (Merge pull request #14 from clpi/dot/cross-receipt-atomic-re)"
     ]
    ]
   },
@@ -263,25 +239,13 @@
   "planted/ms-without-IQ": {
    "first_verified": "env_unset:IQ",
    "planted": "env_unset:IQ",
-   "prerequisites": [
-    {
-     "artifact_verdicts": [
-      "REPAIRED"
-     ],
-     "ddmin_runs": 4,
-     "first_run_only": null,
-     "minimal": [
-      "theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py"
-     ],
-     "round": 1
-    }
-   ],
+   "prerequisites": [],
    "status": "REPAIRED",
    "trials": [
     [
      0,
      "env_unset:IQ",
-     "VERIFIED",
+     "REPAIRED",
      "IQ=/mnt/project-files/idol-qualification"
     ],
     [
@@ -295,24 +259,6 @@
      "pre:self",
      "REFUTED",
      "run self first (from the gate itself)"
-    ],
-    [
-     1,
-     "file_absent:/tmp/abduction-unrelated",
-     "REFUTED",
-     "planted false cause"
-    ],
-    [
-     1,
-     "pre:self",
-     "REFUTED",
-     "run self first (from the gate itself)"
-    ],
-    [
-     1,
-     "regressed_at:df1d7795a358",
-     "REPAIRED",
-     "the gate's folder as it was before df1d7795a358 (Merge pull request #14 from clpi/dot/cross-receipt-atomic-re)"
     ]
    ]
   },
@@ -364,7 +310,7 @@
      0,
      "arg_missing:2",
      "VERIFIED",
-     "positional ['/tmp/claude-0/abd5/cache/bin-idol', '/home/user/idol-lib', '']"
+     "positional ['/tmp/claude-0/abd6/cache/bin-idol', '/home/user/idol-lib', '']"
     ],
     [
      0,
@@ -381,26 +327,14 @@
    ]
   },
   "srce/monotone-synthesis": {
-   "prerequisites": [
-    {
-     "artifact_verdicts": [
-      "REPAIRED"
-     ],
-     "ddmin_runs": 4,
-     "first_run_only": null,
-     "minimal": [
-      "theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py"
-     ],
-     "round": 3
-    }
-   ],
+   "prerequisites": [],
    "status": "REPAIRED",
    "trials": [
     [
      0,
      "env_unset:OPT",
      "VERIFIED",
-     "OPT=/tmp/claude-0/abd5/cache/clpi_software-optimality@3418711"
+     "OPT=/tmp/claude-0/abd6/cache/clpi_software-optimality@3418711"
     ],
     [
      0,
@@ -418,7 +352,7 @@
      1,
      "env_unset:IL",
      "VERIFIED",
-     "IL=/tmp/claude-0/abd5/cache/clpi_idol-lib"
+     "IL=/tmp/claude-0/abd6/cache/clpi_idol-lib"
     ],
     [
      1,
@@ -435,7 +369,7 @@
     [
      2,
      "env_unset:IQ",
-     "VERIFIED",
+     "REPAIRED",
      "IQ=/mnt/project-files/idol-qualification"
     ],
     [
@@ -449,28 +383,10 @@
      "pre:self",
      "REFUTED",
      "run self first (from the gate itself)"
-    ],
-    [
-     3,
-     "env_unset:ABDUCTION_UNREAD",
-     "REFUTED",
-     "planted false cause"
-    ],
-    [
-     3,
-     "pre:self",
-     "REFUTED",
-     "run self first (from the gate itself)"
-    ],
-    [
-     3,
-     "regressed_at:df1d7795a358",
-     "REPAIRED",
-     "the gate's folder as it was before df1d7795a358 (Merge pull request #14 from clpi/dot/cross-receipt-atomic-re)"
     ]
    ]
   }
  },
- "planted_false_refuted": 8,
- "planted_false_tested": 8
+ "planted_false_refuted": 6,
+ "planted_false_tested": 6
 }

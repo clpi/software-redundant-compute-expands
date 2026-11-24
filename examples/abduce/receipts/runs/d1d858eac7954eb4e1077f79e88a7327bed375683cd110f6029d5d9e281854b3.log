@@ -1,4 +1,3 @@
-$ (cd theses/redundant-compute-expands/examples/monotone-synthesis && bash run.sh)
 pin ok software-optimality 34187114afd4714d530b2fdf6e9a3103e6091a8a
 Qualification.lean: OK
 ExecutableClosure.lean: OK
@@ -17,7 +16,7 @@ mutant killed abstraction-underived
 mutant killed single-pass-saturated
 mutant killed retire-uncovered-ok
 == loop on real data
-55788bc9de9b69e6a3752dad93c926bc941de87e84dc672ac5fdf676c2a1f938  /tmp/abduction-out/ms2/stream.jsonl
+55788bc9de9b69e6a3752dad93c926bc941de87e84dc672ac5fdf676c2a1f938  /tmp/abduction-out/ms3/stream.jsonl
 PASS spec order=history reach=316 live=316 admitted=354 retired=38 deferred=16 inc=1201 cold_wl=236537 cold_naive=130394
 PASS reference final reach = independent closure loop=313 ref=313 diff=0
 PASS spec order=reverse reach=316 live=316 admitted=354 retired=38 deferred=213 inc=1728 cold_wl=223459 cold_naive=432119
@@ -34,11 +33,12 @@ PASS strict verifier (direct battery application only): spec holds admitted=59 l
 PASS ingest: one process per commit batch, spec holds after each 19 batches, reach=316 live=316 pending=0
 PASS ingest final state = one-shot run (reach and live ids)
 PASS ingest: re-ingesting an applied batch changes nothing
-FAIL control: a state that lost a live artifact is refused (reach would shrink)
+PASS control: a state that lost a live artifact is refused (reach would shrink) {"batch": "20003d3f6e1deb05e399205b3bf1b0a30d1c3066", "refused": ["reach != closure of live rules", "reach != closure of
 PASS mutant no-cover caught first caught at order history
 PASS mutant eager-retire caught first caught at order shuffle:1
 PASS mutant no-premise-check caught first caught at order history
 PASS mutant no-verifier caught first caught at order history (reference)
 PASS mutant no-retry caught first caught at order history
-GATE FAIL control: a state that lost a live artifact is refused (reach would shrink) (21/22)
-GATE FAILED (exit 1)
+GATE PASS (22/22)
+IDOL not set: cross-home and generated steps skipped
+ALL PASS

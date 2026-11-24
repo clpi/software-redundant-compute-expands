@@ -14,8 +14,12 @@ empirical), and appends only checked results to the store. `run.sh` reruns every
 | Reference | `engine.py` `brute` | Line-by-line mirror of Lean `abduce` (every sublist up to k, erase-one minimality). Used to check ATMS completeness. |
 | Ranking | `engine.py` `front` | Pareto front over (observations covered, cost). Same order as Lean `front`. |
 | Formal check | `certify.py` | Emits a Lean file with the whole log and checks `certificate_fast` by `decide +kernel`: the cone is closed over every record, then a derivation trace, a closed set without `bot`, and one closed set per removed hypothesis that misses an observation. |
-| Empirical check | `gates.py` | Control runs, intervention runs, placebo runs (an unread variable set), 2 repeats each. VERIFIED = target symptom in every control, in no intervention, in every placebo. REPAIRED = also exit 0. |
-| Admission | `admit.py` | Second implementation: own closure, own chain check, verdicts re-decided from stored run logs. Appends to `receipts/hypergraph.jsonl` only; checks append only and monotone. |
+| Causes from symptoms | `gates.py` `theory` | Static reads of the gate script (required variables, positional arguments, argv, tools) and the run's symptoms (missing paths, failed fetches). Each cause predicts symptoms; one that predicts something absent is inconsistent. |
+| Causes from the tree | `gates.py` `harvest`, `bisect` | Read from the repository, never from the failure text: the gate run first (not idempotent from a clean tree), the build of every package that builds the gate's folder, shell lines of the folder's README, tracked files missing from the tree, and the commit that broke the gate (its folder walked back through history). Each action is probed once; the names it creates that the failing log mentions become observations it explains, so it ranks first. |
+| Empirical check | `gates.py` `experiment` | Control, intervention and placebo runs, 2 each (placebo: an unread variable, or a no-op in the same slot). VERIFIED = target in every control and placebo, in no intervention; REPAIRED = also exit 0. Causes from the tree target the exit status, or the run's final signature when they fix one failure and expose the next. A gate whose controls disagree is flaky: every arm goes to 12 runs and both control and placebo must beat the intervention by a one-sided Fisher exact test at 0.05. |
+| Narrowing | `gates.py` `narrow`, `ddmin` | A verified tree cause is cut down by delta debugging (hierarchical, into directories) to a 1-minimal set of paths that, restored alone on a fresh tree, repairs; for a regression, to the files of that commit whose old versions alone repair. The set is verified again with controls. |
+| Cross-check | `crosscheck.py` | The D0 logs through #16's engine (`examples/abduction`) and its independent checker; the two minimal explanation sets must be equal. A mutant of each input must be caught. |
+| Admission | `admit.py` | Second implementation: own closure, own chain check, verdicts re-decided from stored run logs (the Fisher rule and the signature rule written again, not imported), prerequisite logs hash-checked, 1-minimality of a narrowed set re-derived from the delta-debugging runs. Appends to `receipts/hypergraph.jsonl` only; checks append only and monotone. |
 
 ## Proved (Lean 4.19.0, `proof/check.sh` cold, standard axioms only)
 
@@ -61,34 +65,69 @@ cycle breaks). Raw mode (no cycle grouping): the 10 pending artifacts are explai
 typed `cycle`. Lean certificates on the whole 1,044-record log: 36/36 (1 raw, 29 strict
 components, 6 planted cores); 6/6 planted false hypotheses refused by the kernel.
 
-**D2, gates of this repository** (`gates-public.json`; 2 repeats of control, intervention and
-placebo each). `examples/monotone-synthesis/run.sh` fails with no inputs; the engine abduces
-`OPT` unset (the only consistent cause: `IL`, `IQ`, every tool are refuted by absent
-symptoms), sets it from the message's own pin (a clone of software-optimality at 3418711),
-sees `IL`, then `IQ`, and ends REPAIRED: exit 0 in both intervention runs. The planted unread
-variable is refuted in every round. `examples/admission/run.sh`: missing positional argument 2
-VERIFIED as the cause of `/sha256/sha256.id`; the next failure (the compiler aborts) is outside
-the vocabulary and stays unexplained. Planted faults: `lean` off PATH, `IQ` removed, `gate.py`
-removed: each recovered as the top hypothesis and REPAIRED; a removed Lean module: no
-hypothesis (out of vocabulary), as expected; planted false causes refuted in 5/5 tests.
+**Cross-check with #16** (`crosscheck.py`): the 123 D0 logs through #16's engine and its
+independent checker. Minimal explanation sets equal on 123/123 (239 explanations, all sizes);
+#16's checker accepts 123/123 certificates; with one used abducible deleted from #16's input
+only, 123/123 mutants disagree, so the agreement is not vacuous.
 
-**Admission**: only re-decided verdicts and clean certificates are appended; the store is
-hash-chained, append only and monotone; 8/8 tamper controls caught (relabeled verdict,
-fabricated run symptoms, certificate output with `sorryAx`, claim naming another H, planted
-false hypothesis whose refusal was replaced, history rewrite, re-admission appends nothing).
+**D2, gates of this repository** (`gates-public.json`). `examples/monotone-synthesis/run.sh`
+fails with no inputs; the engine abduces `OPT` unset (the only consistent cause), sets it from
+the message's own pin, then `IL`, then `IQ`, and ends REPAIRED: exit 0 in both intervention
+runs; the planted unread variable is refuted every round. `examples/admission/run.sh`: missing
+argument 2 VERIFIED, then `/sha256/sha256.id`; the next failure (the compiler aborts) has no
+cause in either source and stays unexplained.
 
-The same apparatus was also run over the 9 gates that fail in the consolidated
-`clpi/software-*` tree; those receipts stay out of this public repository because some of
-those repositories may be private.
+At 4ebcfa0 (receipts in commit 4187e37) the same gate failed after those three repairs on
+its own control ("a state that lost a live artifact is refused", 21/22). No symptom cause and
+no tree action applied, so the engine walked the folder back through history: the folder as it
+was before the #14 merge passes, and delta debugging cut the difference to `ingest.py` alone.
+REPAIRED with controls and placebo. #14 had changed the state's `seen` field from a list to a
+map and the gate's control still rebuilt it as a list; 5ed0332 fixes the control, and these
+receipts are from that commit.
+
+Planted cases, 9/9 recovered and REPAIRED: `lean` off PATH, `IQ` removed, `gate.py` removed
+(by its missing path and, separately, as a tracked file missing from the tree), a removed Lean
+module (no symptom names it; recovered as a tracked file missing from the tree, unexplained
+before), a folder whose build generates the table its gate reads (narrowed to
+`gen/table.txt`), a gate that only passes on its second run (narrowed to `.cache/warm`, and
+the first run's only extra output line, `cold start`, reported), and a flaky gate that fails
+about 3 runs in 4 unless its build ran (12 runs per arm, Fisher test, narrowed to `gen/ok`).
+Planted false causes refuted 6/6, including the README decoy `touch decoy.txt`.
+
+The 13 gates of the consolidated `clpi/software-*` tree were run the same way (receipts kept
+out of this public repository). The engine alone repaired the two that had needed a hand
+diagnosis: `is-incrementally-safe/examples` (run the package build first; narrowed to the
+built library and its three dependency checkouts) and `doesnt-need-review` (the gate run
+first: its first run clones two dependencies in `statement/` and lake's clone lines land in
+the captured version string; narrowed to those two checkouts, and the clone lines are the
+first run's only extra output). Real gates repaired: 3 of 9, against 1 of 9 before. The rest
+stop at a verified fail point whose producer is outside the repository (an experiment output,
+a fixture, a file under the author's home directory) or at a failure no source explains.
+
+**Admission**: only re-decided verdicts, re-derived minimal sets and clean certificates are
+appended (55 admitted, 22 refused, 2,197 records); the store is hash-chained, append only and
+monotone; 10/10 tamper controls caught (relabeled verdict, fabricated run symptoms, certificate
+output with `sorryAx`, claim naming another H, planted false hypothesis whose refusal was
+replaced, a delta-debugging run relabeled, a prerequisite step's log deleted, history rewrite,
+re-admission appends nothing).
 
 ## Premises and limits
 
-* Symptoms come from a fixed set of patterns (`gates.py` `RX`). A failure outside that
-  vocabulary stays unexplained; the planted removal of a Lean module shows this (no hypothesis,
-  nothing admitted).
-* A verified cause is a cause of one symptom, not of the whole failure; the loop then abduces
-  the next symptom with the intervention kept. An empty placeholder file only tests the fail
-  point, and is admitted only as a fail-point claim.
+* Two cause sources: a fixed set of symptom patterns (`gates.py` `RX`), and actions read from the
+  tree (the gate itself, package builds, README shell lines, tracked deletions, the folder's
+  history). A failure that neither reaches stays unexplained: the admission gate's compiler
+  abort is one.
+* A verified cause is a cause of one failure, not of all of them; the loop then abduces again
+  with the intervention kept. An empty placeholder file only tests the fail point, and is
+  admitted only as a fail-point claim.
+* Narrowing is 1-minimal within its run budget (80 gate runs, 30 for a regression): a set is
+  claimed minimal only when admission finds, for each of its paths, a recorded run without that
+  path that failed. Where the budget ran out the set is reported, not claimed minimal.
+* A regression names the commit after which the folder fails and the files whose old versions
+  repair; the repair a person makes may be elsewhere (here the stale control in `gate.py`, not
+  `ingest.py`).
+* The flaky rule assumes runs are independent; it controls the false-positive rate per test,
+  not over every test in a run.
 * ATMS completeness is tested against the brute mirror (every prefix of every planted log), not
   proved. Explanations are bounded at k = 3 per observation; for components with no
   qualify-only explanation the joint explanation is erase-one minimal, not proven cheapest.
