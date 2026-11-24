@@ -37,6 +37,14 @@ Lean (version 4.19.0, x86_64-unknown-linux-gnu, commit 6caaee842e94, Release)
 'Canon.AbduceControls.c9_admission' depends on axioms: [propext, Quot.sound]
 'Canon.AbduceControls.c10_front' does not depend on any axioms
 'Canon.AbduceControls.c11_certificate' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Canon.Abduction.assume_mono' does not depend on any axioms
+'Canon.Abduction.no_assumptions_restore' does not depend on any axioms
+'Canon.Abduction.Cover.sound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Canon.Abduction.Cover.exact_minimal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Canon.Abduction.Cover.every_solution_has_minimal_subset' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Canon.Abduction.no_authority_from_offer' does not depend on any axioms
+'Canon.Abduction.restriction_exact' does not depend on any axioms
+'Canon.Abduction.single_omissions_certify_minimal' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Canon.ActionVector.dispatch_permutation' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Canon.ActionVector.prerequisites_checked' depends on axioms: [propext, Quot.sound]
 'Canon.ActionVector.inverse_checked' depends on axioms: [propext, Quot.sound]
@@ -103,6 +111,25 @@ Lean (version 4.19.0, x86_64-unknown-linux-gnu, commit 6caaee842e94, Release)
 'Canon.View.refine_append' depends on axioms: [propext]
 'Canon.Control.merge' depends on axioms: [propext]
 'Canon.Control.coarse_only' depends on axioms: [propext]
+'CanonicalProgress.supported_successor_derives' depends on axioms: [propext, Quot.sound]
+'CanonicalProgress.cut_exact' depends on axioms: [propext]
+'CanonicalProgress.replay_exact' depends on axioms: [propext]
+'CanonicalProgress.construct_exact' depends on axioms: [propext]
+'CanonicalProgress.checked_edge' depends on axioms: [propext, Quot.sound]
+'CanonicalProgress.cost_monotone' depends on axioms: [propext]
+'CanonicalProgress.behavior_preserved' depends on axioms: [propext, Quot.sound]
+'CanonicalProgress.impossible_if_cost_regresses' depends on axioms: [propext]
+'CanonicalProgress.append_keeps_witness' depends on axioms: [propext]
+'CanonicalProgress.history_no_worse' depends on axioms: [propext]
+'CanonicalProgress.history_carries' depends on axioms: [propext, Quot.sound]
+'CanonicalProgress.history_append' depends on axioms: [propext]
+'CanonicalProgress.no_new_disallowed_behavior' depends on axioms: [propext, Quot.sound]
+'CanonicalProgress.valid_cost_exact' depends on axioms: [propext, Quot.sound]
+'CanonicalProgress.front_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CanonicalProgress.candidate_has_front_cover' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CanonicalProgress.separate_progress_does_not_compose' does not depend on any axioms
+'CanonicalProgress.observations_do_not_grant_progress' does not depend on any axioms
+'CanonicalProgress.qualified_orders_are_retained' does not depend on any axioms
 'Canon.Cases.root_mem' depends on axioms: [propext]
 'Canon.Cases.total' depends on axioms: [propext]
 'Canon.Cases.ids_unique' depends on axioms: [propext, Quot.sound]
@@ -221,6 +248,14 @@ Lean (version 4.19.0, x86_64-unknown-linux-gnu, commit 6caaee842e94, Release)
 'Redundant.Touch.mono' depends on axioms: [propext, Quot.sound]
 'Redundant.Touch.grow' depends on axioms: [propext, Quot.sound]
 'Redundant.Touch.bound' depends on axioms: [propext, Quot.sound]
+'CanonicalProgress.Exact.body_injective' depends on axioms: [propext, Quot.sound]
+'CanonicalProgress.Exact.one_receipt_one_transition' depends on axioms: [propext, Quot.sound]
+'CanonicalProgress.Exact.keep' depends on axioms: [propext]
+'CanonicalProgress.Exact.checked_projects_to_full_edge' depends on axioms: [propext, Quot.sound]
+'CanonicalProgress.Exact.checked_cost_monotone' depends on axioms: [propext]
+'CanonicalProgress.Exact.checked_behavior_preserved' depends on axioms: [propext, Quot.sound]
+'CanonicalProgress.Exact.bare_ids_accept_different_costs_and_order' does not depend on any axioms
+'CanonicalProgress.Exact.exact_receipt_controls' does not depend on any axioms
 'Canon.Rebase.impls_append' depends on axioms: [propext]
 'Canon.Rebase.grow' depends on axioms: [propext, Quot.sound]
 'Canon.Rebase.order' depends on axioms: [propext, Classical.choice, Quot.sound]

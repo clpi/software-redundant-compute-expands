@@ -1,18 +1,18 @@
 {
  "admission": {
-  "admitted": 55,
+  "admitted": 64,
   "append_only": true,
-  "head": "35d9dbf6610bea4cde5a3377947d03ee4f1b7065d07913dbd9a8fe61536e197f",
+  "head": "75e75db300acb6457e7331ed491e210ea76cd66a70f168644d365a08e16c2dd3",
   "monotone": true,
   "refused": 27,
-  "store_records": 2197
+  "store_records": 2209
  },
  "certificates": {
   "certified": 36,
   "false_of": 6,
   "false_refused": 6,
   "of": 36,
-  "seconds_total": 661.1
+  "seconds_total": 738.6
  },
  "crosscheck_pr16": {
   "agree_all": 123,
@@ -140,7 +140,7 @@
      "artifact_verdicts": [
       "REPAIRED"
      ],
-     "ddmin_runs": 2,
+     "ddmin_runs": 4,
      "first_run_only": null,
      "minimal": [
       "examples/abduce/planted/flaky/gen/ok"
@@ -167,14 +167,26 @@
   "planted/gate-script-removed": {
    "first_verified": "file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py",
    "planted": "file_absent:<gate.py>",
-   "prerequisites": [],
-   "status": "FAILING",
+   "prerequisites": [
+    {
+     "artifact_verdicts": [
+      "REPAIRED"
+     ],
+     "ddmin_runs": 4,
+     "first_run_only": null,
+     "minimal": [
+      "theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py"
+     ],
+     "round": 1
+    }
+   ],
+   "status": "REPAIRED",
    "trials": [
     [
      0,
      "file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py",
      "VERIFIED",
-     "restore from history 0cf9af7d8436:theses/redundant-compute-expands/examples/monotone-synthesis/gate.py"
+     "restore from history 21f906e4803e:theses/redundant-compute-expands/examples/monotone-synthesis/gate.py"
     ],
     [
      0,
@@ -193,6 +205,12 @@
      "pre:self",
      "REFUTED",
      "run self first (from the gate itself)"
+    ],
+    [
+     1,
+     "regressed_at:df1d7795a358",
+     "REPAIRED",
+     "the gate's folder as it was before df1d7795a358 (Merge pull request #14 from clpi/dot/cross-receipt-atomic-re)"
     ]
    ]
   },
@@ -245,8 +263,20 @@
   "planted/ms-without-IQ": {
    "first_verified": "env_unset:IQ",
    "planted": "env_unset:IQ",
-   "prerequisites": [],
-   "status": "FAILING",
+   "prerequisites": [
+    {
+     "artifact_verdicts": [
+      "REPAIRED"
+     ],
+     "ddmin_runs": 4,
+     "first_run_only": null,
+     "minimal": [
+      "theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py"
+     ],
+     "round": 1
+    }
+   ],
+   "status": "REPAIRED",
    "trials": [
     [
      0,
@@ -277,6 +307,12 @@
      "pre:self",
      "REFUTED",
      "run self first (from the gate itself)"
+    ],
+    [
+     1,
+     "regressed_at:df1d7795a358",
+     "REPAIRED",
+     "the gate's folder as it was before df1d7795a358 (Merge pull request #14 from clpi/dot/cross-receipt-atomic-re)"
     ]
    ]
   },
@@ -345,8 +381,20 @@
    ]
   },
   "srce/monotone-synthesis": {
-   "prerequisites": [],
-   "status": "FAILING",
+   "prerequisites": [
+    {
+     "artifact_verdicts": [
+      "REPAIRED"
+     ],
+     "ddmin_runs": 4,
+     "first_run_only": null,
+     "minimal": [
+      "theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py"
+     ],
+     "round": 3
+    }
+   ],
+   "status": "REPAIRED",
    "trials": [
     [
      0,
@@ -413,6 +461,12 @@
      "pre:self",
      "REFUTED",
      "run self first (from the gate itself)"
+    ],
+    [
+     3,
+     "regressed_at:df1d7795a358",
+     "REPAIRED",
+     "the gate's folder as it was before df1d7795a358 (Merge pull request #14 from clpi/dot/cross-receipt-atomic-re)"
     ]
    ]
   }

@@ -1,0 +1,2 @@
+$ (cd theses/redundant-compute-expands/examples/abduce/planted/flaky && sh check.sh)
+lucky

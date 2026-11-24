@@ -39,12 +39,21 @@
   "cause(srce/monotone-synthesis, env_unset:OPT -> unset:OPT)",
   "cause(srce/monotone-synthesis, env_unset:IL -> unset:IL)",
   "cause(srce/monotone-synthesis, env_unset:IQ -> unset:IQ)",
+  "repaired(srce/monotone-synthesis, regressed_at:df1d7795a358 -> fails)",
+  "repaired(srce/monotone-synthesis, regressed_files:theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py -> fails)",
+  "minimal_prerequisite(srce/monotone-synthesis, theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py)",
   "cause(srce/admission, arg_missing:2 -> nofile:/sha256/sha256.id)",
   "cause(srce/admission, file_absent:/sha256/sha256.id -> nofile:/sha256/sha256.id)",
   "repaired(planted/lean-off-path, tool_missing:lean -> notfound:lean)",
   "cause(planted/ms-without-IQ, env_unset:IQ -> unset:IQ)",
+  "repaired(planted/ms-without-IQ, regressed_at:df1d7795a358 -> fails)",
+  "repaired(planted/ms-without-IQ, regressed_files:theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py -> fails)",
+  "minimal_prerequisite(planted/ms-without-IQ, theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py)",
   "cause(planted/gate-script-removed, file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py -> nofile:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py)",
   "cause(planted/gate-script-removed, tracked_deleted:examples/monotone-synthesis/gate.py -> ends:python3: can't open file '$MONO/theses/redundant-compute-exp)",
+  "repaired(planted/gate-script-removed, regressed_at:df1d7795a358 -> fails)",
+  "repaired(planted/gate-script-removed, regressed_files:theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py -> fails)",
+  "minimal_prerequisite(planted/gate-script-removed, theses/redundant-compute-expands/examples/monotone-synthesis/ingest.py)",
   "repaired(planted/lean-source-removed, tracked_deleted:proof/Canon.lean -> fails)",
   "repaired(planted/needs-build, pre:build:. -> fails)",
   "repaired(planted/needs-build, artifact_absent:examples/abduce/planted/needs-build/gen/table.txt -> fails)",
@@ -57,7 +66,7 @@
   "minimal_prerequisite(planted/flaky, examples/abduce/planted/flaky/gen/ok)"
  ],
  "append_only": true,
- "head": "35d9dbf6610bea4cde5a3377947d03ee4f1b7065d07913dbd9a8fe61536e197f",
+ "head": "75e75db300acb6457e7331ed491e210ea76cd66a70f168644d365a08e16c2dd3",
  "monotone": true,
  "refused": [
   {
@@ -190,6 +199,6 @@
    "reason": "recomputed: not verified"
   }
  ],
- "store_after": 2197,
+ "store_after": 2209,
  "store_before": 0
 }
