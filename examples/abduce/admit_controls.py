@@ -126,6 +126,40 @@ with tempfile.TemporaryDirectory() as w:
             open(src, "w").write(keep)
     check("A9 missing prerequisite-step log", pre_h and any(x.get("claim") == who and "stored log" in str(x.get("reason")) for x in r.get("refused", [])), who or "no prerequisite trial")
 
+    # A10: the narrowed set's passing run swapped for a genuine failing log, rc left at 0
+    # (the exit status is inside the hashed log, so the swap must be refused)
+    t = [json.loads(json.dumps(g)) for g in lines]
+    nm10 = None
+    for g in t:
+        for rd in g["rounds"]:
+            nar = rd.get("narrowed") or {}
+            m = nar.get("minimal")
+            if m and nm10 is None:
+                full = [x for x in nar["tests"] if sorted(x["units"]) == sorted(m) and x["rc"] == 0]
+                bad = [x for x in nar["tests"] if x["rc"] != 0]
+                if full and bad:
+                    for x in full:
+                        x["log_sha256"] = bad[0]["log_sha256"]
+                    nm10 = f"minimal_prerequisite({g['gate']}, {', '.join(m)})"
+    p10 = os.path.join(w, "g10.jsonl"); open(p10, "w").write("\n".join(json.dumps(g) for g in t) + "\n")
+    rc, r = admit(os.path.join(w, "s10.jsonl"), certs, p10)
+    check("A10 passing run swapped for a failing log", nm10 and nm10 in admitted and nm10 not in r.get("admitted", []), nm10 or "no narrowed set")
+
+    # A11: an intervention run's exit status edited from failing to 0 (log unchanged)
+    t = [json.loads(json.dumps(g)) for g in lines]
+    who11 = None
+    for g in t:
+        for rd in g["rounds"]:
+            for x in rd.get("tested", []):
+                for tr in x["trials"]:
+                    if tr["verdict"] == "REFUTED" and who11 is None and all(r_["rc"] != 0 for r_ in tr["intervention"]):
+                        for r_ in tr["intervention"]:
+                            r_["rc"] = 0; r_["symptoms"] = []
+                        tr["verdict"] = "REPAIRED"; who11 = f"{g['gate']}:{x['cause']}"
+    p11 = os.path.join(w, "g11.jsonl"); open(p11, "w").write("\n".join(json.dumps(g) for g in t) + "\n")
+    rc, r = admit(os.path.join(w, "s11.jsonl"), certs, p11)
+    check("A11 exit status edited to 0", who11 and any(x.get("claim") == who11 and "stored log" in str(x.get("reason")) for x in r.get("refused", [])), who11 or "no refuted trial")
+
     # A6: history rewrite of the store
     s6 = os.path.join(w, "s6.jsonl"); shutil.copy(os.path.join(w, "s0.jsonl"), s6)
     L = open(s6).read().splitlines()

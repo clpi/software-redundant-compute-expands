@@ -75,6 +75,11 @@ def main():
     runlogs = sys.argv[5] if len(sys.argv) > 5 else None
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from gates import symptoms as extract  # the one shared piece: the symptom extractor (a stated premise)
+    EXIT = re.compile(r"\n==> exit (-?\d+)\n$")  # every stored log closes with its exit status: the hash binds both
+
+    def split(txt):
+        m = EXIT.search(txt)
+        return (txt[:m.start()], int(m.group(1))) if m else (txt, None)
 
     def run_ok(r):
         """The run's log exists, hashes to its recorded hash, and yields the recorded symptoms."""
@@ -84,11 +89,17 @@ def main():
         if not os.path.exists(p):
             return False
         txt = open(p).read()
-        return H(txt) == r["log_sha256"] and extract(txt, r["rc"], {}) == r["symptoms"] and all(log_ok(q["log_sha256"]) for q in r.get("pre", []))
+        text, rc = split(txt)
+        return (H(txt) == r["log_sha256"] and rc == r["rc"] and extract(text, rc, {}) == r["symptoms"]
+                and all(log_ok(q["log_sha256"], q["rc"]) for q in r.get("pre", [])))
 
-    def log_ok(h):
+    def log_ok(h, rc=None):
+        """The log exists, hashes to h, and (when given) closes with exit status rc."""
         p = os.path.join(runlogs, h + ".log") if runlogs else ""
-        return bool(runlogs) and os.path.exists(p) and H(open(p).read()) == h
+        if not (runlogs and os.path.exists(p)):
+            return False
+        txt = open(p).read()
+        return H(txt) == h and (rc is None or split(txt)[1] == rc)
     old = load(store)
     old_bodies = {r["body"] for r in old}
     new_bodies, report = [], {"admitted": [], "refused": []}
@@ -182,7 +193,7 @@ def main():
                     pp = all(map(hit, tr["placebo"])) and len(tr["placebo"]) >= 2
                     if tr.get("signature") and pc and pp and not gone:  # a tree cause that exposes the next failure
                         def sig_(r):
-                            txt = open(os.path.join(runlogs, r["log_sha256"] + ".log")).read()
+                            txt = split(open(os.path.join(runlogs, r["log_sha256"] + ".log")).read())[0]
                             ls = [l for l in txt.splitlines() if l.strip()]
                             return [sorted(r["symptoms"]), ls[-1].strip() if ls else ""]
                         S, T = [sig_(r) for r in ctrl + tr["placebo"]], [sig_(r) for r in tr["intervention"]]
@@ -218,9 +229,9 @@ def main():
             if m:
                 tests = nar["tests"]
                 key = lambda us: tuple(sorted(us))
-                ok_full = [x for x in tests if key(x["units"]) == key(m) and x["rc"] == 0 and log_ok(x["log_sha256"])]
+                ok_full = [x for x in tests if key(x["units"]) == key(m) and x["rc"] == 0 and log_ok(x["log_sha256"], 0)]
                 drops = {u: [x for x in tests if key(x["units"]) == key([v for v in m if v != u])] for u in m}
-                ok_drop = all(xs and all(x["rc"] != 0 and log_ok(x["log_sha256"]) for x in xs) for xs in drops.values())
+                ok_drop = all(xs and all(x["rc"] != 0 and log_ok(x["log_sha256"], x["rc"]) for x in xs) for xs in drops.values())
                 claim = f"minimal_prerequisite({g['gate']}, {', '.join(m)})"
                 if ok_full and ok_drop:
                     hs = [ok_full[0]["log_sha256"]] + [xs[0]["log_sha256"] for xs in drops.values()]

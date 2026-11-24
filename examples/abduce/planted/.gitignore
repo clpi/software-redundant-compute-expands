@@ -1,3 +1,5 @@
 .cache/
 gen/
 decoy.txt
+data/
+__pycache__/

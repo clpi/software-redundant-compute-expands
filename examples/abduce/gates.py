@@ -44,7 +44,7 @@ def fisher_greater(a, n1, b, n2):
 
 def signature(r):
     """What a run ended on: its symptom set and its last non-empty output line."""
-    lines = [l for l in LOGS.get(r["log_sha256"], r.get("tail", "")).splitlines() if l.strip()]
+    lines = [l for l in body(LOGS.get(r["log_sha256"], r.get("tail", ""))).splitlines() if l.strip()]
     return [sorted(r["symptoms"]), lines[-1].strip() if lines else ""]
 
 
@@ -83,6 +83,17 @@ def decide(target, ctrl, ivr, pl):
     return ("REFUTED" if i_ >= c * len(ivr) / len(ctrl) else "INCONCLUSIVE"), stat
 TIMEOUT = int(os.environ.get("GATE_TIMEOUT", "1800"))
 LOGS = {}  # log sha -> full text, for this process
+EXIT = re.compile(r"\n==> exit (-?\d+)\n$")  # every stored log ends with its exit status, so the hash binds both
+
+
+def body(txt):
+    """A stored log without its closing exit line."""
+    return EXIT.sub("", txt)
+
+
+def rc_of(txt):
+    m = EXIT.search(txt)
+    return int(m.group(1)) if m else None
 
 # ------------------------------------------------------------------ running
 
@@ -164,11 +175,11 @@ def run(g, iv=None, tag=""):
     pre_out = []
     for a in iv.get("pre", []):  # prerequisite actions, run before the gate on the same fresh tree
         try:
-            pp = subprocess.run(a["cmd"], cwd=os.path.join(MONO, a["cwd"]), env=env, capture_output=True, text=True, timeout=TIMEOUT)
+            pp = subprocess.run(a["cmd"], cwd=os.path.join(MONO, a["cwd"]), env=dict(env, **a.get("env", {})), capture_output=True, text=True, timeout=TIMEOUT)
             prc, pout = pp.returncode, pp.stdout + pp.stderr
         except subprocess.TimeoutExpired:
             prc, pout = 124, "TIMEOUT"
-        pout = f"$ (cd {a['cwd']} && {' '.join(a['cmd'])})\n" + pout.replace(MONO, "$MONO")
+        pout = f"$ (cd {a['cwd']} && {' '.join(a['cmd'])})\n" + pout.replace(MONO, "$MONO") + f"\n==> exit {prc}\n"
         if os.environ.get("RUNLOGS"):
             os.makedirs(os.environ["RUNLOGS"], exist_ok=True)
             open(os.path.join(os.environ["RUNLOGS"], sha(pout) + ".log"), "w").write(pout)
@@ -207,11 +218,13 @@ def run(g, iv=None, tag=""):
     if not g.get("keep_tree"):
         git_reset(os.path.join(MONO, *g["cwd"].split("/")[:2]))  # the whole thesis, not just the gate's folder
     out = out.replace(MONO, "$MONO")
+    sym = symptoms(out, rc, g)
+    out += f"\n==> exit {rc}\n"
     if os.environ.get("RUNLOGS"):
         os.makedirs(os.environ["RUNLOGS"], exist_ok=True)
         open(os.path.join(os.environ["RUNLOGS"], sha(out) + ".log"), "w").write(out)
     LOGS[sha(out)] = out
-    r = {"rc": rc, "secs": secs, "log_sha256": sha(out), "tail": out[-1500:], "symptoms": symptoms(out, rc, g), "tag": tag}
+    r = {"rc": rc, "secs": secs, "log_sha256": sha(out), "tail": out[-1500:], "symptoms": sym, "tag": tag}
     if pre_out:
         r["pre"] = pre_out
     if deleted:
@@ -231,6 +244,7 @@ RX = [
     ("notfound", re.compile(r"^\S+: ([\w./+-]+): not found$", re.M)),
     ("fetch", re.compile(r"cloning (https://\S+)")),
     ("emptycmd", re.compile(r"^\S+: (?:line )?(\d+): : (?:Permission denied|not found|command not found)", re.M)),
+    ("nomodule", re.compile(r"ModuleNotFoundError: No module named '([\w.]+)'")),
 ]
 
 
@@ -342,6 +356,8 @@ def theory(g, obs, st, pre=()):
             cause(f"fetch_denied:{v}", 1, [s], {"kind": "fetch", "url": v})
         elif k == "notfound":
             cause(f"tool_missing:{v}", 1, [s], {"kind": "tool", "tool": v})
+        elif k == "nomodule":
+            cause(f"module_missing:{v}", 1, [s], {"kind": "module", "name": v})
         elif k == "silent":
             if v in st["steps"]:
                 cause(f"step_fails:{v}", 2, [s], {"kind": "step", "marker": v, "cmd": st["steps"][v]})
@@ -481,6 +497,20 @@ def interventions(spec, g, st):
             return [{"git": [(spec["url"], "file://" + bare), (spec["url"] + ".git", "file://" + bare)],
                      "why": "rewrite URL to a local mirror of the same content (pinned commit absent)"}]
         return []
+    if k == "module":  # a file of that name elsewhere in the thesis (then anywhere searched): put its folder on PYTHONPATH
+        leaf = spec["name"].split(".")[-1] + ".py"
+        root = os.path.join(MONO, *g["cwd"].split("/")[:2])
+        hits, seen_ = [], set()
+        for base_ in [root] + SEARCH:
+            for dp, dns, fns in os.walk(base_):
+                dns[:] = [x for x in dns if not x.startswith(".") and x not in SKIPDIR]
+                if leaf in fns and dp not in seen_:
+                    seen_.add(dp); hits.append(dp)
+                if len(hits) >= 2:
+                    break
+            if hits:
+                break
+        return [{"env": {"PYTHONPATH": h}, "why": f"put {os.path.relpath(h, MONO) if h.startswith(MONO) else h} on PYTHONPATH (holds {leaf})"} for h in hits]
     if k == "tool":
         w = shutil.which(spec["tool"])
         return [{"env": {"PATH": os.path.dirname(w) + ":" + os.environ["PATH"]}, "why": f"put {spec['tool']} on PATH"}] if w else []
@@ -500,7 +530,8 @@ def interventions(spec, g, st):
         return [{"files": [(("HEAD", rel), os.path.join(troot, spec["path"]))], "why": f"restore tracked {spec['path']} from HEAD"}]
     if k == "pre":
         a = spec["act"]
-        return [{"pre": [{"cwd": a["cwd"], "cmd": a["cmd"]}], "why": f"run {a['name']} first (from {a['src']})"}]
+        return [{"pre": [{"cwd": a["cwd"], "cmd": a["cmd"], **({"env": a["env"]} if a.get("env") else {})}],
+                 "why": f"run {a['name']} first (from {a['src']}{', repaired with ' + json.dumps(a['env']) if a.get('env') else ''})"}]
     if k == "restore":
         return [{"files": spec["files"], "why": f"restore only {', '.join(spec['units'])} from the {spec['act']} snapshot"}]
     return []
@@ -528,15 +559,58 @@ SKIPDIR = {".git", ".lake", "node_modules", "__pycache__", "target", "zig-out", 
 GENERIC = {"build", "packages", "lib", "lean", "ir", "lake", "cache", "target", "debug", "release", "olean",
            "ilean", "trace", "hash", "c", "o", "json", "README", "LICENSE", "manifest", "config", "objects"}
 PROBES = {}
+SUB = []  # producer sub-gates abduced on the way, written out after their parent
 
 
 def thesis_root(g):
     return os.path.join(MONO, *g["cwd"].split("/")[:2])
 
 
-def harvest(g):
+def producers(g, obs, cap=3):
+    """Scripts in the thesis whose source names a file the run found missing: running one may make it."""
+    root = thesis_root(g)
+    want = []
+    for o in obs:
+        k_, _, v = o.partition(":")
+        if k_ == "nofile":
+            b = os.path.basename(v)
+            stem = re.sub(r"[-_]?\d+$", "", b.split(".")[0])
+            want.append((b, stem if len(stem) >= 4 and stem != b.split(".")[0] else None))
+    if not want:
+        return []
+    gate_script = os.path.realpath(os.path.join(MONO, g["cwd"], g.get("script", "")))
+    found = []
+    for dp, dns, fns in os.walk(root):
+        dns[:] = sorted(x for x in dns if not x.startswith(".") and x not in SKIPDIR)
+        for f in sorted(fns):
+            if not f.endswith((".py", ".sh")):
+                continue
+            path = os.path.join(dp, f)
+            if os.path.realpath(path) == gate_script:
+                continue
+            try:
+                src = open(path, errors="replace").read()
+            except OSError:
+                continue
+            for b, stem in want:
+                score = 2 if b in src else (1 if stem and stem in src else 0)
+                if score:
+                    found.append((-score, path, b))
+                    break
+    acts = []
+    for score, path, b in sorted(found)[:cap]:
+        rel = os.path.relpath(os.path.dirname(path), MONO)
+        f = os.path.basename(path)
+        acts.append({"name": f"produce:{os.path.relpath(path, root)}", "cwd": rel, "cmd": ["python3" if f.endswith(".py") else "sh", f],
+                     "cost": 2, "src": f"its source names {b}", "script": f})
+    return acts
+
+
+def harvest(g, obs=()):
     root, cwd = thesis_root(g), os.path.join(MONO, g["cwd"])
     acts = [{"name": "self", "cwd": g["cwd"], "cmd": list(g["cmd"]), "cost": 1, "src": "the gate itself"}]
+    if g.get("_depth", 0) < 1:
+        acts += producers(g, obs)
     dirs = []
     d = cwd
     while True:  # ancestors up to the thesis root
@@ -622,11 +696,11 @@ def names_in(snap, paths, cap=20000):
 def probe(g, a, keep):
     """Run action a once on a fresh tree; snapshot what it creates."""
     root = thesis_root(g)
-    key = (root, a["cwd"], tuple(a["cmd"]), json.dumps(keep.get("env", {}), sort_keys=True))
+    key = (root, a["cwd"], tuple(a["cmd"]), json.dumps(keep.get("env", {}), sort_keys=True), json.dumps(a.get("env", {}), sort_keys=True))
     if key in PROBES:
         return PROBES[key]
     git_reset(root)
-    env = dict(os.environ); env.update(keep.get("env", {}))
+    env = dict(os.environ); env.update(keep.get("env", {})); env.update(a.get("env", {}))
     try:
         p = subprocess.run(a["cmd"], cwd=os.path.join(MONO, a["cwd"]), env=env, capture_output=True, text=True, timeout=TIMEOUT)
         rc = p.returncode
@@ -644,6 +718,18 @@ def probe(g, a, keep):
             shutil.copy2(src, dst, follow_symlinks=False)
     git_reset(root)
     PROBES[key] = {"rc": rc, "snap": snap, "paths": paths, "names": names_in(snap, paths)}
+    if rc != 0 and a["name"].startswith("produce:") and g.get("_depth", 0) < 1:
+        # the producer itself fails: abduce why, as a gate of its own, one level down
+        sub = {"name": f"{g['name']} > {a['name']}", "cwd": a["cwd"], "cmd": a["cmd"], "script": a["script"],
+               "_depth": g.get("_depth", 0) + 1, "parent": g["name"]}
+        r = gate(sub)
+        SUB.append(r)
+        if r["status"] == "REPAIRED" and r["repair"] and set(r["repair"]) <= {"env"}:
+            fixed = dict(a, env=r["repair"]["env"])
+            again = probe(g, fixed, keep)
+            again["env"] = r["repair"]["env"]
+            again["subgate"] = sub["name"]
+            PROBES[key] = again
     return PROBES[key]
 
 
@@ -651,8 +737,10 @@ def mentions(g, ctrl, keep):
     """For each candidate action: the names it creates that the failing log mentions."""
     text = LOGS.get(ctrl[0]["log_sha256"], ctrl[0]["tail"])
     res = []
-    for a in harvest(g):
+    for a in harvest(g, ctrl[0]["symptoms"]):
         pr = probe(g, a, keep)
+        if pr.get("env"):
+            a = dict(a, env=pr["env"])
         hit = sorted(n for n in pr["names"] if re.search(r"(?<![\w-])" + re.escape(n) + r"(?![\w-])", text))[:8]
         res.append((a, pr, hit))
     return res
@@ -884,7 +972,12 @@ def merge(a, b):
         if k in ("why", "acquire"):
             out[k] = v
         elif isinstance(v, dict):
-            out.setdefault(k, {}).update(v)
+            d_ = out.setdefault(k, {})
+            for kk, vv in v.items():  # PYTHONPATH entries compose instead of replacing each other
+                if kk == "PYTHONPATH" and d_.get(kk):
+                    d_[kk] = d_[kk] if vv in d_[kk].split(":") else vv + ":" + d_[kk]
+                else:
+                    d_[kk] = vv
         elif k == "args":
             out[k] = list(v)
         elif isinstance(v, list):
@@ -922,7 +1015,7 @@ def gate(g):
                 verified = (cname, good[0])
         rd = {"round": rnd, "control": ctrl, "reproducible": reproducible, "abduction": ab, "tested": tested}
         rounds.append(rd)
-        if verified is None and REGRESS:
+        if verified is None and REGRESS and not g.get("_depth"):
             spec, btests = bisect(g, keep)
             rd["bisect"] = {"tests": btests, "found": {k_: v for k_, v in (spec or {}).items() if k_ != "top"} or None}
             if spec:
@@ -964,7 +1057,7 @@ def gate(g):
         if t["verdict"] == "REPAIRED":
             status = "REPAIRED"
             break
-    return {"gate": g["name"], "status": status, "static": st, "rounds": rounds,
+    return {"gate": g["name"], "parent": g.get("parent"), "status": status, "static": st, "rounds": rounds,
             "repair": {k: v for k, v in keep.items() if k not in ("why", "acquire")} if status == "REPAIRED" else None}
 
 
@@ -979,5 +1072,9 @@ if __name__ == "__main__":
             r = gate(g)
             r["seconds"] = round(time.time() - t, 1)
             f.write(json.dumps(r, sort_keys=True) + "\n"); f.flush()
+            for sr in SUB:
+                f.write(json.dumps(sr, sort_keys=True) + "\n"); f.flush()
+                print("  " + sr["gate"], sr["status"], flush=True)
+            SUB.clear()
             last = r["rounds"][-1]
             print(g["name"], r["status"], r["seconds"], [(x["cause"], [t["verdict"] for t in x["trials"]]) for rd in r["rounds"] for x in rd.get("tested", [])], flush=True)

@@ -167,5 +167,19 @@
   "script": "check.sh",
   "planted": "flaky: fails about 3 runs in 4 unless the folder's build (make) has created gen/ok",
   "exhaustive": true
+ },
+ {
+  "name": "planted/needs-producer",
+  "cwd": "theses/redundant-compute-expands/examples/abduce/planted/needs-producer",
+  "cmd": [
+   "sh",
+   "check.sh"
+  ],
+  "script": "check.sh",
+  "planted": "producer chain: data/out.json is written only by tools/gen.py, which needs planted_helper from lib/; tools/report.py only reads it",
+  "false_pre": [
+   "pre:produce:examples/abduce/planted/needs-producer/tools/report.py"
+  ],
+  "exhaustive": true
  }
 ]
