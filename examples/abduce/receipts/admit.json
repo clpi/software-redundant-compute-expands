@@ -38,15 +38,26 @@
   "minimal_explanation(d0-seed12-core)",
   "cause(srce/monotone-synthesis, env_unset:OPT -> unset:OPT)",
   "cause(srce/monotone-synthesis, env_unset:IL -> unset:IL)",
-  "repaired(srce/monotone-synthesis, env_unset:IQ -> unset:IQ)",
+  "cause(srce/monotone-synthesis, env_unset:IQ -> unset:IQ)",
   "cause(srce/admission, arg_missing:2 -> nofile:/sha256/sha256.id)",
   "cause(srce/admission, file_absent:/sha256/sha256.id -> nofile:/sha256/sha256.id)",
   "repaired(planted/lean-off-path, tool_missing:lean -> notfound:lean)",
-  "repaired(planted/ms-without-IQ, env_unset:IQ -> unset:IQ)",
-  "repaired(planted/gate-script-removed, file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py -> nofile:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py)"
+  "cause(planted/ms-without-IQ, env_unset:IQ -> unset:IQ)",
+  "cause(planted/gate-script-removed, file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py -> nofile:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py)",
+  "cause(planted/gate-script-removed, tracked_deleted:examples/monotone-synthesis/gate.py -> ends:python3: can't open file '$MONO/theses/redundant-compute-exp)",
+  "repaired(planted/lean-source-removed, tracked_deleted:proof/Canon.lean -> fails)",
+  "repaired(planted/needs-build, pre:build:. -> fails)",
+  "repaired(planted/needs-build, artifact_absent:examples/abduce/planted/needs-build/gen/table.txt -> fails)",
+  "minimal_prerequisite(planted/needs-build, examples/abduce/planted/needs-build/gen/table.txt)",
+  "repaired(planted/first-run, pre:self -> fails)",
+  "repaired(planted/first-run, artifact_absent:examples/abduce/planted/first-run/.cache/warm -> fails)",
+  "minimal_prerequisite(planted/first-run, examples/abduce/planted/first-run/.cache/warm)",
+  "repaired(planted/flaky, pre:build:. -> fails)",
+  "repaired(planted/flaky, artifact_absent:examples/abduce/planted/flaky/gen/ok -> fails)",
+  "minimal_prerequisite(planted/flaky, examples/abduce/planted/flaky/gen/ok)"
  ],
  "append_only": true,
- "head": "457b82b24be3d45326b9c6a3bf6df3f575bdddeef71de1019bf0b4addb1e2f1f",
+ "head": "35d9dbf6610bea4cde5a3377947d03ee4f1b7065d07913dbd9a8fe61536e197f",
  "monotone": true,
  "refused": [
   {
@@ -79,12 +90,42 @@
    "reason": "recomputed: not verified"
   },
   {
-   "claim": "srce/monotone-synthesis:env_unset:ABDUCTION_UNREAD",
+   "claim": "srce/monotone-synthesis:pre:self",
    "claimed_verdict": "REFUTED",
    "reason": "recomputed: not verified"
   },
   {
    "claim": "srce/monotone-synthesis:env_unset:ABDUCTION_UNREAD",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "srce/monotone-synthesis:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "srce/monotone-synthesis:env_unset:ABDUCTION_UNREAD",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "srce/monotone-synthesis:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "srce/monotone-synthesis:env_unset:ABDUCTION_UNREAD",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "srce/monotone-synthesis:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "srce/admission:pre:self",
    "claimed_verdict": "REFUTED",
    "reason": "recomputed: not verified"
   },
@@ -94,11 +135,61 @@
    "reason": "recomputed: not verified"
   },
   {
+   "claim": "planted/lean-off-path:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
    "claim": "planted/ms-without-IQ:file_absent:/tmp/abduction-unrelated",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/ms-without-IQ:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/ms-without-IQ:file_absent:/tmp/abduction-unrelated",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/ms-without-IQ:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/gate-script-removed:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/gate-script-removed:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/lean-source-removed:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/needs-build:pre:self",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/needs-build:pre:doc:touch decoy.txt",
+   "claimed_verdict": "REFUTED",
+   "reason": "recomputed: not verified"
+  },
+  {
+   "claim": "planted/flaky:pre:self",
    "claimed_verdict": "REFUTED",
    "reason": "recomputed: not verified"
   }
  ],
- "store_after": 2180,
+ "store_after": 2197,
  "store_before": 0
 }

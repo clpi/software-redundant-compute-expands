@@ -1,0 +1,2 @@
+$ (cd theses/redundant-compute-expands/examples/abduce/planted/needs-build && sh check.sh)
+table check failed

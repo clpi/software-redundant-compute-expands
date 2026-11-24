@@ -30,7 +30,8 @@ SEARCH = [p for p in os.environ.get("SEARCH", "/mnt/project-files:/home/user").s
 REPEATS = int(os.environ.get("REPEATS", "2"))
 ROUNDS = int(os.environ.get("ROUNDS", "4"))
 PREREQ = os.environ.get("PREREQ", "1") == "1"
-FLAKY_N = int(os.environ.get("FLAKY_N", "12"))  # runs per arm when the controls disagree
+FLAKY_N = int(os.environ.get("FLAKY_N", "12"))
+REGRESS = os.environ.get("REGRESS", "1") == "1"  # runs per arm when the controls disagree
 ALPHA = 0.05
 
 
@@ -137,6 +138,24 @@ def run(g, iv=None, tag=""):
             else:
                 shutil.copy(src, d)
             placed.append(d)
+    resets = []  # (top, paths) whose index must go back to HEAD after the run
+    for key in ("tree", "tree_files"):
+        tv = iv.get(key)
+        if not tv:
+            continue
+        top, c = tv["top"], tv["commit"]
+        paths = [tv["folder"]] if key == "tree" else list(tv["paths"])
+        for q in paths:
+            if subprocess.run(["git", "-C", top, "cat-file", "-e", f"{c}:{q}"], capture_output=True).returncode == 0:
+                subprocess.run(["git", "-C", top, "checkout", "-q", c, "--", q], capture_output=True)
+            if key == "tree":  # files the folder gained since c
+                gone = subprocess.run(["git", "-C", top, "diff", "--name-only", "--diff-filter=A", c, "HEAD", "--", q], capture_output=True, text=True).stdout.split()
+            else:
+                gone = [] if subprocess.run(["git", "-C", top, "cat-file", "-e", f"{c}:{q}"], capture_output=True).returncode == 0 else [q]
+            for x in gone:
+                if os.path.exists(os.path.join(top, x)):
+                    os.remove(os.path.join(top, x))
+        resets.append((top, paths))
     # tracked files the tree is missing just before the run (read from git, not from any output)
     troot = os.path.join(MONO, *g["cwd"].split("/")[:2])
     deleted = sorted(os.path.relpath(os.path.join(subprocess.run(["git", "-C", troot, "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip(), l[3:]), troot)
@@ -182,6 +201,9 @@ def run(g, iv=None, tag=""):
             os.removedirs(p_)
         except OSError:
             pass
+    for top, paths in resets:
+        subprocess.run(["git", "-C", top, "reset", "-q", "--"] + paths, capture_output=True)
+        subprocess.run(["git", "-C", top, "checkout", "-q", "HEAD", "--"] + paths, capture_output=True)
     if not g.get("keep_tree"):
         git_reset(os.path.join(MONO, *g["cwd"].split("/")[:2]))  # the whole thesis, not just the gate's folder
     out = out.replace(MONO, "$MONO")
@@ -466,6 +488,12 @@ def interventions(spec, g, st):
         return [{"cmd": ["sh", "-c", spec["cmd"]], "why": f"run the hidden step visibly: {spec['cmd']}", "acquire": True}]
     if k == "placebo":
         return [{"env": spec.get("env", {}), "why": "planted false cause"}]
+    if k == "regress":
+        return [{"tree": {"top": spec["top"], "folder": spec["folder"], "commit": spec["good"]},
+                 "why": f"the gate's folder as it was before {spec['bad'][:12]} ({spec['subject'][:60]})"}]
+    if k == "regress_files":
+        return [{"tree_files": {"top": spec["top"], "commit": spec["good"], "paths": spec["paths"]},
+                 "why": f"only {', '.join(spec['paths'])} as before {spec['bad'][:12]}"}]
     if k == "tracked":
         troot = os.path.join(MONO, *g["cwd"].split("/")[:2])
         rel = os.path.relpath(os.path.join(troot, spec["path"]), MONO)
@@ -702,6 +730,71 @@ def narrow(g, a, keep, flaky=False, cap=80):
                     break
     return {"units": units, "minimal": sorted(m), "tests": log, "complete": complete}
 
+# ------------------------------------------------------------------ regression (the gate's folder in history)
+#
+# When nothing above verifies, the gate's own folder is walked back through the commits that
+# touched it (first parent, newest first). Exponential then binary search finds the newest
+# folder state that passes; the commit after it is the regression candidate. Its test is the
+# usual one: control, intervention (the folder as before that commit), placebo (the folder as
+# it is now, the same slot). A verified regression is narrowed by ddmin to the files of that
+# commit whose old versions alone repair.
+
+def toplevel(d):
+    return subprocess.run(["git", "-C", d, "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+
+
+def bisect(g, keep, cap=8):
+    cwd = os.path.join(MONO, g["cwd"])
+    top = toplevel(cwd)
+    folder = os.path.relpath(cwd, top)
+    L = subprocess.run(["git", "-C", top, "log", "--first-parent", "--format=%H", "-n", "30", "--", folder],
+                       capture_output=True, text=True).stdout.split()
+    tests = []
+
+    def passes(i):
+        r = run(g, merge(keep, {"tree": {"top": top, "folder": folder, "commit": L[i] if i == 0 else L[i]}}), "bisect")
+        tests.append({"commit": L[i], "rc": r["rc"], "log_sha256": r["log_sha256"]})
+        return r["rc"] == 0
+
+    if len(L) < 2:
+        return None, tests
+    bad, good, i = 0, None, 1
+    while i < len(L) and len(tests) < cap:
+        if passes(i):
+            good = i; break
+        bad, i = i, i * 2
+    if good is None and len(tests) < cap and bad < len(L) - 1 and passes(len(L) - 1):
+        good = len(L) - 1
+    if good is None:
+        return None, tests
+    while good - bad > 1 and len(tests) < cap + 6:
+        mid = (bad + good) // 2
+        if passes(mid):
+            good = mid
+        else:
+            bad = mid
+    if good - bad > 1:
+        return None, tests
+    subj = subprocess.run(["git", "-C", top, "log", "-1", "--format=%s", L[bad]], capture_output=True, text=True).stdout.strip()
+    return {"kind": "regress", "top": top, "folder": folder, "bad": L[bad], "good": L[good], "subject": subj}, tests
+
+
+def narrow_regress(g, keep, spec, cap=30):
+    files = subprocess.run(["git", "-C", spec["top"], "diff", "--name-only", spec["good"], spec["bad"], "--", spec["folder"]],
+                           capture_output=True, text=True).stdout.split()
+    log = []
+
+    def test(S):
+        r = run(g, merge(keep, {"tree_files": {"top": spec["top"], "commit": spec["good"], "paths": S}}), "narrow")
+        log.append({"units": sorted(S), "rc": r["rc"], "log_sha256": r["log_sha256"]})
+        return r["rc"] == 0
+
+    if not files or not test(files):
+        return {"units": files, "minimal": None, "tests": log, "note": "the old versions of every changed file do not repair alone"}
+    m, calls, complete = ddmin(files, test, cap)
+    return {"units": files, "minimal": sorted(m), "tests": log, "complete": complete}
+
+
 # ------------------------------------------------------------------ the loop
 
 def runs(g, iv, n, tag):
@@ -746,7 +839,7 @@ def abduce_round(g, ctrl, st, keep=None):
 
 
 def experiment(g, cname, spec, st, ctrl, keep):
-    if spec["kind"] in ("pre", "restore", "tracked"):  # symptom free: the gate's own exit status
+    if spec["kind"] in ("pre", "restore", "tracked", "regress", "regress_files"):  # symptom free: the gate's own exit status
         target = ["fails"]
     else:
         target = [p for p in theory(g, ctrl[0]["symptoms"], st)[3][cname][1] if p in ctrl[0]["symptoms"] and p != "fails"]
@@ -760,11 +853,13 @@ def experiment(g, cname, spec, st, ctrl, keep):
         placebo = {"env": {"ABDUCTION_PLACEBO": "1"}}
         if spec["kind"] == "pre":  # same slot, no effect
             placebo["pre"] = [{"cwd": spec["act"]["cwd"], "cmd": ["true"]}]
+        if spec["kind"] in ("regress", "regress_files"):  # same slot, no effect: the folder as it is now
+            placebo["tree"] = {"top": spec["top"], "folder": spec["folder"], "commit": "HEAD"}
         pl = runs(g, merge(keep, placebo), n, "placebo")
         sig = None
         if iv.get("acquire"):
             verdict, stat = "ACQUIRED", None
-        elif spec["kind"] in ("pre", "restore", "tracked"):
+        elif spec["kind"] in ("pre", "restore", "tracked", "regress", "regress_files"):
             verdict, stat, sig = decide_tree(ctrl, ivr, pl)
         else:
             verdict, stat = decide(target, ctrl, ivr, pl)
@@ -827,6 +922,22 @@ def gate(g):
                 verified = (cname, good[0])
         rd = {"round": rnd, "control": ctrl, "reproducible": reproducible, "abduction": ab, "tested": tested}
         rounds.append(rd)
+        if verified is None and REGRESS:
+            spec, btests = bisect(g, keep)
+            rd["bisect"] = {"tests": btests, "found": {k_: v for k_, v in (spec or {}).items() if k_ != "top"} or None}
+            if spec:
+                cname = f"regressed_at:{spec['bad'][:12]}"
+                trials = experiment(g, cname, spec, st, ctrl, keep)
+                tested.append({"cause": cname, "trials": trials})
+                good = [t for t in trials if t["verdict"] in ("REPAIRED", "VERIFIED")]
+                if good:
+                    verified = (cname, good[0])
+                    nar = narrow_regress(g, keep, spec)
+                    rd["narrowed"] = nar
+                    if nar.get("minimal"):
+                        fs = dict(spec, kind="regress_files", paths=nar["minimal"])
+                        rd["artifact"] = {"cause": f"regressed_files:{','.join(nar['minimal'])}", "produced_by": cname,
+                                          "trials": experiment(g, "regress_files", fs, st, ctrl, keep)}
         if verified is None:
             break
         cname, t = verified

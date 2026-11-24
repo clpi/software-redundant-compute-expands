@@ -43,10 +43,7 @@ JOBS="${JOBS:-2}" python3 certify_all.py "$OUT" "$OUT/certs" | tail -1
 echo "== 5 gates"
 if [ ! -d "$MONO" ]; then
   if [ -n "${BUNDLE:-}" ]; then git clone -q "$BUNDLE" "$MONO"
-  else  # this repository's committed tree as the only thesis
-    mkdir -p "$MONO/theses/redundant-compute-expands"
-    git -C ../.. archive HEAD | tar -x -C "$MONO/theses/redundant-compute-expands"
-    git -C "$MONO" init -q && git -C "$MONO" add -A && git -C "$MONO" -c user.email=a@b -c user.name=abduction commit -qm tree
+  else ./mkmono.sh ../.. "$MONO"  # this repository (first-parent history) as the only thesis
   fi
 fi
 git clone -q https://github.com/clpi/software-optimality "$WORK/opt" && git -C "$WORK/opt" checkout -q 3418711

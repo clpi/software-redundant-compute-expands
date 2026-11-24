@@ -1,18 +1,28 @@
 {
  "admission": {
-  "admitted": 44,
+  "admitted": 55,
   "append_only": true,
-  "head": "457b82b24be3d45326b9c6a3bf6df3f575bdddeef71de1019bf0b4addb1e2f1f",
+  "head": "35d9dbf6610bea4cde5a3377947d03ee4f1b7065d07913dbd9a8fe61536e197f",
   "monotone": true,
-  "refused": 11,
-  "store_records": 2180
+  "refused": 27,
+  "store_records": 2197
  },
  "certificates": {
   "certified": 36,
   "false_of": 6,
   "false_refused": 6,
   "of": 36,
-  "seconds_total": 738.0
+  "seconds_total": 661.1
+ },
+ "crosscheck_pr16": {
+  "agree_all": 123,
+  "agree_k3": 123,
+  "errors": 0,
+  "explanations_total": 239,
+  "instances": 123,
+  "mutants": 123,
+  "mutants_detected": 123,
+  "pr16_checker_accepts": 123
  },
  "d0_planted": {
   "agree_every_prefix": 123,
@@ -94,22 +104,102 @@
   }
  },
  "gates_planted": {
-  "planted/gate-script-removed": {
-   "first_verified": "file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py",
-   "planted": "file_absent:<gate.py>",
+  "planted/first-run": {
+   "first_verified": "pre:self",
+   "planted": "not idempotent: the gate's own first run creates .cache/warm",
+   "prerequisites": [
+    {
+     "artifact_verdicts": [
+      "REPAIRED"
+     ],
+     "ddmin_runs": 2,
+     "first_run_only": [
+      "cold start"
+     ],
+     "minimal": [
+      "examples/abduce/planted/first-run/.cache/warm"
+     ],
+     "round": 0
+    }
+   ],
    "status": "REPAIRED",
    "trials": [
     [
      0,
-     "file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py",
+     "pre:self",
      "REPAIRED",
-     "restore from history bd50330a7ada:theses/redundant-compute-expands/examples/monotone-synthesis/gate.py"
+     "run self first (from the gate itself)"
+    ]
+   ]
+  },
+  "planted/flaky": {
+   "first_verified": "pre:build:.",
+   "planted": "flaky: fails about 3 runs in 4 unless the folder's build (make) has created gen/ok",
+   "prerequisites": [
+    {
+     "artifact_verdicts": [
+      "REPAIRED"
+     ],
+     "ddmin_runs": 2,
+     "first_run_only": null,
+     "minimal": [
+      "examples/abduce/planted/flaky/gen/ok"
+     ],
+     "round": 0
+    }
+   ],
+   "status": "REPAIRED",
+   "trials": [
+    [
+     0,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ],
+    [
+     0,
+     "pre:build:.",
+     "REPAIRED",
+     "run build:. first (from Makefile)"
+    ]
+   ]
+  },
+  "planted/gate-script-removed": {
+   "first_verified": "file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py",
+   "planted": "file_absent:<gate.py>",
+   "prerequisites": [],
+   "status": "FAILING",
+   "trials": [
+    [
+     0,
+     "file_absent:$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py",
+     "VERIFIED",
+     "restore from history 0cf9af7d8436:theses/redundant-compute-expands/examples/monotone-synthesis/gate.py"
+    ],
+    [
+     0,
+     "tracked_deleted:examples/monotone-synthesis/gate.py",
+     "VERIFIED",
+     "restore tracked examples/monotone-synthesis/gate.py from HEAD"
+    ],
+    [
+     0,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ],
+    [
+     1,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
     ]
    ]
   },
   "planted/lean-off-path": {
    "first_verified": "tool_missing:lean",
    "planted": "tool_missing:lean",
+   "prerequisites": [],
    "status": "REPAIRED",
    "trials": [
     [
@@ -123,24 +213,45 @@
      "env_unset:ABDUCTION_UNREAD",
      "REFUTED",
      "planted false cause"
+    ],
+    [
+     0,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
     ]
    ]
   },
   "planted/lean-source-removed": {
-   "first_verified": null,
+   "first_verified": "tracked_deleted:proof/Canon.lean",
    "planted": "out-of-vocabulary (a Lean module removed: no rule names it)",
-   "status": "FAILING",
-   "trials": []
-  },
-  "planted/ms-without-IQ": {
-   "first_verified": "env_unset:IQ",
-   "planted": "env_unset:IQ",
+   "prerequisites": [],
    "status": "REPAIRED",
    "trials": [
     [
      0,
-     "env_unset:IQ",
+     "tracked_deleted:proof/Canon.lean",
      "REPAIRED",
+     "restore tracked proof/Canon.lean from HEAD"
+    ],
+    [
+     0,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ]
+   ]
+  },
+  "planted/ms-without-IQ": {
+   "first_verified": "env_unset:IQ",
+   "planted": "env_unset:IQ",
+   "prerequisites": [],
+   "status": "FAILING",
+   "trials": [
+    [
+     0,
+     "env_unset:IQ",
+     "VERIFIED",
      "IQ=/mnt/project-files/idol-qualification"
     ],
     [
@@ -148,36 +259,100 @@
      "file_absent:/tmp/abduction-unrelated",
      "REFUTED",
      "planted false cause"
+    ],
+    [
+     0,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ],
+    [
+     1,
+     "file_absent:/tmp/abduction-unrelated",
+     "REFUTED",
+     "planted false cause"
+    ],
+    [
+     1,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ]
+   ]
+  },
+  "planted/needs-build": {
+   "first_verified": "pre:build:.",
+   "planted": "prerequisite: the folder's own build (make) generates gen/table.txt; README decoy `touch decoy.txt` is false",
+   "prerequisites": [
+    {
+     "artifact_verdicts": [
+      "REPAIRED"
+     ],
+     "ddmin_runs": 4,
+     "first_run_only": null,
+     "minimal": [
+      "examples/abduce/planted/needs-build/gen/table.txt"
+     ],
+     "round": 0
+    }
+   ],
+   "status": "REPAIRED",
+   "trials": [
+    [
+     0,
+     "pre:build:.",
+     "REPAIRED",
+     "run build:. first (from Makefile)"
+    ],
+    [
+     0,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ],
+    [
+     0,
+     "pre:doc:touch decoy.txt",
+     "REFUTED",
+     "run doc:touch decoy.txt first (from README.md)"
     ]
    ]
   }
  },
  "gates_real": {
   "srce/admission": {
+   "prerequisites": [],
    "status": "FAILING",
    "trials": [
     [
      0,
      "arg_missing:2",
      "VERIFIED",
-     "positional ['/tmp/claude-0/abd/work/cache/bin-idol', '/home/user/idol-lib', '']"
+     "positional ['/tmp/claude-0/abd5/cache/bin-idol', '/home/user/idol-lib', '']"
     ],
     [
      0,
      "file_absent:/sha256/sha256.id",
      "VERIFIED",
      "copy /home/user/idol-lib/sha256/sha256.id"
+    ],
+    [
+     1,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
     ]
    ]
   },
   "srce/monotone-synthesis": {
-   "status": "REPAIRED",
+   "prerequisites": [],
+   "status": "FAILING",
    "trials": [
     [
      0,
      "env_unset:OPT",
      "VERIFIED",
-     "OPT=/tmp/claude-0/abd/work/cache/clpi_software-optimality@3418711"
+     "OPT=/tmp/claude-0/abd5/cache/clpi_software-optimality@3418711"
     ],
     [
      0,
@@ -186,10 +361,16 @@
      "planted false cause"
     ],
     [
+     0,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ],
+    [
      1,
      "env_unset:IL",
      "VERIFIED",
-     "IL=/tmp/claude-0/abd/work/cache/clpi_idol-lib"
+     "IL=/tmp/claude-0/abd5/cache/clpi_idol-lib"
     ],
     [
      1,
@@ -198,9 +379,15 @@
      "planted false cause"
     ],
     [
+     1,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ],
+    [
      2,
      "env_unset:IQ",
-     "REPAIRED",
+     "VERIFIED",
      "IQ=/mnt/project-files/idol-qualification"
     ],
     [
@@ -208,10 +395,28 @@
      "env_unset:ABDUCTION_UNREAD",
      "REFUTED",
      "planted false cause"
+    ],
+    [
+     2,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
+    ],
+    [
+     3,
+     "env_unset:ABDUCTION_UNREAD",
+     "REFUTED",
+     "planted false cause"
+    ],
+    [
+     3,
+     "pre:self",
+     "REFUTED",
+     "run self first (from the gate itself)"
     ]
    ]
   }
  },
- "planted_false_refuted": 5,
- "planted_false_tested": 5
+ "planted_false_refuted": 8,
+ "planted_false_tested": 8
 }
