@@ -131,5 +131,41 @@
    ]
   },
   "planted": "out-of-vocabulary (a Lean module removed: no rule names it)"
+ },
+ {
+  "name": "planted/needs-build",
+  "cwd": "theses/redundant-compute-expands/examples/abduce/planted/needs-build",
+  "cmd": [
+   "sh",
+   "check.sh"
+  ],
+  "script": "check.sh",
+  "planted": "prerequisite: the folder's own build (make) generates gen/table.txt; README decoy `touch decoy.txt` is false",
+  "exhaustive": true,
+  "false_pre": [
+   "pre:doc:touch decoy.txt"
+  ]
+ },
+ {
+  "name": "planted/first-run",
+  "cwd": "theses/redundant-compute-expands/examples/abduce/planted/first-run",
+  "cmd": [
+   "sh",
+   "check.sh"
+  ],
+  "script": "check.sh",
+  "planted": "not idempotent: the gate's own first run creates .cache/warm",
+  "exhaustive": true
+ },
+ {
+  "name": "planted/flaky",
+  "cwd": "theses/redundant-compute-expands/examples/abduce/planted/flaky",
+  "cmd": [
+   "sh",
+   "check.sh"
+  ],
+  "script": "check.sh",
+  "planted": "flaky: fails about 3 runs in 4 unless the folder's build (make) has created gen/ok",
+  "exhaustive": true
  }
 ]

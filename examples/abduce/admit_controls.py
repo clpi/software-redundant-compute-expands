@@ -92,6 +92,40 @@ with tempfile.TemporaryDirectory() as w:
     rc, r = admit(os.path.join(w, "s5.jsonl"), c5, gates)
     check("A5 planted false hypothesis not refused by the kernel", neg is not None and rc == 1, neg["name"] if neg else "none")
 
+    # A8: a delta-debugging run whose recorded failure is relabeled a pass: the narrowed set's
+    # 1-minimality must no longer be admitted (its one-path removal is not shown to fail)
+    t = [json.loads(json.dumps(g)) for g in lines]
+    nm = None
+    for g in t:
+        for rd in g["rounds"]:
+            m = (rd.get("narrowed") or {}).get("minimal")
+            if m and nm is None:
+                for x in rd["narrowed"]["tests"]:
+                    if sorted(x["units"]) == sorted(m[1:]) or (len(m) == 1 and x["units"] == []):
+                        x["rc"] = 0
+                nm = f"minimal_prerequisite({g['gate']}, {', '.join(m)})"
+    p8 = os.path.join(w, "g8.jsonl"); open(p8, "w").write("\n".join(json.dumps(g) for g in t) + "\n")
+    rc, r = admit(os.path.join(w, "s8.jsonl"), certs, p8)
+    check("A8 relabeled delta-debugging run", nm and nm in admitted and nm not in r.get("admitted", []), nm or "no narrowed set")
+
+    # A9: a prerequisite step's log deleted from the run store: trials that cite it are refused
+    t = [json.loads(json.dumps(g)) for g in lines]
+    pre_h, who = None, None
+    for g in t:
+        for rd in g["rounds"]:
+            for x in rd.get("tested", []):
+                for tr in x["trials"]:
+                    for run in tr["intervention"]:
+                        if run.get("pre") and pre_h is None and tr["verdict"] in ("REPAIRED", "VERIFIED"):
+                            pre_h, who = run["pre"][0]["log_sha256"], f"{g['gate']}:{x['cause']}"
+    if pre_h:
+        src = os.path.join(runlogs, pre_h + ".log"); keep = open(src).read(); os.remove(src)
+        try:
+            rc, r = admit(os.path.join(w, "s9.jsonl"), certs, gates)
+        finally:
+            open(src, "w").write(keep)
+    check("A9 missing prerequisite-step log", pre_h and any(x.get("claim") == who and "stored log" in str(x.get("reason")) for x in r.get("refused", [])), who or "no prerequisite trial")
+
     # A6: history rewrite of the store
     s6 = os.path.join(w, "s6.jsonl"); shutil.copy(os.path.join(w, "s0.jsonl"), s6)
     L = open(s6).read().splitlines()

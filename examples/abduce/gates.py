@@ -29,7 +29,39 @@ CACHE = os.environ.get("CACHE", "/tmp/abduction-cache")
 SEARCH = [p for p in os.environ.get("SEARCH", "/mnt/project-files:/home/user").split(":") if p]
 REPEATS = int(os.environ.get("REPEATS", "2"))
 ROUNDS = int(os.environ.get("ROUNDS", "4"))
+PREREQ = os.environ.get("PREREQ", "1") == "1"
+FLAKY_N = int(os.environ.get("FLAKY_N", "12"))  # runs per arm when the controls disagree
+ALPHA = 0.05
+
+
+def fisher_greater(a, n1, b, n2):
+    """One-sided Fisher exact p: P(at least a of the n1+n2 runs' a+b failures fall in arm 1)."""
+    from math import comb
+    k, n = a + b, n1 + n2
+    return sum(comb(n1, i) * comb(n2, k - i) for i in range(a, min(n1, k) + 1) if 0 <= k - i <= n2) / comb(n, k)
+
+
+def decide(target, ctrl, ivr, pl):
+    """Verdict from run records. Deterministic gates: target in every control and placebo run, in no
+    intervention run. When the controls disagree (a flaky gate): the intervention must show the
+    target in no run, and the control and placebo failure counts must each exceed the intervention's
+    by a one-sided Fisher exact test at ALPHA."""
+    hit = lambda r: all(t in r["symptoms"] for t in target)
+    gone = all(not any(t in r["symptoms"] for t in target) for r in ivr) and len(ivr) >= 2
+    if all(hit(r) for r in ctrl) and len(ctrl) >= 2:
+        if gone and all(hit(r) for r in pl) and len(pl) >= 2:
+            return ("REPAIRED" if all(r["rc"] == 0 for r in ivr) else "VERIFIED"), None
+        return ("REFUTED" if not gone else "INCONCLUSIVE"), None
+    c, i_, q = sum(map(hit, ctrl)), sum(map(hit, ivr)), sum(map(hit, pl))
+    stat = {"control": [c, len(ctrl)], "intervention": [i_, len(ivr)], "placebo": [q, len(pl)],
+            "p_control": fisher_greater(c, len(ctrl), i_, len(ivr)), "p_placebo": fisher_greater(q, len(pl), i_, len(ivr))}
+    if c == 0:
+        return "INCONCLUSIVE", stat
+    if i_ == 0 and stat["p_control"] < ALPHA and stat["p_placebo"] < ALPHA:
+        return ("REPAIRED" if all(r["rc"] == 0 for r in ivr) else "VERIFIED"), stat
+    return ("REFUTED" if i_ >= c * len(ivr) / len(ctrl) else "INCONCLUSIVE"), stat
 TIMEOUT = int(os.environ.get("GATE_TIMEOUT", "1800"))
+LOGS = {}  # log sha -> full text, for this process
 
 # ------------------------------------------------------------------ running
 
@@ -85,6 +117,18 @@ def run(g, iv=None, tag=""):
             else:
                 shutil.copy(src, d)
             placed.append(d)
+    pre_out = []
+    for a in iv.get("pre", []):  # prerequisite actions, run before the gate on the same fresh tree
+        try:
+            pp = subprocess.run(a["cmd"], cwd=os.path.join(MONO, a["cwd"]), env=env, capture_output=True, text=True, timeout=TIMEOUT)
+            prc, pout = pp.returncode, pp.stdout + pp.stderr
+        except subprocess.TimeoutExpired:
+            prc, pout = 124, "TIMEOUT"
+        pout = f"$ (cd {a['cwd']} && {' '.join(a['cmd'])})\n" + pout.replace(MONO, "$MONO")
+        if os.environ.get("RUNLOGS"):
+            os.makedirs(os.environ["RUNLOGS"], exist_ok=True)
+            open(os.path.join(os.environ["RUNLOGS"], sha(pout) + ".log"), "w").write(pout)
+        pre_out.append({"rc": prc, "log_sha256": sha(pout)})
     cmd = list(iv.get("cmd") or g["cmd"]) + list(iv.get("args", []))
     t = time.time()
     try:
@@ -119,7 +163,11 @@ def run(g, iv=None, tag=""):
     if os.environ.get("RUNLOGS"):
         os.makedirs(os.environ["RUNLOGS"], exist_ok=True)
         open(os.path.join(os.environ["RUNLOGS"], sha(out) + ".log"), "w").write(out)
-    return {"rc": rc, "secs": secs, "log_sha256": sha(out), "tail": out[-1500:], "symptoms": symptoms(out, rc, g), "tag": tag}
+    LOGS[sha(out)] = out
+    r = {"rc": rc, "secs": secs, "log_sha256": sha(out), "tail": out[-1500:], "symptoms": symptoms(out, rc, g), "tag": tag}
+    if pre_out:
+        r["pre"] = pre_out
+    return r
 
 # ------------------------------------------------------------------ symptoms
 
@@ -214,13 +262,16 @@ def static(g):
 
 # ------------------------------------------------------------------ theory
 
-def theory(g, obs, st):
+def theory(g, obs, st, pre=()):
     """Canonical log for this gate: causes -> predicted symptoms; absent predictions -> bot."""
     lg = Log()
     causes = {}  # name -> (cost, predicted symptoms, intervention spec)
 
     def cause(name, cost, preds, spec):
         causes[name] = (cost, sorted(set(preds)), spec)
+
+    for a, pr, hit in pre:  # prerequisite actions read from the tree; they predict what they create
+        cause(f"pre:{a['name']}", a["cost"], ["fails"] + [f"mentions:{h}" for h in hit], {"kind": "pre", "act": a})
 
     for v, msg in st["required"].items():
         cause(f"env_unset:{v}", 1, [f"unset:{v}"], {"kind": "env", "var": v, "msg": msg})
@@ -385,7 +436,237 @@ def interventions(spec, g, st):
         return [{"cmd": ["sh", "-c", spec["cmd"]], "why": f"run the hidden step visibly: {spec['cmd']}", "acquire": True}]
     if k == "placebo":
         return [{"env": spec.get("env", {}), "why": "planted false cause"}]
+    if k == "pre":
+        a = spec["act"]
+        return [{"pre": [{"cwd": a["cwd"], "cmd": a["cmd"]}], "why": f"run {a['name']} first (from {a['src']})"}]
+    if k == "restore":
+        return [{"files": spec["files"], "why": f"restore only {', '.join(spec['units'])} from the {spec['act']} snapshot"}]
     return []
+
+# ------------------------------------------------------------------ prerequisite abduction (no symptom vocabulary)
+#
+# A gate that fails on a fresh tree may need state that some other action produces: a build of
+# its package, a dependency checkout, or its own earlier run (then the gate is not idempotent
+# from a clean checkout). Candidate actions are read from the tree, never from the failure text:
+#   self       the gate itself (cost 1)
+#   build:DIR  the build system of each package that builds the gate's folder: markers in the
+#              gate's folder (depth <= 3) and in its ancestors up to the thesis root (cost 2)
+#   doc:CMD    shell lines in fenced sh/bash blocks of the gate folder's README (cost 3)
+# Each action is probed once on a fresh tree: what it creates (untracked or ignored paths) is
+# snapshotted. The names it creates that the failing log mentions become observations
+# `mentions:NAME`, and `pre:ACTION -> mentions:NAME` records, so an action whose products the
+# failure talks about covers more and ranks first. The test is symptom free: target "fails",
+# intervention = run ACTION first, placebo = run `true` first. A verified action is narrowed by
+# delta debugging over the snapshot to a 1-minimal set of created paths that, restored alone,
+# makes the gate pass; that set is verified again the same way.
+
+BUILD = [("lakefile.lean", ["lake", "build"]), ("lakefile.toml", ["lake", "build"]), ("Makefile", ["make"]),
+         ("build.zig", ["zig", "build"]), ("Cargo.toml", ["cargo", "build", "--offline"])]
+SKIPDIR = {".git", ".lake", "node_modules", "__pycache__", "target", "zig-out", ".zig-cache", "zig-cache"}
+GENERIC = {"build", "packages", "lib", "lean", "ir", "lake", "cache", "target", "debug", "release", "olean",
+           "ilean", "trace", "hash", "c", "o", "json", "README", "LICENSE", "manifest", "config", "objects"}
+PROBES = {}
+
+
+def thesis_root(g):
+    return os.path.join(MONO, *g["cwd"].split("/")[:2])
+
+
+def harvest(g):
+    root, cwd = thesis_root(g), os.path.join(MONO, g["cwd"])
+    acts = [{"name": "self", "cwd": g["cwd"], "cmd": list(g["cmd"]), "cost": 1, "src": "the gate itself"}]
+    dirs = []
+    d = cwd
+    while True:  # ancestors up to the thesis root
+        dirs.append(d)
+        if os.path.realpath(d) == os.path.realpath(root) or len(d) <= len(root):
+            break
+        d = os.path.dirname(d)
+    for dp, dns, fns in os.walk(cwd):  # the gate's own subtree
+        dns[:] = sorted(x for x in dns if x not in SKIPDIR and not x.startswith("."))
+        if dp.count(os.sep) - cwd.count(os.sep) >= 3:
+            dns[:] = []
+        if dp != cwd:
+            dirs.append(dp)
+    seen = set()
+    for d in dirs:
+        for marker, cmd in BUILD:
+            if os.path.isfile(os.path.join(d, marker)) and shutil.which(cmd[0]) and d not in seen:
+                seen.add(d)
+                rel = os.path.relpath(d, MONO)
+                acts.append({"name": f"build:{os.path.relpath(d, cwd)}", "cwd": rel, "cmd": cmd, "cost": 2, "src": marker})
+    rd = os.path.join(cwd, "README.md")
+    if os.path.isfile(rd):
+        fence = False
+        for line in open(rd, errors="replace"):
+            t = line.strip()
+            if t.startswith("```"):
+                fence = t[3:].strip() in ("sh", "bash", "shell", "console")
+                continue
+            t = t.removeprefix("$ ").strip()
+            if fence and t and not t.startswith("#") and t != " ".join(g["cmd"]) and "${{" not in t:
+                acts.append({"name": f"doc:{t}", "cwd": g["cwd"], "cmd": ["sh", "-c", t], "cost": 3, "src": "README.md"})
+    return acts
+
+
+def created(root):
+    """Untracked and ignored paths under root (git collapses whole new directories)."""
+    out = subprocess.run(["git", "-C", root, "status", "--porcelain", "--ignored", "--untracked-files=normal", "--", "."],
+                         capture_output=True, text=True).stdout
+    top = subprocess.run(["git", "-C", root, "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+    paths = []
+    for line in out.splitlines():
+        if line[:2] in ("??", "!!"):
+            paths.append(os.path.relpath(os.path.join(top, line[3:].strip().rstrip("/")), root))
+    return sorted(paths)
+
+
+def units_of(snap, paths, limit=24):
+    """Split created paths into at most `limit` units, expanding directories breadth first."""
+    units = list(paths)
+    changed = True
+    while changed:
+        changed = False
+        for u in sorted(units, key=lambda x: x.count("/")):
+            full = os.path.join(snap, u)
+            if os.path.isdir(full) and not os.path.islink(full):
+                kids = sorted(os.listdir(full))
+                if kids and len(units) - 1 + len(kids) <= limit:
+                    units.remove(u)
+                    units += [os.path.join(u, k) for k in kids]
+                    changed = True
+                    break
+    return sorted(units)
+
+
+def names_in(snap, paths, cap=20000):
+    out, n = set(), 0
+    for p in paths:
+        for dp, dns, fns in os.walk(os.path.join(snap, p)):
+            for x in dns + fns:
+                n += 1
+                for v in {x, x.split(".")[0]}:
+                    if len(v) >= 5 and v not in GENERIC and not v.startswith("."):
+                        out.add(v)
+            if n > cap:
+                break
+        for c in p.split("/"):
+            for v in {c, c.split(".")[0]}:
+                if len(v) >= 5 and v not in GENERIC and not v.startswith("."):
+                    out.add(v)
+    return out
+
+
+def probe(g, a, keep):
+    """Run action a once on a fresh tree; snapshot what it creates."""
+    root = thesis_root(g)
+    key = (root, a["cwd"], tuple(a["cmd"]), json.dumps(keep.get("env", {}), sort_keys=True))
+    if key in PROBES:
+        return PROBES[key]
+    git_reset(root)
+    env = dict(os.environ); env.update(keep.get("env", {}))
+    try:
+        p = subprocess.run(a["cmd"], cwd=os.path.join(MONO, a["cwd"]), env=env, capture_output=True, text=True, timeout=TIMEOUT)
+        rc = p.returncode
+    except subprocess.TimeoutExpired:
+        rc = 124
+    paths = created(root)
+    snap = os.path.join(CACHE, "snap-" + sha(json.dumps(key))[:16])
+    shutil.rmtree(snap, ignore_errors=True)
+    for q in paths:
+        src, dst = os.path.join(root, q), os.path.join(snap, q)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        if os.path.isdir(src) and not os.path.islink(src):
+            shutil.copytree(src, dst, symlinks=True)
+        elif os.path.lexists(src):
+            shutil.copy2(src, dst, follow_symlinks=False)
+    git_reset(root)
+    PROBES[key] = {"rc": rc, "snap": snap, "paths": paths, "names": names_in(snap, paths)}
+    return PROBES[key]
+
+
+def mentions(g, ctrl, keep):
+    """For each candidate action: the names it creates that the failing log mentions."""
+    text = LOGS.get(ctrl[0]["log_sha256"], ctrl[0]["tail"])
+    res = []
+    for a in harvest(g):
+        pr = probe(g, a, keep)
+        hit = sorted(n for n in pr["names"] if re.search(r"(?<![\w-])" + re.escape(n) + r"(?![\w-])", text))[:8]
+        res.append((a, pr, hit))
+    return res
+
+
+def ddmin(units, test, cap=40):
+    """Zeller's ddmin: a 1-minimal subset of units for which test passes (test(units) must pass)."""
+    calls = [0]
+
+    def t(s):
+        calls[0] += 1
+        return test(s)
+
+    n = 2
+    while len(units) >= 2 and calls[0] < cap:
+        chunk = max(1, len(units) // n)
+        parts = [units[i:i + chunk] for i in range(0, len(units), chunk)]
+        done = False
+        for p in parts:
+            if calls[0] >= cap:
+                break
+            if t(p):
+                units, n, done = p, 2, True
+                break
+        if not done:
+            for p in parts:
+                if calls[0] >= cap:
+                    break
+                rest = [u for u in units if u not in p]
+                if rest and t(rest):
+                    units, n, done = rest, max(n - 1, 2), True
+                    break
+        if not done:
+            if n >= len(units):
+                break
+            n = min(len(units), 2 * n)
+    if len(units) == 1 and calls[0] < cap and t([]):
+        units = []
+    return units, calls[0], calls[0] < cap
+
+
+def narrow(g, a, keep, flaky=False, cap=80):
+    """Smallest set of paths created by a that, restored alone on a fresh tree, makes the gate pass.
+    Hierarchical: after ddmin over the top units, each chosen directory is opened and narrowed
+    again with the rest held fixed, while the run budget lasts. On a flaky gate a set passes only
+    if every one of 3 runs passes."""
+    pr = probe(g, a, keep)
+    root = thesis_root(g)
+    units = units_of(pr["snap"], pr["paths"])
+    log = []
+
+    def test(s):
+        for _ in range(3 if flaky else 1):
+            iv = merge(keep, {"files": [(os.path.join(pr["snap"], u), os.path.join(root, u)) for u in s]})
+            r = run(g, iv, "narrow")
+            log.append({"units": sorted(s), "rc": r["rc"], "log_sha256": r["log_sha256"]})
+            if r["rc"] != 0:
+                return False
+        return True
+
+    if not units or not test(units):
+        return {"units": units, "minimal": None, "tests": log, "note": "restoring every created path does not repair"}
+    m, calls, complete = ddmin(units, test, cap)
+    opened = True
+    while opened and complete and len(log) < cap:
+        opened = False
+        for u in sorted(m):
+            full = os.path.join(pr["snap"], u)
+            kids = sorted(os.listdir(full)) if os.path.isdir(full) and not os.path.islink(full) else []
+            if 1 < len(kids) <= 24:
+                rest = [v for v in m if v != u]
+                sub, c2, complete = ddmin([os.path.join(u, k) for k in kids], lambda s_: test(rest + s_), cap - len(log))
+                if complete and sub:
+                    m, opened = sorted(rest + sub), True
+                    break
+    return {"units": units, "minimal": sorted(m), "tests": log, "complete": complete}
 
 # ------------------------------------------------------------------ the loop
 
@@ -393,9 +674,10 @@ def runs(g, iv, n, tag):
     return [run(g, iv, tag) for _ in range(n)]
 
 
-def abduce_round(g, ctrl, st):
-    obs = ctrl[0]["symptoms"]
-    lg, A, O, causes = theory(g, obs, st)
+def abduce_round(g, ctrl, st, keep=None):
+    pre = mentions(g, ctrl, keep or {}) if PREREQ else []
+    obs = sorted(set(ctrl[0]["symptoms"]) | {f"mentions:{h}" for _, _, hit in pre for h in hit})
+    lg, A, O, causes = theory(g, obs, st, pre)
     at = ATMS(A, 2)
     for r in lg.recs:
         at.add(r)
@@ -417,32 +699,39 @@ def abduce_round(g, ctrl, st):
     fr = front(cands)
     inconsistent = sorted(lg.names[a] for a in A if 0 in closure(lg.recs, [a]))
     return {"observed": obs, "abducibles": [lg.names[a] for a in A], "inconsistent": inconsistent,
+            "probes": [{"action": a["name"], "cwd": a["cwd"], "cmd": a["cmd"], "rc": pr["rc"], "created": pr["paths"], "mentioned": hit} for a, pr, hit in pre],
             "explanations": [list(c[0]) for c in cands if c[1] == len(O)], "front": [list(c[0]) for c in fr],
             "ranked": [{"hyp": list(c[0]), "cover": c[1], "cost": c[2]} for c in cands],
             "log_head": lg.head_hash(), "records": len(lg.recs)}, causes
 
 
 def experiment(g, cname, spec, st, ctrl, keep):
-    target = [p for p in theory(g, ctrl[0]["symptoms"], st)[3][cname][1] if p in ctrl[0]["symptoms"] and p != "fails"]
+    if spec["kind"] in ("pre", "restore"):  # symptom free: the gate's own exit status
+        target = ["fails"]
+    else:
+        target = [p for p in theory(g, ctrl[0]["symptoms"], st)[3][cname][1] if p in ctrl[0]["symptoms"] and p != "fails"]
     if not target:  # the cause predicts nothing observed: test it against what was observed
         target = [p for p in ctrl[0]["symptoms"] if p != "fails"] or ["fails"]
     trials = []
+    n = max(REPEATS, len(ctrl))
     for iv in interventions(spec, g, st):
         merged = merge(keep, iv)
-        ivr = runs(g, merged, REPEATS, "intervention")
-        pl = runs(g, merge(keep, {"env": {"ABDUCTION_PLACEBO": "1"}}), REPEATS, "placebo")
-        present_ctrl = all(all(t in r["symptoms"] for t in target) for r in ctrl)
-        gone = all(not any(t in r["symptoms"] for t in target) for r in ivr)
-        present_pl = all(all(t in r["symptoms"] for t in target) for r in pl)
-        if iv.get("acquire"):
-            verdict = "ACQUIRED"
-        elif present_ctrl and gone and present_pl:
-            verdict = "REPAIRED" if all(r["rc"] == 0 for r in ivr) else "VERIFIED"
-        elif present_ctrl and not gone:
-            verdict = "REFUTED"
-        else:
-            verdict = "INCONCLUSIVE"
-        trials.append({"why": iv["why"], "verdict": verdict, "target": target, "intervention": ivr, "placebo": pl, "iv": iv})
+        ivr = runs(g, merged, n, "intervention")
+        placebo = {"env": {"ABDUCTION_PLACEBO": "1"}}
+        if spec["kind"] == "pre":  # same slot, no effect
+            placebo["pre"] = [{"cwd": spec["act"]["cwd"], "cmd": ["true"]}]
+        pl = runs(g, merge(keep, placebo), n, "placebo")
+        verdict, stat = ("ACQUIRED", None) if iv.get("acquire") else decide(target, ctrl, ivr, pl)
+        extra = []
+        hit = lambda r: all(t in r["symptoms"] for t in target)
+        if verdict == "INCONCLUSIVE" and stat is None and 0 < sum(map(hit, pl)) < len(pl):
+            # the placebo arm shows the gate is flaky after all: measure every arm at FLAKY_N
+            extra = runs(g, keep, FLAKY_N - len(ctrl), "control")
+            ivr += runs(g, merged, FLAKY_N - len(ivr), "intervention")
+            pl += runs(g, merge(keep, placebo), FLAKY_N - len(pl), "placebo")
+            verdict, stat = decide(target, ctrl + extra, ivr, pl)
+        trials.append({"why": iv["why"], "verdict": verdict, "target": target, "intervention": ivr, "placebo": pl, "iv": iv, "stat": stat,
+                       **({"control_extra": extra} if extra else {})})
         if verdict in ("REPAIRED", "VERIFIED", "ACQUIRED") and not iv.get("why", "").startswith("empty placeholder"):
             break
     return trials
@@ -469,24 +758,46 @@ def gate(g):
     keep, rounds, status = {}, [], "FAILING"
     for rnd in range(ROUNDS):
         ctrl = runs(g, keep, REPEATS, "control")
+        if len({r["rc"] == 0 for r in ctrl}) > 1:  # the gate is flaky from a fresh tree: measure its rate
+            ctrl += runs(g, keep, FLAKY_N - len(ctrl), "control")
         if all(r["rc"] == 0 for r in ctrl):
             status = "PASSING" if rnd == 0 else "REPAIRED"
             rounds.append({"round": rnd, "control": ctrl})
             break
-        reproducible = len({tuple(r["symptoms"]) for r in ctrl}) == 1
-        ab, causes = abduce_round(g, ctrl, st)
+        reproducible = len({tuple(r["symptoms"]) for r in ctrl}) == 1 and len({r["rc"] for r in ctrl}) == 1
+        ab, causes = abduce_round(g, ctrl, st, keep)
         tested, verified = [], None
-        order = [h[0] for h in ab["front"] if len(h) == 1] + [c for c in ab["abducibles"] if c in {f["name"] for f in g.get("false", [])}]
-        for cname in dict.fromkeys(order):
+        order = [h[0] for h in ab["front"] if len(h) == 1 and not h[0].startswith("pre:")] + [c for c in ab["abducibles"] if c in {f["name"] for f in g.get("false", [])}]
+        prs = sorted((c for c in causes if c.startswith("pre:")), key=lambda c: (-len(causes[c][1]), causes[c][0], c))
+        exhaustive = bool(g.get("planted") or g.get("false") or g.get("exhaustive"))
+        for cname in dict.fromkeys(order + prs):
+            if verified is not None and cname.startswith("pre:") and not exhaustive:
+                break
             trials = experiment(g, cname, causes[cname][2], st, ctrl, keep)
             tested.append({"cause": cname, "trials": trials})
             good = [t for t in trials if t["verdict"] in ("REPAIRED", "VERIFIED", "ACQUIRED") and not t["why"].startswith("empty placeholder")]
             if good and verified is None:
                 verified = (cname, good[0])
-        rounds.append({"round": rnd, "control": ctrl, "reproducible": reproducible, "abduction": ab, "tested": tested})
+        rd = {"round": rnd, "control": ctrl, "reproducible": reproducible, "abduction": ab, "tested": tested}
+        rounds.append(rd)
         if verified is None:
             break
         cname, t = verified
+        if cname.startswith("pre:"):
+            a = causes[cname][2]["act"]
+            nar = narrow(g, a, keep, flaky=not reproducible)
+            rd["narrowed"] = nar
+            if nar.get("minimal"):
+                pr = probe(g, a, keep)
+                root = thesis_root(g)
+                spec = {"kind": "restore", "act": a["name"], "units": nar["minimal"],
+                        "files": [(os.path.join(pr["snap"], u), os.path.join(root, u)) for u in nar["minimal"]]}
+                rd["artifact"] = {"cause": f"artifact_absent:{','.join(nar['minimal'])}", "produced_by": cname,
+                                  "trials": experiment(g, "restore", spec, st, ctrl, keep)}
+            if a["name"] == "self":  # not idempotent from a clean tree: where the first run's output diverges
+                warm = set(LOGS.get(t["intervention"][0]["log_sha256"], "").splitlines())
+                cold = LOGS.get(ctrl[0]["log_sha256"], "").splitlines()
+                rd["first_run_only"] = [l for l in cold if l not in warm and l.strip()][:12]
         if t["verdict"] == "ACQUIRED":
             # the hidden step's own output becomes the observation for the next round
             g = dict(g, cmd=t["iv"]["cmd"], script=g["script"])

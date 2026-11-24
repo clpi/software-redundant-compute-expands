@@ -10,6 +10,17 @@ gates = [json.loads(l) for l in open(os.path.join(R, "gates.jsonl"))]
 adm = json.load(open(os.path.join(R, "admit.json")))
 
 
+def prereq(g):
+    out = []
+    for rd in g["rounds"]:
+        if rd.get("narrowed") or rd.get("artifact"):
+            a = rd.get("artifact") or {}
+            out.append({"round": rd["round"], "minimal": (rd.get("narrowed") or {}).get("minimal"),
+                        "ddmin_runs": len((rd.get("narrowed") or {}).get("tests", [])),
+                        "artifact_verdicts": [t["verdict"] for t in a.get("trials", [])], "first_run_only": rd.get("first_run_only")})
+    return out
+
+
 def trials(g):
     return [(rd["round"], x["cause"], t["verdict"], t["why"]) for rd in g["rounds"] for x in rd.get("tested", []) for t in x["trials"]]
 
@@ -26,12 +37,13 @@ out = {
     "certificates": {"certified": sum(c["ok"] for c in certs if not c.get("expect_fail")), "of": sum(1 for c in certs if not c.get("expect_fail")),
                      "false_refused": sum(c["ok"] for c in certs if c.get("expect_fail")), "false_of": sum(1 for c in certs if c.get("expect_fail")),
                      "seconds_total": round(sum(c.get("seconds") or 0 for c in certs), 1)},
-    "gates_real": {g["gate"]: {"status": g["status"], "trials": trials(g)} for g in real},
+    "crosscheck_pr16": json.load(open(os.path.join(R, "crosscheck.json")))["summary"],
+    "gates_real": {g["gate"]: {"status": g["status"], "trials": trials(g), "prerequisites": prereq(g)} for g in real},
     "gates_planted": {g["gate"]: {"status": g["status"], "planted": spec.get(g["gate"], {}).get("planted"),
                                   "first_verified": next((c for (_, c, v, why) in trials(g) if v in ("REPAIRED", "VERIFIED") and not why.startswith("empty")), None),
-                                  "trials": trials(g)} for g in planted},
-    "planted_false_refuted": sum(1 for g in gates for (_, c, v, _w) in trials(g) if c in {f["name"] for f in spec.get(g["gate"], {}).get("false", [])} and v == "REFUTED"),
-    "planted_false_tested": sum(1 for g in gates for (_, c, v, _w) in trials(g) if c in {f["name"] for f in spec.get(g["gate"], {}).get("false", [])}),
+                                  "trials": trials(g), "prerequisites": prereq(g)} for g in planted},
+    "planted_false_refuted": sum(1 for g in gates for (_, c, v, _w) in trials(g) if c in {f["name"] for f in spec.get(g["gate"], {}).get("false", [])} | set(spec.get(g["gate"], {}).get("false_pre", [])) and v == "REFUTED"),
+    "planted_false_tested": sum(1 for g in gates for (_, c, v, _w) in trials(g) if c in {f["name"] for f in spec.get(g["gate"], {}).get("false", [])} | set(spec.get(g["gate"], {}).get("false_pre", []))),
     "admission": {"admitted": len(adm["admitted"]), "refused": len(adm["refused"]), "store_records": adm["store_after"], "head": adm["head"],
                   "monotone": adm["monotone"], "append_only": adm["append_only"]},
 }
