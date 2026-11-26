@@ -220,8 +220,12 @@ static void join_with_fact(int r, int pos, int f) {
     done[pos] = 1; prem[0] = f; OPS++;
     join(r, done, ru->nb - 1, bind, prem, 1);
 }
+static double RQ_DEADLINE = 1e300;
+static double now_s(void);
 static void run_queue(void) {
+    long it = 0;
     while (QH < QT && REFUTED < 0) {
+        if ((++it & 255) == 0 && RQ_DEADLINE < 1e299 && now_s() > RQ_DEADLINE) return;
         int f = QUEUE[QH++]; int p = F[f].pred;
         if (p >= NBYP) continue;
         for (int i = 0; i < BYP[p].n && REFUTED < 0; i++) { int x = BYP[p].a[i]; join_with_fact(x >> 8, x & 255, f); }
@@ -291,7 +295,7 @@ static void literal(void) {
 }
 
 static int known_consts_n;
-static int EACH; static long NCLAUSES;   /* --each: answer after every appended clause */
+static int EACH, NOSCHED; static long NCLAUSES;   /* --each: answer after every appended clause */
 static void add_rule_from_lits(int name) {
     int npos = 0, hi = -1;
     for (int i = 0; i < NL; i++) if (!LITS[i].neg) { npos++; hi = i; }
@@ -413,18 +417,46 @@ static long proof_steps(int *order_out) {   /* iterative post-order over the der
     free(st); free(seen); return n + 1;
 }
 
+#include "core.c"
+
+/* forward chaining gets four parts of every round, each other engine one; rounds double */
+static int WINNER;   /* 0 forward chaining, 1/2 ordered resolution (two orderings), 3 equivalence search */
+static ord *O1, *O2; static eqb *Q1;
+static void schedule(void) {
+    double slice = 0.02;
+    int o1 = 1, o2 = 1, q1 = 1;
+    for (;;) {
+        RQ_DEADLINE = now_s() + 4 * slice; run_queue(); RQ_DEADLINE = 1e300;
+        if (REFUTED >= 0 || QH >= QT) { WINNER = 0; return; }
+        if (o1) { if (!O1) { O1 = xmalloc(sizeof(ord)); ord_init(O1, -1); } ord_run(O1, now_s() + slice); if (O1->refuted >= 0) { WINNER = 1; return; } if (O1->done) o1 = 0; }
+        if (o2) { if (!O2) { O2 = xmalloc(sizeof(ord)); ord_init(O2, 1); } ord_run(O2, now_s() + slice); if (O2->refuted >= 0) { WINNER = 2; return; } if (O2->done) o2 = 0; }
+        if (q1) { if (!Q1) { Q1 = xmalloc(sizeof(eqb)); eqb_init(Q1, 1); } if (Q1->refuted_g < 0) eqb_run(Q1, now_s() + slice); if (Q1->refuted_g >= 0) { WINNER = 3; return; } if (Q1->done) q1 = 0; }
+        if (!o1 && !o2 && !q1) { run_queue(); WINNER = 0; return; }
+        slice *= 2;
+    }
+}
+
 int main(int argc, char **argv) {
     if (argc < 2) { fprintf(stderr, "usage: horn PROBLEM.p [--root DIR] [--proof-json FILE]\n"); return 2; }
     const char *path = argv[1], *root = ".", *pj = NULL;
-    for (int i = 2; i < argc; i++) { if (!strcmp(argv[i], "--root") && i + 1 < argc) root = argv[++i]; else if (!strcmp(argv[i], "--proof-json") && i + 1 < argc) pj = argv[++i]; else if (!strcmp(argv[i], "--each")) EACH = 1; }
+    for (int i = 2; i < argc; i++) { if (!strcmp(argv[i], "--root") && i + 1 < argc) root = argv[++i]; else if (!strcmp(argv[i], "--proof-json") && i + 1 < argc) pj = argv[++i]; else if (!strcmp(argv[i], "--each")) EACH = 1; else if (!strcmp(argv[i], "--fc-only")) NOSCHED = 1; }
     struct timespec t0, t1; clock_gettime(CLOCK_MONOTONIC, &t0);
     parse_file(path, root, NULL, -1);
-    if (!OUT_OF_CLASS) run_queue();
+    if (!OUT_OF_CLASS) { if (EACH || NOSCHED) run_queue(); else schedule(); }
     clock_gettime(CLOCK_MONOTONIC, &t1);
     double secs = (t1.tv_sec - t0.tv_sec) + (t1.tv_nsec - t0.tv_nsec) / 1e9;
     const char *base = strrchr(path, '/'); base = base ? base + 1 : path;
     if (OUT_OF_CLASS) { printf("%% SZS status GaveUp for %s\n%% reason %s\n", base, WHY); return 0; }
     long ps = 0;
+    if (WINNER == 1 || WINNER == 2 || WINNER == 3) {
+        printf("%% SZS status Unsatisfiable for %s\n", base);
+        FILE *o = pj ? fopen(pj, "w") : NULL; if (pj && !o) die("cannot write proof");
+        if (WINNER == 3) { ps = eqb_proof(Q1, o); printf("%% engine eqb\n"); }
+        else { ps = ord_proof(WINNER == 1 ? O1 : O2, o); printf("%% engine ord%s\n", WINNER == 1 ? "-" : "+"); }
+        if (o) fclose(o);
+        printf("%% secs %.4f ops %ld facts %d proof_steps %ld\n", secs, OPS, NF, ps);
+        return 0;
+    }
     if (REFUTED >= 0) {
         printf("%% SZS status Unsatisfiable for %s\n", base);
         int *order = xmalloc((NF + 1) * sizeof(int));
