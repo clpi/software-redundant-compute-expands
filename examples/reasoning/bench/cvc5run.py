@@ -8,7 +8,7 @@ s = cvc5.Solver(tm)
 s.setOption("produce-models", "false")
 s.setOption("full-saturate-quant", "true")  # complete instantiation for refutations (EPR)
 if len(sys.argv) > 2:
-    s.setOption("tlimit", str(int(float(sys.argv[2]) * 1000)))
+    s.setOption("tlimit-per", str(int(float(sys.argv[2]) * 1000)))  # per query, so an incremental script gets the limit per answer
 p = cvc5.InputParser(s)
 p.setFileInput(cvc5.InputLanguage.SMT_LIB_2_6, sys.argv[1])
 sm = p.getSymbolManager()

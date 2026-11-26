@@ -103,7 +103,12 @@ if __name__ == "__main__":
     if "--logs" in sys.argv:
         bench.LOGS = sys.argv[sys.argv.index("--logs") + 1]
         os.makedirs(bench.LOGS, exist_ok=True)
+    done = set()
+    if os.path.exists(outp):
+        done = {(json.loads(l)["solver"], json.loads(l)["problem"]) for l in open(outp)}
     with open(outp, "a") as f:
         for prob in open(lst).read().split():
             for s in solvers:
+                if (s, prob) in done:
+                    continue
                 f.write(json.dumps(run_problem(s, prob, root, limit)) + "\n"); f.flush()

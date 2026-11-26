@@ -334,7 +334,11 @@ static void add_rule_from_lits(int name) {
             fire_unsafe_rec(PEND[i].r, b2, PEND[i].prem, PEND[i].np, 0, 0, from);
         }
     }
-    run_queue();
+    /* With --each the clauses so far must be decided before the next one arrives, so the log is
+       saturated now. Otherwise saturation waits until every clause is in: saturating each prefix
+       would explore the closure of the first few rules alone (on a Rubik's cube problem, the
+       subgroup the first four moves generate) before the rules that reach the goal arrive. */
+    if (EACH) run_queue();
 }
 
 static void parse_file(const char *path, const char *root, char **sel, int nsel);
@@ -415,6 +419,7 @@ int main(int argc, char **argv) {
     for (int i = 2; i < argc; i++) { if (!strcmp(argv[i], "--root") && i + 1 < argc) root = argv[++i]; else if (!strcmp(argv[i], "--proof-json") && i + 1 < argc) pj = argv[++i]; else if (!strcmp(argv[i], "--each")) EACH = 1; }
     struct timespec t0, t1; clock_gettime(CLOCK_MONOTONIC, &t0);
     parse_file(path, root, NULL, -1);
+    if (!OUT_OF_CLASS) run_queue();
     clock_gettime(CLOCK_MONOTONIC, &t1);
     double secs = (t1.tv_sec - t0.tv_sec) + (t1.tv_nsec - t0.tv_nsec) / 1e9;
     const char *base = strrchr(path, '/'); base = base ? base + 1 : path;
