@@ -459,8 +459,8 @@ int main(int argc, char **argv) {
     for (int i = 2; i < argc; i++) { if (!strcmp(argv[i], "--root") && i + 1 < argc) root = argv[++i]; else if (!strcmp(argv[i], "--proof-json") && i + 1 < argc) pj = argv[++i]; else if (!strcmp(argv[i], "--each")) EACH = 1; else if (!strcmp(argv[i], "--fc-only")) NOSCHED = 1; else if (!strcmp(argv[i], "--only") && i + 1 < argc) { i++; ONLY = !strcmp(argv[i], "ord-") ? 1 : !strcmp(argv[i], "ord+") ? 2 : !strcmp(argv[i], "eqb") ? 3 : 0; } }
     struct timespec t0, t1; clock_gettime(CLOCK_MONOTONIC, &t0);
     parse_file(path, root, NULL, -1);
-    if (OUT_OF_CLASS && !EACH && !strcmp(WHY, "function symbol over a variable")) {
-        /* Horn with function symbols: the term engine (hyper.c, built next to this binary) takes it */
+    if (OUT_OF_CLASS && !EACH && (!strcmp(WHY, "function symbol over a variable") || !strcmp(WHY, "equality"))) {
+        /* Horn with function symbols or equality: the term engine (hyper.c, built next to this binary) takes it */
         static char hp[4096]; const char *sl = strrchr(argv[0], '/');
         snprintf(hp, sizeof hp, "%.*shyper", sl ? (int)(sl - argv[0] + 1) : 0, argv[0]);
         argv[0] = hp; execv(hp, argv);   /* returns only if hyper is missing: then GaveUp below */
