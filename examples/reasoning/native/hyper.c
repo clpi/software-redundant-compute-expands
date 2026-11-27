@@ -452,7 +452,15 @@ static void vcount(int t, int d) {
     for (int i = 0; i < T[t].n; i++) vcount(ARG(t, i), d);
 }
 static int EQSYM = -1;   /* set to EQ once known: equality is the smallest symbol, so a conditional equation resolves its conditions first */
-static int prec_gt(int f, int g) { if (f == EQSYM) return 0; if (g == EQSYM) return 1; return SY[f].arity != SY[g].arity ? SY[f].arity > SY[g].arity : f > g; }
+/* precedence (--prec P): 0 by arity then symbol number; 1 rarer symbols in the input above more
+   frequent ones (then arity); 2 more frequent above rarer. Equality stays smallest. */
+static int PREC = 0; static int *SFREQ; static int NSFREQ;
+static void sfreq_rec(int t) { if (ISVAR(t)) return; if (T[t].f < NSFREQ) SFREQ[T[t].f]++; for (int i = 0; i < T[t].n; i++) sfreq_rec(ARG(t, i)); }
+static int prec_gt(int f, int g) {
+    if (f == EQSYM) return 0; if (g == EQSYM) return 1;
+    if (PREC && SFREQ && f < NSFREQ && g < NSFREQ && SFREQ[f] != SFREQ[g]) return PREC == 1 ? SFREQ[f] < SFREQ[g] : SFREQ[f] > SFREQ[g];
+    return SY[f].arity != SY[g].arity ? SY[f].arity > SY[g].arity : f > g;
+}
 static int kbo_rec(int s, int t) {   /* lexicographic part, both sides already weighed */
     if (s == t) return KEQ;
     if (ISVAR(s) || ISVAR(t)) return KINC;
@@ -518,6 +526,14 @@ static void eligible(int c) {
     if (!x->nb) { x->eh = 1; return; }
     if (SELMODE == 5 && x->head >= 0 && T[x->head].f != EQ) x->eh = 1;   /* the head of a non-equational clause stays eligible beside the selected literal: extra inferences, still sound and complete */
     int best = 0;
+    if (SELMODE == 6) {   /* E's SelectNewComplexAHP: lightest ground literal, else lightest non-equational one, else heaviest equation; ties avoid the head's predicate */
+        long bk = 0;
+        for (int i = 0; i < x->nb; i++) { int a = LIT(c, i);
+            long w1 = T[a].gr ? 0 : T[a].f != EQ ? 10 : 20, w2 = w1 == 20 ? -T[a].w : T[a].w, w3 = x->head >= 0 && T[x->head].f == T[a].f;
+            long k = (w1 * 100000 + (w2 + 50000)) * 2 + w3;
+            if (i == 0 || k < bk) { bk = k; best = i; } }
+        x->eb = 1ULL << best; return;
+    }
     for (int i = 1; i < x->nb; i++) { int a = LIT(c, i), b = LIT(c, best);
         int better = SELMODE == 1 || SELMODE == 5 ? T[a].w < T[b].w : SELMODE == 2 ? (T[a].w - 2 * T[a].vo) > (T[b].w - 2 * T[b].vo) : SELMODE == 3 ? (T[a].gr && !T[b].gr) || (T[a].gr == T[b].gr && T[a].w > T[b].w) : T[a].w > T[b].w;
         if (better) best = i; }
@@ -870,6 +886,8 @@ static long res_proof(FILE *f) {
 static int CYCLE[64] = { 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, CYCLE_N = 20;   /* goal, weight, goal, then weight: picking by weight alone is fair, since finitely many clauses up to renaming have a given weight, and age picks drag in heavy clauses */
 static int res_run(double ratio) {
     (void)ratio;
+    if (PREC) { NSFREQ = NSY; SFREQ = xmalloc((NSY + 1) * sizeof(int)); memset(SFREQ, 0, (NSY + 1) * sizeof(int));
+        for (int r = 0; r < NR; r++) { if (R[r].head >= 0) sfreq_rec(R[r].head); for (int i = 0; i < R[r].nb; i++) sfreq_rec(R[r].body[i]); } }
     if (GW) { GSYM = xmalloc(NSY + 1); memset(GSYM, 0, NSY + 1); for (int r = 0; r < NR; r++) if (R[r].head < 0) for (int i = 0; i < R[r].nb; i++) gmark(R[r].body[i]); }
     for (int r = 0; r < NR && RREF < 0; r++) { int banks[MAXB]; for (int i = 0; i < R[r].nb; i++) banks[i] = 0; int c = new_clause(R[r].head, 0, R[r].body, banks, R[r].nb, -1, -1, -1, r); if (c >= 0) keep_clause(c); }
     long picks = 0;
@@ -1062,7 +1080,7 @@ static const config *SCH = SCHED; static int NSCH = sizeof SCHED / sizeof SCHED[
 static void apply_args(const char *a) {   /* a setting is a string of the command-line options */
     char buf[512]; snprintf(buf, sizeof buf, "%s", a); char *tok[32]; int n = 0;
     for (char *t = strtok(buf, " "); t && n < 32; t = strtok(NULL, " ")) tok[n++] = t;
-    MAGIC = RES = 0; MAXW = 0; FW = 2; VW = 1; HM = 1.0; LP = 0; SELMODE = 0; GW = 0;
+    MAGIC = RES = 0; MAXW = 0; FW = 2; VW = 1; HM = 1.0; LP = 0; SELMODE = 0; GW = 0; PREC = 0;
     for (int i = 0; i < n; i++) {
         if (!strcmp(tok[i], "--magic")) MAGIC = 1;
         else if (!strcmp(tok[i], "--res")) RES = 1;
@@ -1072,6 +1090,7 @@ static void apply_args(const char *a) {   /* a setting is a string of the comman
         else if (!strcmp(tok[i], "--cycle") && i + 1 < n) set_cycle(tok[++i]);
         else if (!strcmp(tok[i], "--sel") && i + 1 < n) SELMODE = atoi(tok[++i]);
         else if (!strcmp(tok[i], "--gw") && i + 1 < n) GW = atoi(tok[++i]);
+        else if (!strcmp(tok[i], "--prec") && i + 1 < n) PREC = atoi(tok[++i]);
     }
 }
 #include <sys/wait.h>
@@ -1120,6 +1139,7 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--single")) SINGLE = 1;
         else if (!strcmp(argv[i], "--sel") && i + 1 < argc) SELMODE = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--gw") && i + 1 < argc) GW = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--prec") && i + 1 < argc) PREC = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--maxw") && i + 1 < argc) MAXW = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--wt") && i + 1 < argc) { sscanf(argv[++i], "%d,%d,%lf,%d", &FW, &VW, &HM, &LP); }
         else if (!strcmp(argv[i], "--cycle") && i + 1 < argc) set_cycle(argv[++i]);
