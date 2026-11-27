@@ -156,13 +156,13 @@ static void dt_insert(dtree *d, int t, int e) {
     n->ent[n->nent++] = e;
 }
 /* the query, flattened */
-static int QS[1 << 16], QE[1 << 16], QN;
+static int QS[1 << 16], QE[1 << 16], QN, QEND;   /* QEND: where the query ends (a subterm query ends early) */
 static int flat_rec(int t) {
     int i = QN++; if (QN >= (1 << 16)) die("query too large");
     if (ISVAR(t)) QS[i] = QVAR; else { QS[i] = T[t].f; for (int k = 0; k < T[t].n; k++) flat_rec(ARG(t, k)); }
     QE[i] = QN; return i;
 }
-static void flatten(int t) { QN = 0; flat_rec(t); }
+static void flatten(int t) { QN = 0; flat_rec(t); QEND = QN; }
 /* the query is a term under bindings: flatten through them, without building it */
 static int flat_rec_b(int t, int b) {
     deref(&t, &b);
@@ -170,13 +170,13 @@ static int flat_rec_b(int t, int b) {
     if (ISVAR(t)) QS[i] = QVAR; else { QS[i] = T[t].f; for (int k = 0; k < T[t].n; k++) flat_rec_b(ARG(t, k), b); }
     QE[i] = QN; return i;
 }
-static void flatten_b(int t, int b) { QN = 0; flat_rec_b(t, b); }
+static void flatten_b(int t, int b) { QN = 0; flat_rec_b(t, b); QEND = QN; }
 static int *CAND; static long NCAND, CCAND;
 static void take(dnode *n) { if (NCAND + n->nent > CCAND) { while (NCAND + n->nent > CCAND) CCAND = CCAND ? CCAND * 2 : 1024; CAND = xrealloc(CAND, CCAND * sizeof(int)); } memcpy(CAND + NCAND, n->ent, n->nent * sizeof(int)); NCAND += n->nent; }
 static int sym_arity(int s) { return s == STAR ? 0 : SY[s].arity; }
 /* generalizations of the query: stored terms that may match onto it */
 static void dt_gen(dtree *d, int node, int i) {
-    if (i == QN) { take(&d->N[node]); return; }
+    if (i == QEND) { take(&d->N[node]); return; }
     int c = dt_get(d, node, STAR); if (c >= 0) dt_gen(d, c, QE[i]);
     if (QS[i] >= 0) { c = dt_get(d, node, QS[i]); if (c >= 0) dt_gen(d, c, i + 1); }
 }
@@ -464,9 +464,12 @@ static int kbo_rec(int s, int t) {   /* lexicographic part, both sides already w
 }
 static int kbo(int s, int t) {
     if (s == t) return KEQ;
+    int r = kbo_rec(s, t);
+    if (r != KGT && r != KLT) return r;
+    if (T[t].gr && r == KGT) return KGT;   /* nothing to check: t has no variables */
+    if (T[s].gr && r == KLT) return KLT;
     NVT = 0; vcount(s, 1); vcount(t, -1);
     int ge = 1, le = 1; for (int i = 0; i < NVT; i++) { int v = VT[i]; if (VC[v] < 0) ge = 0; if (VC[v] > 0) le = 0; VC[v] = 0; }
-    int r = kbo_rec(s, t);
     /* a weight or precedence decision counts only if the variable condition agrees */
     if (r == KGT) return ge ? KGT : KINC;
     if (r == KLT) return le ? KLT : KINC;
@@ -670,17 +673,35 @@ static int wsub(int t) {   /* weight of t under the match bindings of bank MB, w
     if (ISVAR(t)) { int u = BT[MB][VNO(t)]; return u >= 0 ? T[u].w : 1; }
     int w = 1; for (int i = 0; i < T[t].n; i++) w += wsub(ARG(t, i)); return w;
 }
-static int dem_find(int t, int depth, int *u, int *d) {   /* outermost first; PTMP holds the path */
+/* a term found irreducible stays irreducible under the rules it was checked against (rules are
+   only ever retired otherwise), so terms, being shared, remember how many rules they were checked
+   against (NFV, plus one) and a later check of the same term tries only the rules added since */
+static int *NFV; static long CNFV; static int *RL; static int NRL, CRL;
+static void add_rule_dem(int l, int code) { dt_insert(&RDEM, l, code); if (NRL == CRL) { CRL = CRL ? CRL * 2 : 1024; RL = xrealloc(RL, CRL * sizeof(int)); } RL[NRL++] = code; }
+static int dem_try(int t, int code, int depth, int *u, int *d) {
+    int c = code / 2, dd = code % 2; if (C[c].st != 1) return -1;
+    int m = NTR; if (match(ARG(C[c].head, dd), t)) {
+        /* an unorientable unit rewrites only where its instance decreases (ordered rewriting) */
+        int rr = ARG(C[c].head, 1 - dd);
+        if (kbo(ARG(C[c].head, dd), rr) == KGT || (wsub(rr) <= T[t].w && kbo(t, inst_nr(rr, MB)) == KGT)) { *u = c; *d = dd; return depth; } }
+    undo_to(m); return -1;
+}
+static int dem_find_q(int t, int qi, int depth, int *u, int *d) {   /* t flattened at query index qi */
     if (ISVAR(t) || depth > 500) return -1;
-    flatten(t); NCAND = 0; dt_gen(&RDEM, 0, 0);
-    for (long i = 0; i < NCAND; i++) { int c = CAND[i] / 2, dd = CAND[i] % 2; if (C[c].st != 1) continue;
-        int m = NTR; if (match(ARG(C[c].head, dd), t)) {
-            /* an unorientable unit rewrites only where its instance decreases (ordered rewriting) */
-            int rr = ARG(C[c].head, 1 - dd);
-            if (kbo(ARG(C[c].head, dd), rr) == KGT || (wsub(rr) <= T[t].w && kbo(t, inst_nr(rr, MB)) == KGT)) { *u = c; *d = dd; return depth; } }
-        undo_to(m); }
-    for (int j = 0; j < T[t].n; j++) { PTMP[depth] = j; int r = dem_find(ARG(t, j), depth + 1, u, d); if (r >= 0) return r; }
+    int done = t < CNFV ? NFV[t] - 1 : -1;
+    if (done == NRL) return -1;
+    if (done < 0) {
+        QEND = QE[qi]; NCAND = 0; dt_gen(&RDEM, 0, qi);
+        for (long i = 0; i < NCAND; i++) { int r = dem_try(t, CAND[i], depth, u, d); if (r >= 0) return r; }
+    } else for (int k = done; k < NRL; k++) { int r = dem_try(t, RL[k], depth, u, d); if (r >= 0) return r; }
+    for (int j = 0, q = qi + 1; j < T[t].n; j++, q = QE[q]) { PTMP[depth] = j; int r = dem_find_q(ARG(t, j), q, depth + 1, u, d); if (r >= 0) return r; }
+    if (t >= CNFV) { long n = CNFV ? CNFV : 1 << 16; while (n <= t) n *= 2; NFV = xrealloc(NFV, n * sizeof(int)); memset(NFV + CNFV, 0, (n - CNFV) * sizeof(int)); CNFV = n; }
+    NFV[t] = NRL + 1;
     return -1;
+}
+static int dem_find(int t, int depth, int *u, int *d) {   /* outermost first; PTMP holds the path */
+    if (ISVAR(t) || (t < CNFV && NFV[t] - 1 == NRL)) return -1;
+    flatten(t); return dem_find_q(t, 0, depth, u, d);
 }
 static int demod(int c) {
     int start_nc = NC; long start_cb = NCB; (void)start_nc; (void)start_cb;
@@ -772,7 +793,7 @@ static void eq_give(int g) {
     int h = C[g].head;
     if (C[g].eh && h >= 0 && T[h].f == EQ)
         for (int d = 0; d < 2; d++) { int l = ARG(h, d), r = ARG(h, 1 - d); if (!ISVAR(l) && kbo(r, l) != KGT) dt_insert(&RHE, l, g * 2 + d);
-            if (!C[g].nb && !ISVAR(l)) { int o = kbo(l, r); if (o == KGT) { dt_insert(&RDEM, l, g * 2 + d); back_demod(g, l); } else if (ORW && o == KINC) dt_insert(&RDEM, l, g * 2 + d); } }
+            if (!C[g].nb && !ISVAR(l)) { int o = kbo(l, r); if (o == KGT) { add_rule_dem(l, g * 2 + d); back_demod(g, l); } else if (ORW && o == KINC) add_rule_dem(l, g * 2 + d); } }
     /* from g into active positions (g's own included) */
     if (C[g].eh && h >= 0 && T[h].f == EQ)
         for (int d = 0; d < 2 && RREF < 0; d++) {
