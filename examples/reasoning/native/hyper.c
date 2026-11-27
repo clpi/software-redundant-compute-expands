@@ -843,12 +843,35 @@ static int attempt(double limit, int ratio, const char *base, const char *pj, in
    input satisfiable (each is complete for Horn clauses), and the schedule stops. */
 typedef struct { const char *args; double secs; } config;
 /* (filled from the training-half sweep by bench/make_schedule.py) */
-static const config SCHED[] = {
-    { "--res --wt 1,1,1,0", 0.5 },
+static const config SCHED[] = {   /* Horn without equality */
+    { "--single", 0.05 },
+    { "--res --wt 2,1,1,3 --cycle gwwa", 0.05 },
+    { "--single --ratio 0", 0.05 },
+    { "--res --wt 2,1,1,3", 0.1 },
+    { "--res --wt 1,1,1,0 --sel 4", 0.05 },
+    { "--single", 0.1 },
+    { "--magic", 0.1 },
+    { "--res --wt 2,1,1,3 --cycle gwwa", 0.2 },
     { "--single", 0.5 },
-    { "--magic", 0.5 },
     { "--res --wt 2,1,1,3", 0.5 },
+    { "--res --wt 1,1,1,0", 0.2 },
+    { "--magic", 0.2 },
+    { "--magic", 2.0 },
+    { "--res --wt 1,1,1,0 --cycle gwwa", 0.5 },
+    { "--res --wt 1,1,1,0 --sel 4", 1.0 },
+    { "--res --wt 1,1,1,0", 2.0 },
+    { "--single", 5.0 },
+    { "--res --wt 2,1,1,3 --cycle gwwa", 5.0 },
 };
+static const config SCHED_EQ[] = {   /* Horn with equality: superposition settings */
+    { "--res --wt 1,1,1,0 --cycle gwwa", 0.2 },
+    { "--res --wt 2,1,1,3 --cycle gwwa", 0.2 },
+    { "--res --wt 1,1,1,0", 0.2 },
+    { "--res --wt 1,1,1,0 --sel 4 --cycle gwwa", 0.5 },
+    { "--res --wt 1,1,1,0 --cycle gwwa", 2.0 },
+    { "--res --wt 2,1,1,3 --cycle gwwa", 2.0 },
+};
+static const config *SCH = SCHED; static int NSCH = sizeof SCHED / sizeof SCHED[0];
 static void apply_args(const char *a) {   /* a setting is a string of the command-line options */
     char buf[512]; snprintf(buf, sizeof buf, "%s", a); char *tok[32]; int n = 0;
     for (char *t = strtok(buf, " "); t && n < 32; t = strtok(NULL, " ")) tok[n++] = t;
@@ -869,7 +892,7 @@ static int run_child(int k, double lim, const char *base, const char *pj) {
     pid_t pid = fork();
     if (pid < 0) die("fork");
     if (pid == 0) {
-        SCHED_RATIO = 5; apply_args(SCHED[k].args);
+        SCHED_RATIO = 5; apply_args(SCH[k].args);
         int st = attempt(lim, SCHED_RATIO, base, pj, 0);
         fflush(stdout); _exit(st > 0 ? 10 : st < 0 ? 20 : 0);
     }
@@ -879,11 +902,12 @@ static int run_child(int k, double lim, const char *base, const char *pj) {
     return 0;
 }
 static int schedule(double limit, const char *base, const char *pj) {
-    int n = sizeof SCHED / sizeof SCHED[0]; double top = 0;
+    if (HAS_EQ) { SCH = SCHED_EQ; NSCH = sizeof SCHED_EQ / sizeof SCHED_EQ[0]; }
+    int n = NSCH; double top = 0;
     fflush(stdout);
     for (int k = 0; k < n; k++) {   /* the fitted schedule */
         double left = T0 + limit - now_s(); if (left <= 0.005) return 0;
-        double lim = SCHED[k].secs < left ? SCHED[k].secs : left; if (SCHED[k].secs > top) top = SCHED[k].secs;
+        double lim = SCH[k].secs < left ? SCH[k].secs : left; if (SCH[k].secs > top) top = SCH[k].secs;
         int st = run_child(k, lim, base, pj); if (st) return st;
     }
     for (double slice = 2 * top;; slice *= 2)   /* then every setting again, with doubling slices */
