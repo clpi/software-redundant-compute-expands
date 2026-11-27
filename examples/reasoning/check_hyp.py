@@ -12,7 +12,9 @@ positive unit derived from problem clause `rule`: with no parents, the atom must
 that clause (a positive unit clause); otherwise the clause's body literals, in file order, are
 unified simultaneously with the parents' atoms (each renamed apart), and the atom must be a variant
 of the clause head under that most general unifier, or an instance of it (a derived unit holds for
-every instance, so instantiating one is sound). The last step has atom null: the rule must be
+every instance, so instantiating one is sound). A step may carry "unfold", a list of problem
+equations that define function symbols; the clause is then first rewritten with them (see
+unfold_clause). The last step has atom null: the rule must be
 a clause without a positive literal whose body unifies with its parents. Unification has an occurs
 check. Hyperresolution is sound, so a proof that checks is a refutation.
 
@@ -254,6 +256,53 @@ def clause_variant(c, d):
     return start is not None and body(start[0], start[1], b1, b2)
 
 
+def unfold_clause(cls, cl, defs):
+    """rewrite clause cl to normal form with the problem equations named in defs, each a pair
+    [name, side]: the equation's side `side` must be f(X1..Xn) with distinct variables and the other
+    side may use only those variables; f terms are replaced by the instance of the other side.
+    Rewriting a clause with problem equations yields a clause that follows from the problem, so
+    accepting the rewritten clause as an input step is sound. Returns None if a definition is
+    malformed or rewriting does not terminate."""
+    rules = {}
+    for name, side in defs:
+        c = cls.get(name)
+        if c is None or c[1] or c[0] is None or c[0][0] != "=" or side not in (0, 1):
+            return None
+        lhs, rhs = c[0][1 + side], c[0][2 - side]
+        if lhs[0] == "?" or any(a[0] != "?" for a in lhs[1:]) or len({a[1] for a in lhs[1:]}) != len(lhs) - 1:
+            return None
+        lv = {a[1] for a in lhs[1:]}
+
+        def vs(t):
+            return {t[1]} if t[0] == "?" else set().union(*[vs(a) for a in t[1:]])
+        if not vs(rhs) <= lv or (lhs[0], len(lhs) - 1) in rules:
+            return None
+        rules[(lhs[0], len(lhs) - 1)] = ([a[1] for a in lhs[1:]], rhs)
+    budget = [200000]
+
+    def put(t, m):
+        return m[t[1]] if t[0] == "?" else (t[0],) + tuple(put(a, m) for a in t[1:])
+
+    def nf(t):
+        budget[0] -= 1
+        if budget[0] < 0:
+            raise RecursionError
+        if t[0] == "?":
+            return t
+        t = (t[0],) + tuple(nf(a) for a in t[1:])
+        r = rules.get((t[0], len(t) - 1))
+        if r is None:
+            return t
+        return nf(put(r[1], dict(zip(r[0], t[1:]))))
+
+    def atom(a):
+        return None if a is None else (a[0],) + tuple(nf(x) for x in a[1:])
+    try:
+        return (atom(cl[0]), [atom(b) for b in cl[1]])
+    except RecursionError:
+        return None
+
+
 def check_resolution(cls, steps):
     """steps are clauses: {"input": name} must be a variant of that problem clause; {"from": [i, j, k]}
     must be a variant of the binary resolvent of clause i's head with body literal k of clause j"""
@@ -262,6 +311,8 @@ def check_resolution(cls, steps):
         cl = (from_json(st["head"]) if st["head"] is not None else None, [from_json(a) for a in st["body"]])
         if "input" in st:
             src = cls.get(st["input"])
+            if src is not None and "unfold" in st:
+                src = unfold_clause(cls, src, st["unfold"])
             if src is None or not clause_variant(cl, src):
                 print(f"REJECTED: step {n}: not a variant of problem clause {st['input']}")
                 return 1
@@ -359,6 +410,8 @@ def main():
     have = {}
     for n, st in enumerate(steps):
         rule = cls.get(st["rule"])
+        if rule is not None and "unfold" in st:
+            rule = unfold_clause(cls, rule, st["unfold"])
         if rule is None:
             print(f"REJECTED: step {n}: no clause {st['rule']}")
             return 1

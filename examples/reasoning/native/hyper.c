@@ -412,6 +412,7 @@ static void give(int u) {
 
 /* ---------------- proof output */
 static void put_str(FILE *f, const char *s) { fputc('"', f); for (; *s; s++) { if (*s == '"' || *s == '\\') fputc('\\', f); fputc(*s, f); } fputc('"', f); }
+static void put_unfold(FILE *f);
 static void put_term(FILE *f, int t) {
     if (ISVAR(t)) { fprintf(f, "\"?%d\"", VNO(t)); return; }
     fputc('[', f); put_str(f, SY[T[t].f].name);
@@ -427,12 +428,12 @@ static long proof(FILE *f) {
     for (int u = 0; u < NU; u++) if (NEED[u] && !is_magic(U[u].atom)) {   /* magic steps and magic parents are left out */
         int g = R[U[u].rule].guard;
         if (f) { if (n) fputs(",\n", f); fprintf(f, "{\"id\":%d,\"atom\":", u); put_term(f, U[u].atom); fputs(",\"rule\":", f); put_str(f, SY[R[U[u].rule].name].name);
-            fputs(",\"parents\":[", f); for (int i = g; i < U[u].np; i++) fprintf(f, "%s%d", i > g ? "," : "", PAR[U[u].par0 + i]); fputs("]}", f); }
+            fputs(",\"parents\":[", f); for (int i = g; i < U[u].np; i++) fprintf(f, "%s%d", i > g ? "," : "", PAR[U[u].par0 + i]); fputc(']', f); put_unfold(f); fputc('}', f); }
         n++;
     }
     if (f) { if (n) fputs(",\n", f); fputs("{\"atom\":null,\"rule\":", f); put_str(f, SY[R[REF_RULE].name].name); fputs(",\"parents\":[", f);
         for (int k = 0; k < R[REF_RULE].nb; k++) fprintf(f, "%s%d", k ? "," : "", REF_PAR[k]);
-        fputs("]}]\n", f); }
+        fputc(']', f); put_unfold(f); fputs("}]\n", f); }
     return n + 1;
 }
 
@@ -753,7 +754,7 @@ static void res_give(int g) {
 static void put_clause(FILE *f, int c) {
     fprintf(f, "{\"id\":%d,\"head\":", c); if (C[c].head >= 0) put_term(f, C[c].head); else fputs("null", f);
     fputs(",\"body\":[", f); for (int i = 0; i < C[c].nb; i++) { if (i) fputc(',', f); put_term(f, LIT(c, i)); } fputc(']', f);
-    if (C[c].src >= 0) { fputs(",\"input\":", f); put_str(f, SY[R[C[c].src].name].name); }
+    if (C[c].src >= 0) { fputs(",\"input\":", f); put_str(f, SY[R[C[c].src].name].name); put_unfold(f); }
     else if (C[c].kind == 1) { fprintf(f, ",\"rule\":\"sup\",\"from\":[%d,%d,%d],\"dir\":%d,\"path\":[", C[c].p1, C[c].p2, C[c].lit, C[c].dir);
         for (int i = 0; i < C[c].plen; i++) fprintf(f, "%s%d", i ? "," : "", PB[C[c].pp0 + i]);
         fputc(']', f); }
@@ -801,6 +802,61 @@ static double T0;
 static int attempt_inner(double limit, int ratio, const char *base, const char *pj, int loud);
 /* with equality, saturation proves nothing: hyperresolution reads = as an ordinary predicate, and
    the superposition here skips steps from variable sides, so neither is complete there */
+
+/* ---------------- definition unfolding. A positive unit equation f(X1..Xn) = t, with distinct
+   variables Xi, f absent from t and every variable of t among the Xi, defines f. Replacing every f
+   term by the matching instance of t and dropping the equation keeps the clause set
+   equisatisfiable: each new clause follows from an old clause and the equation, and a model of the
+   new set becomes a model of the old one by reading f as t. Definitions are unfolded one at a time,
+   each into every clause including the other definitions, so the result is the normal form under
+   all of them. Proof steps that use an unfolded clause list the definitions ("unfold"), and the
+   checker rewrites the problem clause with those problem equations itself. */
+static int DEFNAME[256], DEFDIR[256], NDEF;
+static int DF, DRHS, DN, DV[64];
+static int occurs_sym(int t, int f) { if (ISVAR(t)) return 0; if (T[t].f == f) return 1; for (int i = 0; i < T[t].n; i++) if (occurs_sym(ARG(t, i), f)) return 1; return 0; }
+static int vars_within(int t) { if (ISVAR(t)) { for (int i = 0; i < DN; i++) if (DV[i] == VNO(t)) return 1; return 0; } for (int i = 0; i < T[t].n; i++) if (!vars_within(ARG(t, i))) return 0; return 1; }
+static int is_def(int l, int r) {
+    if (ISVAR(l) || T[l].f == EQ || T[l].n > 64) return 0;
+    DN = T[l].n; for (int i = 0; i < DN; i++) { int a = ARG(l, i); if (!ISVAR(a)) return 0; DV[i] = VNO(a); for (int j = 0; j < i; j++) if (DV[j] == DV[i]) return 0; }
+    if (occurs_sym(r, T[l].f) || !vars_within(r)) return 0;
+    DF = T[l].f; DRHS = r; return 1;
+}
+static int def_sub(int t, const int *a) {
+    if (ISVAR(t)) { for (int i = 0; i < DN; i++) if (DV[i] == VNO(t)) return a[i]; return t; }
+    int n = T[t].n, b[64]; for (int i = 0; i < n; i++) b[i] = def_sub(ARG(t, i), a); return mk(T[t].f, n, b);
+}
+static int UNF_BIG;
+static int unf_term(int t) {
+    if (ISVAR(t)) return t;
+    int n = T[t].n, a[64]; for (int i = 0; i < n; i++) a[i] = unf_term(ARG(t, i));
+    int r = T[t].f == DF ? def_sub(DRHS, a) : mk(T[t].f, n, a);
+    if (T[r].w > 400) UNF_BIG = 1;
+    return r;
+}
+static int unf_atom(int a) { if (a < 0) return a; int n = T[a].n, b[64]; for (int i = 0; i < n; i++) b[i] = unf_term(ARG(a, i)); return mk(T[a].f, n, b); }
+static void unfold_defs(void) {
+    if (!HAS_EQ || getenv("HYPER_NO_UNFOLD")) return;
+    rule *save = xmalloc((NR + 1) * sizeof(rule)); int nr0 = NR;
+    for (int r = 0; r < NR; r++) { save[r] = R[r]; save[r].body = xmalloc((R[r].nb + 1) * sizeof(int)); memcpy(save[r].body, R[r].body, R[r].nb * sizeof(int)); }
+    UNF_BIG = 0;
+    for (;;) {
+        int d = -1;
+        for (int r = 0; r < NR && d < 0 && NDEF < 256; r++) if (R[r].nb == 0 && R[r].head >= 0 && T[R[r].head].f == EQ)
+            for (int dir = 0; dir < 2 && d < 0; dir++) if (is_def(ARG(R[r].head, dir), ARG(R[r].head, 1 - dir))) { d = r; DEFDIR[NDEF] = dir; DEFNAME[NDEF] = R[r].name; NDEF++; }
+        if (d < 0) break;
+        for (int k = d; k + 1 < NR; k++) R[k] = R[k + 1];
+        NR--;
+        for (int r = 0; r < NR; r++) { R[r].head = unf_atom(R[r].head); for (int i = 0; i < R[r].nb; i++) R[r].body[i] = unf_atom(R[r].body[i]); }
+        if (UNF_BIG) break;
+    }
+    if (UNF_BIG) { NR = nr0; for (int r = 0; r < NR; r++) R[r] = save[r]; NDEF = 0; return; }
+    HAS_EQ = 0;
+    for (int r = 0; r < NR; r++) { R[r].orig = r; if (R[r].head >= 0 && T[R[r].head].f == EQ) HAS_EQ = 1; for (int i = 0; i < R[r].nb; i++) if (T[R[r].body[i]].f == EQ) HAS_EQ = 1; }
+}
+static void put_unfold(FILE *f) {
+    if (!NDEF) return;
+    fputs(",\"unfold\":[", f); for (int i = 0; i < NDEF; i++) { if (i) fputc(',', f); fputc('[', f); put_str(f, SY[DEFNAME[i]].name); fprintf(f, ",%d]", DEFDIR[i]); } fputc(']', f);
+}
 static int attempt(double limit, int ratio, const char *base, const char *pj, int loud) {
     int st = attempt_inner(limit, ratio, base, pj, loud);
     if (st < 0 && HAS_EQ) { if (loud) printf("%% SZS status GaveUp for %s\n%% reason saturated without a refutation, which proves nothing with equality\n", base); return 0; }
@@ -957,6 +1013,7 @@ int main(int argc, char **argv) {
     for (int b = 0; b < MAXB; b++) for (int v = 0; v < MAXV; v++) BT[b][v] = -1;
     dt_init(&KEPT); dt_init(&ACT);
     parse_file(path, root, NULL, -1);
+    unfold_defs();
     const char *base = strrchr(path, '/'); base = base ? base + 1 : path;
     if (getenv("HYPER_DUMP")) for (int r = 0; r < NR; r++) { fprintf(stderr, "%s: head %d nb %d nv %d\n", SY[R[r].name].name, R[r].head, R[r].nb, R[r].nv); }
     EQSYM = EQ;
