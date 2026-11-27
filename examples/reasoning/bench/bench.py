@@ -97,7 +97,7 @@ def solve(solver, prob, root, limit):
             if eng:
                 rec["engine"] = eng.group(1)
             checker = ("check_res.py" if eng and eng.group(1).startswith("ord") else
-                       "check_hyp.py" if eng and eng.group(1) == "hyper" else "check.py")
+                       "check_hyp.py" if eng and eng.group(1) in ("hyper", "res") else "check.py")
             c = subprocess.run([sys.executable, os.path.join(REASON, checker), path, pf, "--root", root], capture_output=True, text=True)
             # exit 0 = every step checks, 1 = a step is rejected; anything else is the checker failing
             # (for example out of memory on a proof with millions of steps), which is not a verdict

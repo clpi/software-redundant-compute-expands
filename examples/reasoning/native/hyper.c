@@ -94,10 +94,11 @@ static int unify(int s, int sb, int t, int tb) {
     for (int i = 0; i < T[s].n; i++) if (!unify(ARG(s, i), sb, ARG(t, i), tb)) return 0;
     return 1;
 }
-/* one-way match: variables of general g (bank MB) may bind; specific s is taken literally */
+/* one-way match: variables of general g (bank MB) may bind; specific s is taken literally (and read in MATCH_BANK) */
+static int MATCH_BANK = 0;
 #define MB (MAXB - 1)
 static int match(int g, int s) {
-    if (ISVAR(g)) { int v = VNO(g); if (BT[MB][v] >= 0) return BT[MB][v] == s; bind(MB, v, s, 0); return 1; }
+    if (ISVAR(g)) { int v = VNO(g); if (BT[MB][v] >= 0) return BT[MB][v] == s; bind(MB, v, s, MATCH_BANK); return 1; }
     if (g == s && T[g].gr) return 1;
     if (ISVAR(s) || T[g].f != T[s].f || T[g].n != T[s].n) return 0;
     for (int i = 0; i < T[g].n; i++) if (!match(ARG(g, i), ARG(s, i))) return 0;
@@ -545,6 +546,7 @@ static void keep_clause(int c) {
     if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; }
     hpush(&QW, &NQW, &CQW, c, clw); hpush(&QA, &NQA, &CQA, c, cla); if (C[c].head < 0) hpush(&QS2, &NQS, &CQS, c, clw); KEPTN++;
 }
+static void finish(int c);
 static void resolvent(int hc, int bc, int k) {   /* head of hc (bank 1) against body literal k of bc (bank 2), unified already */
     GENERATED++;
     int lits[1024], banks[1024], n = 0;
@@ -552,10 +554,7 @@ static void resolvent(int hc, int bc, int k) {   /* head of hc (bank 1) against 
     for (int i = 0; i < C[hc].nb && n < 1000; i++) { lits[n] = LIT(hc, i); banks[n++] = 1; }
     int c = new_clause(C[bc].head, 2, lits, banks, n, hc, bc, k, -1);
     if (c < 0) return;
-    if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; }
-    if (MAXW && C[c].w > MAXW) { NC--; NCB -= C[c].nb; DROPPED = 1; return; }
-    if (csubsumed(c)) { NC--; NCB -= C[c].nb; SUBS_FWD++; return; }
-    keep_clause(c);
+    finish(c);
 }
 /* ---------------- equality: superposition and equality resolution (--res with = in the input).
    From an eligible positive equation l = r (l not smaller than r, l not a variable) into a
@@ -592,10 +591,7 @@ static void superpose(int fc, int dir, int rec) {   /* fc in bank 1, the target 
     REP_I = -3;
     if (c < 0) return;
     C[c].kind = 1; C[c].dir = dir; C[c].pp0 = savepath(path, len); C[c].plen = len;
-    if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; }
-    if (MAXW && C[c].w > MAXW) { NC--; NCB -= C[c].nb; DROPPED = 1; return; }
-    if (csubsumed(c)) { NC--; NCB -= C[c].nb; SUBS_FWD++; return; }
-    keep_clause(c);
+    finish(c);
 }
 static void eq_resolve(int g, int k) {   /* sides of body literal k unified in bank 1 */
     GENERATED++;
@@ -604,8 +600,57 @@ static void eq_resolve(int g, int k) {   /* sides of body literal k unified in b
     int c = new_clause(C[g].head, 1, lits, banks, n, g, -1, k, -1);
     if (c < 0) return;
     C[c].kind = 2;
+    finish(c);
+}
+/* forward demodulation by active oriented unit equations l = r (l > r in the order, so every
+   instance is oriented too): each rewrite is recorded as a superposition step with that unit */
+static dtree RDEM;
+static int dem_find(int t, int depth, int *u, int *d) {   /* outermost first; PTMP holds the path */
+    if (ISVAR(t) || depth > 500) return -1;
+    flatten(t); NCAND = 0; dt_gen(&RDEM, 0, 0);
+    for (long i = 0; i < NCAND; i++) { int c = CAND[i] / 2, dd = CAND[i] % 2; if (C[c].st != 1) continue;
+        int m = NTR; if (match(ARG(C[c].head, dd), t)) { *u = c; *d = dd; return depth; } undo_to(m); }
+    for (int j = 0; j < T[t].n; j++) { PTMP[depth] = j; int r = dem_find(ARG(t, j), depth + 1, u, d); if (r >= 0) return r; }
+    return -1;
+}
+static int demod(int c) {
+    int start_nc = NC; long start_cb = NCB; (void)start_nc; (void)start_cb;
+    for (int steps = 0; steps < 1000; steps++) {
+        int slot = -2, u = -1, d = 0, len = -1, m = NTR;
+        MATCH_BANK = 3;
+        if (C[c].head >= 0) { int a = C[c].head; for (int i = 0; i < T[a].n && len < 0; i++) { PTMP[0] = i; len = dem_find(ARG(a, i), 1, &u, &d); } if (len >= 0) slot = -1; }
+        for (int k = 0; k < C[c].nb && len < 0; k++) { int a = LIT(c, k); for (int i = 0; i < T[a].n && len < 0; i++) { PTMP[0] = i; len = dem_find(ARG(a, i), 1, &u, &d); } if (len >= 0) slot = k; }
+        MATCH_BANK = 0;
+        if (len < 0) { undo_to(m); return c; }
+        int path[512]; memcpy(path, PTMP, len * sizeof(int));
+        int lits[64], banks[64], n = C[c].nb; for (int i = 0; i < n; i++) { lits[i] = LIT(c, i); banks[i] = 3; }
+        REP_I = slot < 0 ? -2 : slot; REP_PATH = path; REP_LEN = len; REP_T = ARG(C[u].head, 1 - d); REP_B = MB;
+        int c2 = new_clause(C[c].head, 3, lits, banks, n, u, c, slot, -1);
+        REP_I = -3; undo_to(m);
+        if (c2 < 0) return -1;   /* became a tautology */
+        C[c2].kind = 1; C[c2].dir = d; C[c2].pp0 = savepath(path, len); C[c2].plen = len; C[c2].st = 3;   /* 3: a step on the way */
+        c = c2;
+    }
+    return c;
+}
+/* the ordering side conditions of superposition, on the instances: r must not exceed l, and a
+   target equation is entered on a side the other side does not exceed */
+static int inst_free(int t, int b) { RMN = 0; return inst_rec(t, b); }
+static int sup_ok(int fc, int dir, int rec) {
+    int h = C[fc].head; int l = inst_free(ARG(h, dir), 1), r = inst_free(ARG(h, 1 - dir), 1);
+    if (kbo(r, l) == KGT) return 0;
+    spos *q = &SP[rec]; int tl = lit_of(q->c, q->slot);
+    if (T[tl].f == EQ) { int side = PB[q->pp0]; int a = inst_free(ARG(tl, side), 2), o = inst_free(ARG(tl, 1 - side), 2); if (kbo(o, a) == KGT) return 0; }
+    return 1;
+}
+/* every new clause ends here: refutation, weight bound, demodulation, subsumption, kept */
+static void finish(int c) {
     if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; }
-    if (csubsumed(c)) { NC--; NCB -= C[c].nb; SUBS_FWD++; return; }
+    if (HAS_EQ) { int c2 = demod(c); if (c2 < 0) return; c = c2; C[c].st = 0;
+        if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; }
+        for (int k = 0; k < C[c].nb; k++) { int a = LIT(c, k); if (T[a].f == EQ && ARG(a, 0) == ARG(a, 1)) { /* t != t: equality resolution with no unifier needed */ } } }
+    if (MAXW && C[c].w > MAXW) { DROPPED = 1; return; }
+    if (csubsumed(c)) { SUBS_FWD++; return; }
     keep_clause(c);
 }
 static void eq_give(int g) {
@@ -614,7 +659,8 @@ static void eq_give(int g) {
     for (int k = 0; k < C[g].nb; k++) if (C[g].eb >> k & 1) add_positions(g, k);
     int h = C[g].head;
     if (C[g].eh && h >= 0 && T[h].f == EQ)
-        for (int d = 0; d < 2; d++) { int l = ARG(h, d), r = ARG(h, 1 - d); if (!ISVAR(l) && kbo(r, l) != KGT) dt_insert(&RHE, l, g * 2 + d); }
+        for (int d = 0; d < 2; d++) { int l = ARG(h, d), r = ARG(h, 1 - d); if (!ISVAR(l) && kbo(r, l) != KGT) dt_insert(&RHE, l, g * 2 + d);
+            if (!C[g].nb && kbo(l, r) == KGT) dt_insert(&RDEM, l, g * 2 + d); }
     /* from g into active positions (g's own included) */
     if (C[g].eh && h >= 0 && T[h].f == EQ)
         for (int d = 0; d < 2 && RREF < 0; d++) {
@@ -623,7 +669,7 @@ static void eq_give(int g) {
             long n = NCAND; int *cs = xmalloc((n + 1) * sizeof(int)); memcpy(cs, CAND, n * sizeof(int));
             for (long i = 0; i < n && RREF < 0; i++) { spos *q = &SP[cs[i]]; if (C[q->c].st != 1) continue;
                 int sub = sub_at(lit_of(q->c, q->slot), PB + q->pp0, q->plen);
-                int m = NTR; if (unify(l, 1, sub, 2)) superpose(g, d, cs[i]); undo_to(m); }
+                int m = NTR; if (unify(l, 1, sub, 2) && sup_ok(g, d, cs[i])) superpose(g, d, cs[i]); undo_to(m); }
             free(cs);
         }
     /* from active equations into g's positions */
@@ -632,7 +678,7 @@ static void eq_give(int g) {
         flatten(sub); NCAND = 0; dt_unif(&RHE, 0, 0);
         long n = NCAND; int *cs = xmalloc((n + 1) * sizeof(int)); memcpy(cs, CAND, n * sizeof(int));
         for (long i = 0; i < n && RREF < 0; i++) { int fc = cs[i] / 2, d = cs[i] % 2; if (fc == g || C[fc].st != 1) continue;
-            int m = NTR; if (unify(ARG(C[fc].head, d), 1, sub, 2)) superpose(fc, d, rec); undo_to(m); }
+            int m = NTR; if (unify(ARG(C[fc].head, d), 1, sub, 2) && sup_ok(fc, d, rec)) superpose(fc, d, rec); undo_to(m); }
         free(cs);
     }
     /* equality resolution on g's eligible negative equations */
@@ -641,6 +687,7 @@ static void eq_give(int g) {
     }
 }
 static void res_give(int g) {
+    if (HAS_EQ) { int g2 = demod(g); if (g2 < 0) { C[g].st = 2; return; } if (g2 != g) { C[g].st = 2; g = g2; C[g].st = 0; if (C[g].head < 0 && C[g].nb == 0) { RREF = g; return; } } }
     if (csubsumed(g)) { C[g].st = 2; SUBS_FWD++; return; }
     eligible(g);
     /* backward subsumption among active clauses */
@@ -685,11 +732,13 @@ static long res_proof(FILE *f) {
     if (f) fputs("]\n", f);
     return n;
 }
-static int CYCLE[16] = { 2, 0, 2, 0, 1, 0 }, CYCLE_N = 6;
+static int CYCLE[64] = { 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, CYCLE_N = 20;   /* goal, weight, goal, sixteen weight, one age */
 static int res_run(double ratio) {
     (void)ratio;
     for (int r = 0; r < NR && RREF < 0; r++) { int banks[MAXB]; for (int i = 0; i < R[r].nb; i++) banks[i] = 0; int c = new_clause(R[r].head, 0, R[r].body, banks, R[r].nb, -1, -1, -1, r); if (c >= 0) keep_clause(c); }
     long picks = 0;
+    int ninput = NC;
+    for (int c = 0; c < ninput && RREF < 0; c++) if (C[c].st == 0) res_give(c);   /* the input clauses first, as E does */
     while (RREF < 0) {
         if (now_s() > DEADLINE) return 0;
         int g = -1;
@@ -707,14 +756,14 @@ static int res_run(double ratio) {
     return 1;
 }
 
-static void set_cycle(const char *c) { CYCLE_N = 0; for (; *c && CYCLE_N < 16; c++) CYCLE[CYCLE_N++] = *c == 'g' ? 2 : *c == 'a' ? 1 : 0; }
+static void set_cycle(const char *c) { CYCLE_N = 0; for (; *c && CYCLE_N < 64; c++) CYCLE[CYCLE_N++] = *c == 'g' ? 2 : *c == 'a' ? 1 : 0; }
 static double T0;
 /* one attempt with the configuration in the globals; prints only a refutation unless loud */
 static int attempt(double limit, int ratio, const char *base, const char *pj, int loud) {
     DEADLINE = now_s() + limit;
     if (MAGIC) magic_transform();
     if (RES) {
-        dt_init(&RH); dt_init(&RB); dt_init(&SH); dt_init(&SU); dt_init(&SG); dt_init(&RSUB); dt_init(&RHE);
+        dt_init(&RH); dt_init(&RB); dt_init(&SH); dt_init(&SU); dt_init(&SG); dt_init(&RSUB); dt_init(&RHE); dt_init(&RDEM);
         int st = res_run(ratio); double secs = now_s() - T0;
         if (st > 0) {
             printf("%% SZS status Unsatisfiable for %s\n", base);
