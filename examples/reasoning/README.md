@@ -34,6 +34,33 @@ compares up to renaming; equivalence-search proofs are replayed as ground steps 
 `check.py`. Both checkers reject tampered proofs. Batch mode no longer joins a rule against facts
 while the file is read: queued facts meet every rule when they come off the queue.
 
+## Horn clauses with function symbols and equality (`native/hyper.c`)
+
+`horn` hands a problem with function symbols over variables, or with equality, to `hyper`, a term
+engine built next to it. Terms are hash-consed; unification is structure sharing over banks with
+an occurs check; discrimination trees index candidates for subsumption, resolution and rewriting.
+Three engines run under one strategy schedule, each attempt in a fresh forked process:
+
+- unit hyperresolution in a DISCOUNT given-clause loop (every derived clause is a positive unit),
+  complete for Horn clauses;
+- the same loop on a magic-set rewrite of the problem, which runs as tabled top-down resolution
+  (only what the goal can use is derived);
+- ordered resolution with a Knuth-Bendix order and literal selection, so rules compose into
+  lemmas, plus superposition, equality resolution and forward and backward demodulation when the
+  problem has equality.
+
+The schedule is a list of (setting, seconds) chosen greedily by `bench/make_schedule.py` from
+per-setting sweeps on one half of the problems (every other problem of the sorted list); results
+are reported on the other half too, because a schedule fits the problems it was chosen on. After
+the list, every setting runs again with doubling slices until the time limit.
+
+`check_hyp.py` checks every refutation independently, with its own TPTP reader and unification:
+hyperresolution steps (a derived unit must be an instance of the rule head under the unifier of
+the body with the parents), binary resolution, superposition (rewrite at a stated position) and
+equality resolution steps (each must be a variant of the recomputed conclusion). Magic-set
+proofs are printed without the magic steps, which is why instances are accepted. Tampered proofs
+are rejected.
+
 ## Measured (receipts in the project files, `reasoning/receipts-hrn254-v4`)
 
 254 TPTP v9.0.0 problems of class CNF_UNS_EPR_NEQ_HRN, 30 s wall limit, three runs in parallel

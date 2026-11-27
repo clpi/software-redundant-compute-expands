@@ -843,25 +843,26 @@ static int attempt(double limit, int ratio, const char *base, const char *pj, in
    input satisfiable (each is complete for Horn clauses), and the schedule stops. */
 typedef struct { const char *args; double secs; } config;
 /* (filled from the training-half sweep by bench/make_schedule.py) */
-static const config SCHED[] = {   /* Horn without equality */
+static const config SCHED[] = {   /* Horn without equality; fitted on the training half (bench/sched-v1) */
     { "--single", 0.05 },
-    { "--res --wt 2,1,1,3 --cycle gwwa", 0.05 },
+    { "--res --wt 2,1,1,3 --sel 4", 0.05 },
     { "--single --ratio 0", 0.05 },
-    { "--res --wt 2,1,1,3", 0.1 },
-    { "--res --wt 1,1,1,0 --sel 4", 0.05 },
-    { "--single", 0.1 },
+    { "--res --wt 2,1,1,3 --cycle gwwa", 0.05 },
+    { "--res --wt 2,1,1,3 --sel 4 --cycle gwwa", 0.05 },
+    { "--single", 0.2 },
     { "--magic", 0.1 },
+    { "--res --wt 2,1,1,3", 0.1 },
     { "--res --wt 2,1,1,3 --cycle gwwa", 0.2 },
     { "--single", 0.5 },
-    { "--res --wt 2,1,1,3", 0.5 },
-    { "--res --wt 1,1,1,0", 0.2 },
     { "--magic", 0.2 },
-    { "--magic", 2.0 },
+    { "--res --wt 2,1,1,3 --sel 4", 1.0 },
+    { "--res --wt 2,1,1,3 --sel 4", 2.0 },
+    { "--magic", 0.5 },
     { "--res --wt 1,1,1,0 --cycle gwwa", 0.5 },
+    { "--res --wt 1,1,1,0 --cycle gw", 0.5 },
     { "--res --wt 1,1,1,0 --sel 4", 1.0 },
-    { "--res --wt 1,1,1,0", 2.0 },
     { "--single", 5.0 },
-    { "--res --wt 2,1,1,3 --cycle gwwa", 5.0 },
+    { "--res --wt 2,1,1,3 --sel 4 --cycle gwwa", 5.0 },
 };
 static const config SCHED_EQ[] = {   /* Horn with equality: superposition settings */
     { "--res --wt 1,1,1,0 --cycle gwwa", 0.2 },
