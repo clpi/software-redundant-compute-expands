@@ -514,9 +514,10 @@ static int csubsumed(int d) {
     if (C[d].head >= 0) {
         flatten(C[d].head);
         NCAND = 0; dt_gen(&SU, 0, 0); for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (s != d && C[s].st == 1) { int m = NTR; int ok = match(C[s].head, C[d].head); undo_to(m); if (ok) return 1; } }
-        if (C[d].nb) { NCAND = 0; dt_gen(&SH, 0, 0); for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (s != d && C[s].st == 1 && subsumes(s, d)) return 1; } }
     }
-    for (int j = 0; j < C[d].nb; j++) { flatten(LIT(d, j)); NCAND = 0; dt_gen(&SG, 0, 0); for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (s != d && C[s].st == 1 && subsumes(s, d)) return 1; } }
+    /* clauses with a body are indexed by their heaviest body literal, which must match one of d's */
+    for (int j = 0; j < C[d].nb; j++) { flatten(LIT(d, j)); NCAND = 0; dt_gen(&SG, 0, 0);
+        for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (s == d || C[s].st != 1 || C[s].nb > C[d].nb || C[s].w > C[d].w) continue; if (subsumes(s, d)) return 1; } }
     return 0;
 }
 /* build a clause from literals under bindings, renaming variables jointly; -1 if a tautology */
@@ -693,7 +694,8 @@ static void res_give(int g) {
     /* backward subsumption among active clauses */
     if (C[g].head >= 0) { flatten(C[g].head); NCAND = 0; dt_inst(&SH, 0, 0); if (!C[g].nb) dt_inst(&SU, 0, 0); for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (s != g && C[s].st == 1 && subsumes(g, s)) { C[s].st = 2; SUBS_BWD++; } } }
     C[g].st = 1; GIVEN++;
-    if (C[g].head >= 0) dt_insert(C[g].nb ? &SH : &SU, C[g].head, g); else if (C[g].nb) dt_insert(&SG, LIT(g, 0), g);
+    if (C[g].head >= 0) dt_insert(C[g].nb ? &SH : &SU, C[g].head, g);   /* SH serves backward subsumption */
+    if (C[g].nb) { int key = 0; for (int k = 1; k < C[g].nb; k++) if (T[LIT(g, k)].w > T[LIT(g, key)].w) key = k; dt_insert(&SG, LIT(g, key), g); }
     if (C[g].eh) dt_insert(&RH, C[g].head, g);
     for (int k = 0; k < C[g].nb; k++) if (C[g].eb >> k & 1) dt_insert(&RB, LIT(g, k), g * 64 + k);
     /* g's eligible body literals against active eligible heads */
@@ -732,7 +734,7 @@ static long res_proof(FILE *f) {
     if (f) fputs("]\n", f);
     return n;
 }
-static int CYCLE[64] = { 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, CYCLE_N = 20;   /* goal, weight, goal, sixteen weight, one age */
+static int CYCLE[64] = { 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, CYCLE_N = 20;   /* goal, weight, goal, then weight: picking by weight alone is fair, since finitely many clauses up to renaming have a given weight, and age picks drag in heavy clauses */
 static int res_run(double ratio) {
     (void)ratio;
     for (int r = 0; r < NR && RREF < 0; r++) { int banks[MAXB]; for (int i = 0; i < R[r].nb; i++) banks[i] = 0; int c = new_clause(R[r].head, 0, R[r].body, banks, R[r].nb, -1, -1, -1, r); if (c >= 0) keep_clause(c); }
