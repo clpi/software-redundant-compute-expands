@@ -475,7 +475,17 @@ static int kbo(int s, int t) {
 typedef struct { int head, nb, b0, w, p1, p2, lit, src, pp0, plen; long age; char st, eh, kind, dir; uint64_t eb; } clause;   /* src: problem clause for an input; kind 0 resolution, 1 superposition (dir, path), 2 equality resolution */
 static clause *C; static int NC, CC;
 static int FW = 2, VW = 1, LP = 0; static double HM = 1.0;   /* clause weight: symbols FW, variables VW, head times HM, LP per body literal */
-static int lwt(int t) { return FW * (T[t].w - T[t].vo) + VW * T[t].vo; }
+/* goal-relative weight (--gw G): a symbol that occurs in a goal clause of the input weighs G instead of FW */
+static int GW = 0; static char *GSYM; static int *GSC; static long CGSC;
+static int gcount(int t) {
+    if (ISVAR(t)) return 0;
+    if (t >= CGSC) { long n = CGSC ? CGSC : 1 << 16; while (n <= t) n *= 2; GSC = xrealloc(GSC, n * sizeof(int)); for (long i = CGSC; i < n; i++) GSC[i] = -1; CGSC = n; }
+    if (GSC[t] >= 0) return GSC[t];
+    int c = GSYM[T[t].f] ? 1 : 0; for (int i = 0; i < T[t].n; i++) c += gcount(ARG(t, i));
+    return GSC[t] = c;
+}
+static void gmark(int t) { if (ISVAR(t)) return; GSYM[T[t].f] = 1; for (int i = 0; i < T[t].n; i++) gmark(ARG(t, i)); }
+static int lwt(int t) { if (!GW) return FW * (T[t].w - T[t].vo) + VW * T[t].vo; int g = gcount(t); return FW * (T[t].w - T[t].vo - g) + GW * g + VW * T[t].vo; }
 static int *CB; static long NCB, CCB;
 static dtree RH, RB, SH, SU, SG;   /* SH: heads of active non-units, SU: active units */   /* active: eligible heads, eligible body literals; subsumption: heads, first literal of headless */
 static int *QW, *QA, *QS2; static long NQW, NQA, CQW, CQA, NQS, CQS;   /* by weight, by age, goal clauses (no head) by weight */
@@ -503,9 +513,10 @@ static void eligible(int c) {
         }
     }
     if (!x->nb) { x->eh = 1; return; }
+    if (SELMODE == 5 && x->head >= 0 && T[x->head].f != EQ) x->eh = 1;   /* the head of a non-equational clause stays eligible beside the selected literal: extra inferences, still sound and complete */
     int best = 0;
     for (int i = 1; i < x->nb; i++) { int a = LIT(c, i), b = LIT(c, best);
-        int better = SELMODE == 1 ? T[a].w < T[b].w : SELMODE == 2 ? (T[a].w - 2 * T[a].vo) > (T[b].w - 2 * T[b].vo) : SELMODE == 3 ? (T[a].gr && !T[b].gr) || (T[a].gr == T[b].gr && T[a].w > T[b].w) : T[a].w > T[b].w;
+        int better = SELMODE == 1 || SELMODE == 5 ? T[a].w < T[b].w : SELMODE == 2 ? (T[a].w - 2 * T[a].vo) > (T[b].w - 2 * T[b].vo) : SELMODE == 3 ? (T[a].gr && !T[b].gr) || (T[a].gr == T[b].gr && T[a].w > T[b].w) : T[a].w > T[b].w;
         if (better) best = i; }
     x->eb = 1ULL << best;
 }
@@ -623,11 +634,22 @@ static void eq_resolve(int g, int k) {   /* sides of body literal k unified in b
 /* forward demodulation by active oriented unit equations l = r (l > r in the order, so every
    instance is oriented too): each rewrite is recorded as a superposition step with that unit */
 static dtree RDEM;
+static int ORW = 1;
+static int inst_nr(int t, int b) {   /* instantiate without renaming; an unbound variable of bank MB becomes a fresh one */
+    deref(&t, &b);
+    if (ISVAR(t)) return b == MB ? mkvar(MAXV - 1 - VNO(t)) : t;
+    if (!T[t].n) return t;
+    int a[64]; for (int i = 0; i < T[t].n; i++) a[i] = inst_nr(ARG(t, i), b);
+    return mk(T[t].f, T[t].n, a);
+}
 static int dem_find(int t, int depth, int *u, int *d) {   /* outermost first; PTMP holds the path */
     if (ISVAR(t) || depth > 500) return -1;
     flatten(t); NCAND = 0; dt_gen(&RDEM, 0, 0);
     for (long i = 0; i < NCAND; i++) { int c = CAND[i] / 2, dd = CAND[i] % 2; if (C[c].st != 1) continue;
-        int m = NTR; if (match(ARG(C[c].head, dd), t)) { *u = c; *d = dd; return depth; } undo_to(m); }
+        int m = NTR; if (match(ARG(C[c].head, dd), t)) {
+            /* an unorientable unit rewrites only where its instance decreases (ordered rewriting) */
+            if (kbo(ARG(C[c].head, dd), ARG(C[c].head, 1 - dd)) == KGT || kbo(t, inst_nr(ARG(C[c].head, 1 - dd), MB)) == KGT) { *u = c; *d = dd; return depth; } }
+        undo_to(m); }
     for (int j = 0; j < T[t].n; j++) { PTMP[depth] = j; int r = dem_find(ARG(t, j), depth + 1, u, d); if (r >= 0) return r; }
     return -1;
 }
@@ -661,12 +683,32 @@ static int sup_ok(int fc, int dir, int rec) {
     if (T[tl].f == EQ) { int side = PB[q->pp0]; int a = inst_free(ARG(tl, side), 2), o = inst_free(ARG(tl, 1 - side), 2); if (kbo(o, a) == KGT) return 0; }
     return 1;
 }
+/* unit simplification: a body literal that is an instance of an active positive unit, or an
+   equation t = t, is deleted. Each deletion is recorded as the binary resolvent with that unit
+   (which binds only the unit's variables) or as equality resolution with no unifier. */
+static int USIMP = 1;
+static int simplify_lits(int c) {
+    for (int pass = 0; pass < 64; pass++) {
+        int del = -1, by = -1, kind = 0;
+        for (int k = 0; k < C[c].nb && del < 0; k++) { int a = LIT(c, k);
+            if (T[a].f == EQ && ARG(a, 0) == ARG(a, 1)) { del = k; kind = 2; break; }
+            flatten(a); NCAND = 0; dt_gen(&SU, 0, 0);
+            for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (C[s].st != 1) continue; int m = NTR; int ok = match(C[s].head, a); undo_to(m); if (ok) { del = k; by = s; break; } } }
+        if (del < 0) return c;
+        int lits[64], banks[64], n = 0; for (int i = 0; i < C[c].nb; i++) if (i != del) { lits[n] = LIT(c, i); banks[n++] = 3; }
+        int c2 = kind == 2 ? new_clause(C[c].head, 3, lits, banks, n, c, -1, del, -1) : new_clause(C[c].head, 3, lits, banks, n, by, c, del, -1);
+        if (c2 < 0) return -1;
+        C[c2].kind = kind; C[c2].st = 3; c = c2;
+    }
+    return c;
+}
 /* every new clause ends here: refutation, weight bound, demodulation, subsumption, kept */
 static void finish(int c) {
     if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; }
     if (HAS_EQ) { int c2 = demod(c); if (c2 < 0) return; c = c2; C[c].st = 0;
         if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; }
-        for (int k = 0; k < C[c].nb; k++) { int a = LIT(c, k); if (T[a].f == EQ && ARG(a, 0) == ARG(a, 1)) { /* t != t: equality resolution with no unifier needed */ } } }
+    }
+    if (USIMP) { int c3 = simplify_lits(c); if (c3 < 0) return; if (c3 != c) { c = c3; C[c].st = 0; if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; } } }
     if (MAXW && C[c].w > MAXW) { DROPPED = 1; return; }
     if (csubsumed(c)) { SUBS_FWD++; return; }
     keep_clause(c);
@@ -698,7 +740,7 @@ static void eq_give(int g) {
     int h = C[g].head;
     if (C[g].eh && h >= 0 && T[h].f == EQ)
         for (int d = 0; d < 2; d++) { int l = ARG(h, d), r = ARG(h, 1 - d); if (!ISVAR(l) && kbo(r, l) != KGT) dt_insert(&RHE, l, g * 2 + d);
-            if (!C[g].nb && kbo(l, r) == KGT) { dt_insert(&RDEM, l, g * 2 + d); back_demod(g, l); } }
+            if (!C[g].nb && !ISVAR(l)) { int o = kbo(l, r); if (o == KGT) { dt_insert(&RDEM, l, g * 2 + d); back_demod(g, l); } else if (ORW && o == KINC) dt_insert(&RDEM, l, g * 2 + d); } }
     /* from g into active positions (g's own included) */
     if (C[g].eh && h >= 0 && T[h].f == EQ)
         for (int d = 0; d < 2 && RREF < 0; d++) {
@@ -726,6 +768,7 @@ static void eq_give(int g) {
 }
 static void res_give(int g) {
     if (HAS_EQ) { int g2 = demod(g); if (g2 < 0) { C[g].st = 2; return; } if (g2 != g) { C[g].st = 2; g = g2; C[g].st = 0; if (C[g].head < 0 && C[g].nb == 0) { RREF = g; return; } } }
+    if (USIMP) { int g2 = simplify_lits(g); if (g2 < 0) { C[g].st = 2; return; } if (g2 != g) { C[g].st = 2; g = g2; C[g].st = 0; if (C[g].head < 0 && C[g].nb == 0) { RREF = g; return; } } }
     if (csubsumed(g)) { C[g].st = 2; SUBS_FWD++; return; }
     eligible(g);
     /* backward subsumption among active clauses */
@@ -774,6 +817,7 @@ static long res_proof(FILE *f) {
 static int CYCLE[64] = { 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, CYCLE_N = 20;   /* goal, weight, goal, then weight: picking by weight alone is fair, since finitely many clauses up to renaming have a given weight, and age picks drag in heavy clauses */
 static int res_run(double ratio) {
     (void)ratio;
+    if (GW) { GSYM = xmalloc(NSY + 1); memset(GSYM, 0, NSY + 1); for (int r = 0; r < NR; r++) if (R[r].head < 0) for (int i = 0; i < R[r].nb; i++) gmark(R[r].body[i]); }
     for (int r = 0; r < NR && RREF < 0; r++) { int banks[MAXB]; for (int i = 0; i < R[r].nb; i++) banks[i] = 0; int c = new_clause(R[r].head, 0, R[r].body, banks, R[r].nb, -1, -1, -1, r); if (c >= 0) keep_clause(c); }
     long picks = 0;
     int ninput = NC;
@@ -950,7 +994,7 @@ static const config *SCH = SCHED; static int NSCH = sizeof SCHED / sizeof SCHED[
 static void apply_args(const char *a) {   /* a setting is a string of the command-line options */
     char buf[512]; snprintf(buf, sizeof buf, "%s", a); char *tok[32]; int n = 0;
     for (char *t = strtok(buf, " "); t && n < 32; t = strtok(NULL, " ")) tok[n++] = t;
-    MAGIC = RES = 0; MAXW = 0; FW = 2; VW = 1; HM = 1.0; LP = 0; SELMODE = 0;
+    MAGIC = RES = 0; MAXW = 0; FW = 2; VW = 1; HM = 1.0; LP = 0; SELMODE = 0; GW = 0;
     for (int i = 0; i < n; i++) {
         if (!strcmp(tok[i], "--magic")) MAGIC = 1;
         else if (!strcmp(tok[i], "--res")) RES = 1;
@@ -959,6 +1003,7 @@ static void apply_args(const char *a) {   /* a setting is a string of the comman
         else if (!strcmp(tok[i], "--wt") && i + 1 < n) sscanf(tok[++i], "%d,%d,%lf,%d", &FW, &VW, &HM, &LP);
         else if (!strcmp(tok[i], "--cycle") && i + 1 < n) set_cycle(tok[++i]);
         else if (!strcmp(tok[i], "--sel") && i + 1 < n) SELMODE = atoi(tok[++i]);
+        else if (!strcmp(tok[i], "--gw") && i + 1 < n) GW = atoi(tok[++i]);
     }
 }
 #include <sys/wait.h>
@@ -1005,11 +1050,12 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--res")) RES = SINGLE = 1;
         else if (!strcmp(argv[i], "--single")) SINGLE = 1;
         else if (!strcmp(argv[i], "--sel") && i + 1 < argc) SELMODE = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--gw") && i + 1 < argc) GW = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--maxw") && i + 1 < argc) MAXW = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--wt") && i + 1 < argc) { sscanf(argv[++i], "%d,%d,%lf,%d", &FW, &VW, &HM, &LP); }
         else if (!strcmp(argv[i], "--cycle") && i + 1 < argc) set_cycle(argv[++i]);
     }
-    T0 = now_s();
+    T0 = now_s(); if (getenv("HYPER_NO_USIMP")) USIMP = 0; if (getenv("HYPER_NO_ORW")) ORW = 0;
     for (int b = 0; b < MAXB; b++) for (int v = 0; v < MAXV; v++) BT[b][v] = -1;
     dt_init(&KEPT); dt_init(&ACT);
     parse_file(path, root, NULL, -1);
