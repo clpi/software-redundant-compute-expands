@@ -666,8 +666,11 @@ static long eqb_proof(eqb *q, FILE *f) {
         }
         for (int k = 0; k < G->np; k++) eqb_emit_side(q, em, G->prem[k], f);
         if (G->parent < 0) { put_step(f, NULL, G->goalclause, Y, G->np, G->prem); break; }
-        srule *s = NULL; for (int i = 0; i < q->NSR; i++) if (q->SR[i].rule == G->rule) s = &q->SR[i];
+        /* the renamed copy, as in the backward step: its head is unified with the parent goal too, so a
+           head variable the body leaves free (a disk moved to any peg) takes the value the parent needs */
+        srule *s = NULL; for (int i = 0; i < q->NSR; i++) if (q->SRR[i].rule == G->rule) s = &q->SRR[i];
         int from = q->tnt;
+        unify_at(s->head, q->GN[G->parent].nf, q->B, q->trail, &q->tnt);
         unify_at(s->st, Y, q->B, q->trail, &q->tnt);
         for (int k = 0; k < s->ns; k++) unify_at(s->side[k], G->prem[k], q->B, q->trail, &q->tnt);
         int *h = ground_head(s->head, q->B);

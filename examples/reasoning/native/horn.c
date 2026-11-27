@@ -431,14 +431,14 @@ static int WINNER, ONLY;   /* ONLY: run just one engine (1 ord-, 2 ord+, 3 eqb),
 static ord *O1, *O2; static eqb *Q1;
 static void schedule(void) {
     double slice = 0.02;
-    int o1 = 1, o2 = 1, q1 = 1;
+    int o1 = 1, o2 = 1, q1 = 1, qw = 1;   /* qw: EQB's share, as large as forward chaining's once its shape applies */
     if (ONLY) { o1 = ONLY == 1; o2 = ONLY == 2; q1 = ONLY == 3; }
     for (;;) {
         if (!ONLY) { RQ_DEADLINE = now_s() + 4 * slice; run_queue(); RQ_DEADLINE = 1e300; }
         if (!ONLY && (REFUTED >= 0 || QH >= QT)) { WINNER = 0; return; }
         if (o1) { if (!O1) { O1 = xmalloc(sizeof(ord)); ord_init(O1, -1); } ord_run(O1, now_s() + slice); if (O1->refuted >= 0) { WINNER = 1; return; } if (O1->done) o1 = 0; }
         if (o2) { if (!O2) { O2 = xmalloc(sizeof(ord)); ord_init(O2, 1); } ord_run(O2, now_s() + slice); if (O2->refuted >= 0) { WINNER = 2; return; } if (O2->done) o2 = 0; }
-        if (q1) { if (!Q1) { Q1 = xmalloc(sizeof(eqb)); eqb_init(Q1, 1); } if (Q1->refuted_g < 0) eqb_run(Q1, now_s() + slice); if (Q1->refuted_g >= 0) { WINNER = 3; return; } if (Q1->done) q1 = 0; }
+        if (q1) { if (!Q1) { Q1 = xmalloc(sizeof(eqb)); eqb_init(Q1, 1); if (!Q1->done) qw = 4; } if (Q1->refuted_g < 0) eqb_run(Q1, now_s() + qw * slice); if (Q1->refuted_g >= 0) { WINNER = 3; return; } if (Q1->done) q1 = 0; }
         if (!o1 && !o2 && !q1) { if (!ONLY) run_queue(); WINNER = 0; return; }
         slice *= 2;
     }
