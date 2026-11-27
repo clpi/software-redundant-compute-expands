@@ -797,7 +797,15 @@ static int res_run(double ratio) {
 static void set_cycle(const char *c) { CYCLE_N = 0; for (; *c && CYCLE_N < 64; c++) CYCLE[CYCLE_N++] = *c == 'g' ? 2 : *c == 'a' ? 1 : 0; }
 static double T0;
 /* one attempt with the configuration in the globals; prints only a refutation unless loud */
+static int attempt_inner(double limit, int ratio, const char *base, const char *pj, int loud);
+/* with equality, saturation proves nothing: hyperresolution reads = as an ordinary predicate, and
+   the superposition here skips steps from variable sides, so neither is complete there */
 static int attempt(double limit, int ratio, const char *base, const char *pj, int loud) {
+    int st = attempt_inner(limit, ratio, base, pj, loud);
+    if (st < 0 && HAS_EQ) { if (loud) printf("%% SZS status GaveUp for %s\n%% reason saturated without a refutation, which proves nothing with equality\n", base); return 0; }
+    return st;
+}
+static int attempt_inner(double limit, int ratio, const char *base, const char *pj, int loud) {
     DEADLINE = now_s() + limit;
     if (MAGIC) magic_transform();
     if (RES) {
@@ -808,8 +816,8 @@ static int attempt(double limit, int ratio, const char *base, const char *pj, in
             FILE *o = pj ? fopen(pj, "w") : NULL; if (pj && !o) die("cannot write proof");
             long ps = res_proof(o); if (o) fclose(o);
             printf("%% engine res\n%% secs %.4f given %ld kept %ld generated %ld proof_steps %ld\n", secs, GIVEN, KEPTN, GENERATED, ps);
-        } else if (loud && st < 0) printf("%% SZS status Satisfiable for %s\n%% secs %.4f given %ld kept %ld\n", base, secs, GIVEN, KEPTN);
-        else if (loud) printf("%% SZS status Timeout for %s\n%% secs %.4f given %ld kept %ld generated %ld\n", base, secs, GIVEN, KEPTN, GENERATED);
+        } else if (loud && st < 0 && !HAS_EQ) printf("%% SZS status Satisfiable for %s\n%% secs %.4f given %ld kept %ld\n", base, secs, GIVEN, KEPTN);
+        else if (loud && st == 0) printf("%% SZS status Timeout for %s\n%% secs %.4f given %ld kept %ld generated %ld\n", base, secs, GIVEN, KEPTN, GENERATED);
         return st;
     }
     for (int r = 0; r < NR && REF_RULE < 0; r++) if (R[r].nb == 0 && R[r].head >= 0) { int a = inst(R[r].head, 0, NULL); if (!seen(a)) add_unit(a, r, 0, NULL); }
@@ -834,8 +842,8 @@ static int attempt(double limit, int ratio, const char *base, const char *pj, in
         printf("%% engine hyper\n%% secs %.4f given %ld kept %ld generated %ld proof_steps %ld\n", secs, GIVEN, KEPTN, GENERATED, ps);
         return 1;
     }
-    if (loud && sat) printf("%% SZS status Satisfiable for %s\n%% secs %.4f given %ld kept %ld\n", base, secs, GIVEN, KEPTN);
-    else if (loud) printf("%% SZS status Timeout for %s\n%% secs %.4f given %ld kept %ld generated %ld\n", base, secs, GIVEN, KEPTN, GENERATED);
+    if (loud && sat && !HAS_EQ) printf("%% SZS status Satisfiable for %s\n%% secs %.4f given %ld kept %ld\n", base, secs, GIVEN, KEPTN);
+    else if (loud && !sat) printf("%% SZS status Timeout for %s\n%% secs %.4f given %ld kept %ld generated %ld\n", base, secs, GIVEN, KEPTN, GENERATED);
     return sat ? -1 : 0;
 }
 /* the strategy schedule: every configuration in turn, in a fresh child process, with a time slice
@@ -864,13 +872,22 @@ static const config SCHED[] = {   /* Horn without equality; fitted on the traini
     { "--single", 5.0 },
     { "--res --wt 2,1,1,3 --sel 4 --cycle gwwa", 5.0 },
 };
-static const config SCHED_EQ[] = {   /* Horn with equality: superposition settings */
-    { "--res --wt 1,1,1,0 --cycle gwwa", 0.2 },
-    { "--res --wt 2,1,1,3 --cycle gwwa", 0.2 },
-    { "--res --wt 1,1,1,0", 0.2 },
-    { "--res --wt 1,1,1,0 --sel 4 --cycle gwwa", 0.5 },
-    { "--res --wt 1,1,1,0 --cycle gwwa", 2.0 },
-    { "--res --wt 2,1,1,3 --cycle gwwa", 2.0 },
+static const config SCHED_EQ[] = {   /* Horn with equality; fitted on the training half of the 450 (bench/sched-eq-v1) */
+    { "--res --wt 1,1,1,0 --cycle gwwa", 0.05 },
+    { "--res --wt 1,1,1,0 --cycle ga", 0.05 },
+    { "--res --wt 1,1,1,0 --sel 4 --cycle gwwa", 0.05 },
+    { "--res --wt 2,1,1,3 --cycle gwwa", 0.05 },
+    { "--res --wt 1,1,1,0", 0.05 },
+    { "--res --wt 1,1,1,0 --cycle ga", 0.2 },
+    { "--res --wt 1,1,1,0", 0.5 },
+    { "--single", 0.2 },
+    { "--res --wt 2,1,1,0 --cycle gwa", 1.0 },
+    { "--single", 0.5 },
+    { "--res --wt 1,1,1,0 --cycle ga", 0.5 },
+    { "--res --wt 2,1,1,0 --cycle gwa", 5.0 },
+    { "--res --wt 1,1,1,0", 5.0 },
+    { "--res --wt 1,1,1,0 --cycle gwwa", 5.0 },
+    { "--res --wt 1,1,1,0 --cycle ga", 5.0 },
 };
 static const config *SCH = SCHED; static int NSCH = sizeof SCHED / sizeof SCHED[0];
 static void apply_args(const char *a) {   /* a setting is a string of the command-line options */

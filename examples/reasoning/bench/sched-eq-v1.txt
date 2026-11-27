@@ -1,0 +1,16 @@
+etrain-e1.jsonl	0.05	+86
+etrain-e6.jsonl	0.05	+8
+etrain-e3.jsonl	0.05	+4
+etrain-e2.jsonl	0.05	+3
+etrain-e0.jsonl	0.05	+2
+etrain-e6.jsonl	0.2	+7
+etrain-e0.jsonl	0.5	+7
+etrain-e4.jsonl	0.2	+1
+etrain-e5.jsonl	1	+5
+etrain-e4.jsonl	0.5	+1
+etrain-e6.jsonl	0.5	+1
+etrain-e5.jsonl	5	+4
+etrain-e0.jsonl	5	+1
+etrain-e1.jsonl	5	+1
+etrain-e6.jsonl	5	+1
+# 132 solved in 23.15 s of schedule
