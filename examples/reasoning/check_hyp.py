@@ -382,14 +382,19 @@ def check_resolution(cls, steps):
             if hi is None or not 0 <= k < len(bj):
                 print(f"REJECTED: step {n}: no such head or body literal")
                 return 1
-            s = unify(rename(hi, "i"), rename(bj[k], "j"), {})
-            if s is None:
-                print(f"REJECTED: step {n}: the head and the body literal do not unify")
-                return 1
-            res = (subst(rename(hj, "j"), s) if hj is not None else None,
-                   [subst(rename(a, "j"), s) for q, a in enumerate(bj) if q != k] + [subst(rename(a, "i"), s) for a in bi])
-            if not clause_variant(cl, res):
-                print(f"REJECTED: step {n}: not a variant of the resolvent")
+            good = False
+            # an equation head may be read either way round (l = r gives r = l)
+            for h in [hi] + ([("=", hi[2], hi[1])] if hi[0] == "=" else []):
+                s = unify(rename(h, "i"), rename(bj[k], "j"), {})
+                if s is None:
+                    continue
+                res = (subst(rename(hj, "j"), s) if hj is not None else None,
+                       [subst(rename(a, "j"), s) for q, a in enumerate(bj) if q != k] + [subst(rename(a, "i"), s) for a in bi])
+                if clause_variant(cl, res):
+                    good = True
+                    break
+            if not good:
+                print(f"REJECTED: step {n}: not a variant of the resolvent of the head and the body literal")
                 return 1
         have[st["id"]] = cl
     last = steps[-1]

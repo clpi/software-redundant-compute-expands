@@ -520,30 +520,53 @@ static void eligible(int c) {
         if (better) best = i; }
     x->eb = 1ULL << best;
 }
-/* subsumption of clause d by clause s: one substitution sends s's head to d's head and every body literal of s to some body literal of d */
+/* subsumption of clause d by clause s: one substitution sends s's head to d's head and every body literal of s to some body literal of d; equations match either way round */
+static int swap_eq(int a) { int b[2] = { ARG(a, 1), ARG(a, 0) }; return mk(EQ, 2, b); }
 static int sub_body(int s, int k, int d, uint64_t used) {   /* multiset: distinct literals of d */
     if (k == C[s].nb) return 1;
     int a = LIT(s, k);
     for (int j = 0; j < C[d].nb; j++) { if (used >> j & 1) continue; int b = LIT(d, j); if (T[b].f != T[a].f || T[b].w < T[a].w) continue;
-        int m = NTR; if (match(a, b) && sub_body(s, k + 1, d, used | 1ULL << j)) { undo_to(m); return 1; } undo_to(m); }
+        for (int sw = 0; sw < (T[a].f == EQ ? 2 : 1); sw++) {
+            int m = NTR; if (match(a, sw ? swap_eq(b) : b) && sub_body(s, k + 1, d, used | 1ULL << j)) { undo_to(m); return 1; } undo_to(m); } }
     return 0;
 }
 static int subsumes(int s, int d) {
     if (C[s].nb > C[d].nb || C[s].w > C[d].w) return 0;   /* an instance is never lighter */
     if ((C[s].head >= 0) != 0 && C[d].head < 0) return 0;
-    int m = NTR; int ok = 1;
-    if (C[s].head >= 0) ok = match(C[s].head, C[d].head);
-    if (ok) ok = sub_body(s, 0, d, 0);
-    undo_to(m); return ok;
+    if (C[s].head < 0) { int m = NTR; int ok = sub_body(s, 0, d, 0); undo_to(m); return ok; }
+    for (int sw = 0; sw < (T[C[s].head].f == EQ ? 2 : 1); sw++) {
+        int m = NTR; int ok = match(C[s].head, sw ? swap_eq(C[d].head) : C[d].head) && sub_body(s, 0, d, 0); undo_to(m); if (ok) return 1; }
+    return 0;
 }
 static int csubsumed(int d) {
-    if (C[d].head >= 0) {
-        flatten(C[d].head);
-        NCAND = 0; dt_gen(&SU, 0, 0); for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (s != d && C[s].st == 1) { int m = NTR; int ok = match(C[s].head, C[d].head); undo_to(m); if (ok) return 1; } }
-    }
+    if (C[d].head >= 0)
+        for (int sw = 0; sw < (T[C[d].head].f == EQ ? 2 : 1); sw++) { int h = sw ? swap_eq(C[d].head) : C[d].head;
+            flatten(h);
+            NCAND = 0; dt_gen(&SU, 0, 0); for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (s != d && C[s].st == 1) { int m = NTR; int ok = match(C[s].head, h); undo_to(m); if (ok) return 1; } } }
     /* clauses with a body are indexed by their heaviest body literal, which must match one of d's */
-    for (int j = 0; j < C[d].nb; j++) { flatten(LIT(d, j)); NCAND = 0; dt_gen(&SG, 0, 0);
+    for (int j = 0; j < C[d].nb; j++) for (int sw = 0; sw < (T[LIT(d, j)].f == EQ ? 2 : 1); sw++) { flatten(sw ? swap_eq(LIT(d, j)) : LIT(d, j)); NCAND = 0; dt_gen(&SG, 0, 0);
         for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (s == d || C[s].st != 1 || C[s].nb > C[d].nb || C[s].w > C[d].w) continue; if (subsumes(s, d)) return 1; } }
+    return 0;
+}
+/* equality subsumption: an active unit l = r makes s = t redundant when s and t differ at one
+   position only, where they are an instance of l and r (either way round) */
+static int eq_pair_known(int a, int b) {
+    int e2[2] = { a, b }; int e = mk(EQ, 2, e2);
+    for (int sw = 0; sw < 2; sw++) { int q = sw ? swap_eq(e) : e; flatten(q); NCAND = 0; dt_gen(&SU, 0, 0);
+        for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (C[s].st != 1 || T[C[s].head].f != EQ) continue; int m = NTR; int ok = match(C[s].head, q); undo_to(m); if (ok) return 1; } }
+    return 0;
+}
+static int esubsumed(int c) {
+    int h = C[c].head; if (h < 0 || T[h].f != EQ) return 0;
+    int a = ARG(h, 0), b = ARG(h, 1);
+    for (int depth = 0; depth < 500; depth++) {
+        if (a == b) return 0;
+        if (depth > 0 && eq_pair_known(a, b)) return 1;
+        if (ISVAR(a) || ISVAR(b) || T[a].f != T[b].f || T[a].n != T[b].n) return 0;
+        int k = -1, nd = 0; for (int i = 0; i < T[a].n; i++) if (ARG(a, i) != ARG(b, i)) { nd++; k = i; }
+        if (nd != 1) return 0;
+        a = ARG(a, k); b = ARG(b, k);
+    }
     return 0;
 }
 /* build a clause from literals under bindings, renaming variables jointly; -1 if a tautology */
@@ -677,23 +700,25 @@ static int demod(int c) {
    target equation is entered on a side the other side does not exceed */
 static int inst_free(int t, int b) { RMN = 0; return inst_rec(t, b); }
 static int sup_ok(int fc, int dir, int rec) {
-    int h = C[fc].head; int l = inst_free(ARG(h, dir), 1), r = inst_free(ARG(h, 1 - dir), 1);
+    /* both sides are instantiated with one renaming, so shared variables stay shared */
+    int h = C[fc].head; int l = inst_free(ARG(h, dir), 1), r = inst_rec(ARG(h, 1 - dir), 1);
     if (kbo(r, l) == KGT) return 0;
     spos *q = &SP[rec]; int tl = lit_of(q->c, q->slot);
-    if (T[tl].f == EQ) { int side = PB[q->pp0]; int a = inst_free(ARG(tl, side), 2), o = inst_free(ARG(tl, 1 - side), 2); if (kbo(o, a) == KGT) return 0; }
+    if (T[tl].f == EQ) { int side = PB[q->pp0]; int a = inst_free(ARG(tl, side), 2), o = inst_rec(ARG(tl, 1 - side), 2); if (kbo(o, a) == KGT) return 0; }
     return 1;
 }
 /* unit simplification: a body literal that is an instance of an active positive unit, or an
    equation t = t, is deleted. Each deletion is recorded as the binary resolvent with that unit
    (which binds only the unit's variables) or as equality resolution with no unifier. */
-static int USIMP = 1;
+static int USIMP = 1, ESUB = 1;
 static int simplify_lits(int c) {
     for (int pass = 0; pass < 64; pass++) {
         int del = -1, by = -1, kind = 0;
         for (int k = 0; k < C[c].nb && del < 0; k++) { int a = LIT(c, k);
             if (T[a].f == EQ && ARG(a, 0) == ARG(a, 1)) { del = k; kind = 2; break; }
-            flatten(a); NCAND = 0; dt_gen(&SU, 0, 0);
-            for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (C[s].st != 1) continue; int m = NTR; int ok = match(C[s].head, a); undo_to(m); if (ok) { del = k; by = s; break; } } }
+            for (int sw = 0; sw < (T[a].f == EQ ? 2 : 1) && del < 0; sw++) { int a2 = sw ? swap_eq(a) : a;
+                flatten(a2); NCAND = 0; dt_gen(&SU, 0, 0);
+                for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (C[s].st != 1) continue; int m = NTR; int ok = match(C[s].head, a2); undo_to(m); if (ok) { del = k; by = s; break; } } } }
         if (del < 0) return c;
         int lits[64], banks[64], n = 0; for (int i = 0; i < C[c].nb; i++) if (i != del) { lits[n] = LIT(c, i); banks[n++] = 3; }
         int c2 = kind == 2 ? new_clause(C[c].head, 3, lits, banks, n, c, -1, del, -1) : new_clause(C[c].head, 3, lits, banks, n, by, c, del, -1);
@@ -711,6 +736,7 @@ static void finish(int c) {
     if (USIMP) { int c3 = simplify_lits(c); if (c3 < 0) return; if (c3 != c) { c = c3; C[c].st = 0; if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; } } }
     if (MAXW && C[c].w > MAXW) { DROPPED = 1; return; }
     if (csubsumed(c)) { SUBS_FWD++; return; }
+    if (HAS_EQ && ESUB && esubsumed(c)) { SUBS_FWD++; return; }
     keep_clause(c);
     /* a positive unit that unifies with a one-literal goal refutes at once */
     if (C[c].head >= 0 && C[c].nb == 0)
@@ -769,10 +795,10 @@ static void eq_give(int g) {
 static void res_give(int g) {
     if (HAS_EQ) { int g2 = demod(g); if (g2 < 0) { C[g].st = 2; return; } if (g2 != g) { C[g].st = 2; g = g2; C[g].st = 0; if (C[g].head < 0 && C[g].nb == 0) { RREF = g; return; } } }
     if (USIMP) { int g2 = simplify_lits(g); if (g2 < 0) { C[g].st = 2; return; } if (g2 != g) { C[g].st = 2; g = g2; C[g].st = 0; if (C[g].head < 0 && C[g].nb == 0) { RREF = g; return; } } }
-    if (csubsumed(g)) { C[g].st = 2; SUBS_FWD++; return; }
+    if (csubsumed(g) || (HAS_EQ && ESUB && esubsumed(g))) { C[g].st = 2; SUBS_FWD++; return; }
     eligible(g);
     /* backward subsumption among active clauses */
-    if (C[g].head >= 0) { flatten(C[g].head); NCAND = 0; dt_inst(&SH, 0, 0); if (!C[g].nb) dt_inst(&SU, 0, 0); for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (s != g && C[s].st == 1 && subsumes(g, s)) { C[s].st = 2; SUBS_BWD++; } } }
+    if (C[g].head >= 0) for (int sw = 0; sw < (T[C[g].head].f == EQ ? 2 : 1); sw++) { flatten(sw ? swap_eq(C[g].head) : C[g].head); NCAND = 0; dt_inst(&SH, 0, 0); if (!C[g].nb) dt_inst(&SU, 0, 0); for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (s != g && C[s].st == 1 && subsumes(g, s)) { C[s].st = 2; SUBS_BWD++; } } }
     C[g].st = 1; GIVEN++;
     if (C[g].head >= 0) dt_insert(C[g].nb ? &SH : &SU, C[g].head, g);   /* SH serves backward subsumption */
     if (C[g].nb) { int key = 0; for (int k = 1; k < C[g].nb; k++) if (T[LIT(g, k)].w > T[LIT(g, key)].w) key = k; dt_insert(&SG, LIT(g, key), g); }
@@ -1055,7 +1081,7 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--wt") && i + 1 < argc) { sscanf(argv[++i], "%d,%d,%lf,%d", &FW, &VW, &HM, &LP); }
         else if (!strcmp(argv[i], "--cycle") && i + 1 < argc) set_cycle(argv[++i]);
     }
-    T0 = now_s(); if (getenv("HYPER_NO_USIMP")) USIMP = 0; if (getenv("HYPER_NO_ORW")) ORW = 0;
+    T0 = now_s(); if (getenv("HYPER_NO_USIMP")) USIMP = 0; if (getenv("HYPER_NO_ORW")) ORW = 0; if (getenv("HYPER_NO_ESUB")) ESUB = 0;
     for (int b = 0; b < MAXB; b++) for (int v = 0; v < MAXV; v++) BT[b][v] = -1;
     dt_init(&KEPT); dt_init(&ACT);
     parse_file(path, root, NULL, -1);
