@@ -578,7 +578,8 @@ static void resolvent(int hc, int bc, int k) {   /* head of hc (bank 1) against 
 typedef struct { int c, slot, pp0, plen; } spos;   /* slot -1 the head, k body literal k */
 static spos *SP; static int NSP, CSP;
 static int *PB; static long NPB, CPB;
-static dtree RSUB, RHE;
+static dtree RSUB, RHE, RALL;   /* RALL: every position of every active clause, for backward demodulation */
+static dtree *POS_TREE;
 static int PTMP[512];
 static int lit_of(int c, int slot) { return slot < 0 ? C[c].head : LIT(c, slot); }
 static int sub_at(int t, const int *path, int len) { for (int i = 0; i < len; i++) t = ARG(t, path[i]); return t; }
@@ -590,10 +591,11 @@ static void pos_rec(int c, int slot, int t, int depth) {
     if (ISVAR(t) || depth > 500) return;
     if (NSP == CSP) { CSP = CSP ? CSP * 2 : 4096; SP = xrealloc(SP, CSP * sizeof(spos)); }
     int id = NSP++; SP[id].c = c; SP[id].slot = slot; SP[id].plen = depth; SP[id].pp0 = savepath(PTMP, depth);
-    dt_insert(&RSUB, t, id);
+    dt_insert(POS_TREE, t, id);
     for (int j = 0; j < T[t].n; j++) { PTMP[depth] = j; pos_rec(c, slot, ARG(t, j), depth + 1); }
 }
-static void add_positions(int c, int slot) { int a = lit_of(c, slot); for (int i = 0; i < T[a].n; i++) { PTMP[0] = i; pos_rec(c, slot, ARG(a, i), 1); } }
+static void add_positions_to(dtree *d, int c, int slot) { POS_TREE = d; int a = lit_of(c, slot); for (int i = 0; i < T[a].n; i++) { PTMP[0] = i; pos_rec(c, slot, ARG(a, i), 1); } }
+static void add_positions(int c, int slot) { add_positions_to(&RSUB, c, slot); }
 static void superpose(int fc, int dir, int rec) {   /* fc in bank 1, the target in bank 2, unified already */
     GENERATED++;
     int ic = SP[rec].c, slot = SP[rec].slot, len = SP[rec].plen; int path[512]; memcpy(path, PB + SP[rec].pp0, len * sizeof(int));   /* PB may move */
@@ -672,14 +674,29 @@ static void finish(int c) {
             if (unify(C[c].head, 4, LIT(g, 0), 5)) { int e = new_clause(-1, 0, NULL, NULL, 0, c, g, 0, -1); if (e >= 0) RREF = e; }
             undo_to(m); }
 }
+/* backward demodulation: active clauses with an instance of l are retired and come back rewritten */
+static void back_demod(int u, int l) {
+    flatten(l); NCAND = 0; dt_inst(&RALL, 0, 0);
+    long n = NCAND; int *cs = xmalloc((n + 1) * sizeof(int)); memcpy(cs, CAND, n * sizeof(int));
+    for (long i = 0; i < n && RREF < 0; i++) { spos *q = &SP[cs[i]]; int c = q->c; if (c == u || C[c].st != 1) continue;
+        int sub = sub_at(lit_of(c, q->slot), PB + q->pp0, q->plen);
+        int m = NTR; int ok = match(l, sub); undo_to(m); if (!ok) continue;
+        C[c].st = 2; SUBS_BWD++;
+        int c2 = demod(c); if (c2 < 0 || c2 == c) continue;
+        C[c2].st = 0; finish(c2);
+    }
+    free(cs);
+}
 static void eq_give(int g) {
     /* index g: its eligible literals' positions, and its eligible equation sides */
     if (C[g].eh) add_positions(g, -1);
     for (int k = 0; k < C[g].nb; k++) if (C[g].eb >> k & 1) add_positions(g, k);
+    if (C[g].head >= 0) add_positions_to(&RALL, g, -1);
+    for (int k = 0; k < C[g].nb; k++) add_positions_to(&RALL, g, k);
     int h = C[g].head;
     if (C[g].eh && h >= 0 && T[h].f == EQ)
         for (int d = 0; d < 2; d++) { int l = ARG(h, d), r = ARG(h, 1 - d); if (!ISVAR(l) && kbo(r, l) != KGT) dt_insert(&RHE, l, g * 2 + d);
-            if (!C[g].nb && kbo(l, r) == KGT) dt_insert(&RDEM, l, g * 2 + d); }
+            if (!C[g].nb && kbo(l, r) == KGT) { dt_insert(&RDEM, l, g * 2 + d); back_demod(g, l); } }
     /* from g into active positions (g's own included) */
     if (C[g].eh && h >= 0 && T[h].f == EQ)
         for (int d = 0; d < 2 && RREF < 0; d++) {
@@ -784,7 +801,7 @@ static int attempt(double limit, int ratio, const char *base, const char *pj, in
     DEADLINE = now_s() + limit;
     if (MAGIC) magic_transform();
     if (RES) {
-        dt_init(&RH); dt_init(&RB); dt_init(&SH); dt_init(&SU); dt_init(&SG); dt_init(&RSUB); dt_init(&RHE); dt_init(&RDEM);
+        dt_init(&RH); dt_init(&RB); dt_init(&SH); dt_init(&SU); dt_init(&SG); dt_init(&RSUB); dt_init(&RHE); dt_init(&RDEM); dt_init(&RALL);
         int st = res_run(ratio); double secs = now_s() - T0;
         if (st > 0) {
             printf("%% SZS status Unsatisfiable for %s\n", base);
