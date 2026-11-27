@@ -479,7 +479,7 @@ static dtree RH, RB, SH, SU, SG;   /* SH: heads of active non-units, SU: active 
 static int *QW, *QA, *QS2; static long NQW, NQA, CQW, CQA, NQS, CQS;   /* by weight, by age, goal clauses (no head) by weight */
 static int clw(int a, int b) { return C[a].w < C[b].w || (C[a].w == C[b].w && C[a].age < C[b].age); }
 static int cla(int a, int b) { return C[a].age < C[b].age; }
-static int RREF = -1;
+static int RREF = -1; static int GOAL1[256], NGOAL1;   /* input goal clauses with one literal */
 #define LIT(c, k) (CB[C[c].b0 + (k)])
 /* literal selection: a Horn clause whose head is its unique maximal literal resolves on the head;
    any other clause selects its heaviest body literal (the first among equals) and resolves on that
@@ -666,6 +666,11 @@ static void finish(int c) {
     if (MAXW && C[c].w > MAXW) { DROPPED = 1; return; }
     if (csubsumed(c)) { SUBS_FWD++; return; }
     keep_clause(c);
+    /* a positive unit that unifies with a one-literal goal refutes at once */
+    if (C[c].head >= 0 && C[c].nb == 0)
+        for (int i = 0; i < NGOAL1 && RREF < 0; i++) { int g = GOAL1[i]; int m = NTR;
+            if (unify(C[c].head, 4, LIT(g, 0), 5)) { int e = new_clause(-1, 0, NULL, NULL, 0, c, g, 0, -1); if (e >= 0) RREF = e; }
+            undo_to(m); }
 }
 static void eq_give(int g) {
     /* index g: its eligible literals' positions, and its eligible equation sides */
@@ -753,6 +758,7 @@ static int res_run(double ratio) {
     for (int r = 0; r < NR && RREF < 0; r++) { int banks[MAXB]; for (int i = 0; i < R[r].nb; i++) banks[i] = 0; int c = new_clause(R[r].head, 0, R[r].body, banks, R[r].nb, -1, -1, -1, r); if (c >= 0) keep_clause(c); }
     long picks = 0;
     int ninput = NC;
+    for (int c = 0; c < ninput; c++) if (C[c].head < 0 && C[c].nb == 1 && NGOAL1 < 256) GOAL1[NGOAL1++] = c;
     for (int c = 0; c < ninput && RREF < 0; c++) if (C[c].st == 0) res_give(c);   /* the input clauses first, as E does */
     while (RREF < 0) {
         if (now_s() > DEADLINE) return 0;
