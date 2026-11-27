@@ -61,6 +61,15 @@ equality resolution steps (each must be a variant of the recomputed conclusion).
 proofs are printed without the magic steps, which is why instances are accepted. Tampered proofs
 are rejected.
 
+Measured (receipts in `reasoning/receipts-terms`): the 562 TPTP v9.0.0 problems of class
+CNF_UNS_RFO_NEQ_HRN, 30 s, two runs in parallel, same contract as above. All 562: native 510,
+Vampire 509, E 519. Held-out half (not used to fit the schedule): native 253, Vampire 255, E 257.
+Every native proof checks. Native solves 3 that neither baseline solves. On the 490 all three
+solve, median wall is 18.6 ms native, 21.3 ms Vampire, 12.9 ms E, and median peak memory 2.1 MB,
+9.2 MB, 5.7 MB. Open: E solves 20 problems native does not, mostly condensed-detachment logic
+calculi (LCL), and is faster by median. The equality class (450 problems, CNF_UNS_RFO_SEQ_HRN)
+has baselines (Vampire 415, E 372); its native schedule is not fitted yet.
+
 ## Measured (receipts in the project files, `reasoning/receipts-hrn254-v4`)
 
 254 TPTP v9.0.0 problems of class CNF_UNS_EPR_NEQ_HRN, 30 s wall limit, three runs in parallel
