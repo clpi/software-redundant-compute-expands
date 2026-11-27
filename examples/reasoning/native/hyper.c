@@ -208,7 +208,7 @@ typedef struct { int atom, rule, np, par0, w; long age; char st; } unit;   /* st
 static unit *U; static int NU, CU;
 static int *PAR; static long NPAR, CPAR;
 static dtree KEPT, ACT;
-static int OUT_OF_CLASS, MAGIC, RES, SINGLE, MAXW, DROPPED, EQ = -1, HAS_EQ;   /* DROPPED: the weight bound discarded a clause, so saturation proves nothing */ static const char *WHY = "";
+static int OUT_OF_CLASS, MAGIC, RES, SINGLE, MAXW, DROPPED, EQ = -1, HAS_EQ, SCHED_RATIO = 5, SELMODE;   /* DROPPED: the weight bound discarded a clause, so saturation proves nothing */ static const char *WHY = "";
 
 /* ---------------- TPTP CNF reader with nested terms */
 typedef struct { char *s; int kind; } tok;   /* kind: 'w' word, 'V' variable, 'q' quoted, 'p' punctuation */
@@ -489,9 +489,22 @@ static void eligible(int c) {
     if (x->head >= 0) {
         int top = 1; for (int i = 0; i < x->nb && top; i++) if (kbo(x->head, LIT(c, i)) != KGT) top = 0;
         if (top) { x->eh = 1; return; }
+        if (SELMODE == 4) {   /* no selection while the head is maximal: every maximal literal is eligible */
+            int dom = 0; for (int i = 0; i < x->nb && !dom; i++) if (kbo(LIT(c, i), x->head) == KGT) dom = 1;
+            if (!dom) {
+                x->eh = 1;
+                for (int i = 0; i < x->nb; i++) { int m = 1; if (kbo(x->head, LIT(c, i)) == KGT) m = 0;
+                    for (int j = 0; j < x->nb && m; j++) if (j != i && kbo(LIT(c, j), LIT(c, i)) == KGT) m = 0;
+                    if (m) x->eb |= 1ULL << i; }
+                return;
+            }
+        }
     }
     if (!x->nb) { x->eh = 1; return; }
-    int best = 0; for (int i = 1; i < x->nb; i++) if (T[LIT(c, i)].w > T[LIT(c, best)].w) best = i;
+    int best = 0;
+    for (int i = 1; i < x->nb; i++) { int a = LIT(c, i), b = LIT(c, best);
+        int better = SELMODE == 1 ? T[a].w < T[b].w : SELMODE == 2 ? (T[a].w - 2 * T[a].vo) > (T[b].w - 2 * T[b].vo) : SELMODE == 3 ? (T[a].gr && !T[b].gr) || (T[a].gr == T[b].gr && T[a].w > T[b].w) : T[a].w > T[b].w;
+        if (better) best = i; }
     x->eb = 1ULL << best;
 }
 /* subsumption of clause d by clause s: one substitution sends s's head to d's head and every body literal of s to some body literal of d */
@@ -805,40 +818,56 @@ static int attempt(double limit, int ratio, const char *base, const char *pj, in
 /* the strategy schedule: every configuration in turn, in a fresh child process, with a time slice
    that doubles each round; the first refutation wins. A configuration that saturates proves the
    input satisfiable (each is complete for Horn clauses), and the schedule stops. */
-typedef struct { int magic, res, ratio; const char *cycle, *wt; } config;
+typedef struct { const char *args; double secs; } config;
+/* (filled from the training-half sweep by bench/make_schedule.py) */
 static const config SCHED[] = {
-    { 0, 1, 5, "w", "1,1,1,0" },
-    { 0, 0, 5, NULL, NULL },
-    { 0, 1, 5, "w", "2,1,1,3" },
-    { 1, 0, 5, NULL, NULL },
-    { 0, 1, 5, "gwwww", "1,1,1,0" },
-    { 0, 1, 5, "w", "2,1,0.7,0" },
-    { 0, 1, 5, "gwwwwwwwwwwa", "1,1,1,0" },
+    { "--res --wt 1,1,1,0", 0.5 },
+    { "--single", 0.5 },
+    { "--magic", 0.5 },
+    { "--res --wt 2,1,1,3", 0.5 },
 };
+static void apply_args(const char *a) {   /* a setting is a string of the command-line options */
+    char buf[512]; snprintf(buf, sizeof buf, "%s", a); char *tok[32]; int n = 0;
+    for (char *t = strtok(buf, " "); t && n < 32; t = strtok(NULL, " ")) tok[n++] = t;
+    MAGIC = RES = 0; MAXW = 0; FW = 2; VW = 1; HM = 1.0; LP = 0; SELMODE = 0;
+    for (int i = 0; i < n; i++) {
+        if (!strcmp(tok[i], "--magic")) MAGIC = 1;
+        else if (!strcmp(tok[i], "--res")) RES = 1;
+        else if (!strcmp(tok[i], "--maxw") && i + 1 < n) MAXW = atoi(tok[++i]);
+        else if (!strcmp(tok[i], "--ratio") && i + 1 < n) SCHED_RATIO = atoi(tok[++i]);
+        else if (!strcmp(tok[i], "--wt") && i + 1 < n) sscanf(tok[++i], "%d,%d,%lf,%d", &FW, &VW, &HM, &LP);
+        else if (!strcmp(tok[i], "--cycle") && i + 1 < n) set_cycle(tok[++i]);
+        else if (!strcmp(tok[i], "--sel") && i + 1 < n) SELMODE = atoi(tok[++i]);
+    }
+}
 #include <sys/wait.h>
 #include <unistd.h>
+static int run_child(int k, double lim, const char *base, const char *pj) {
+    pid_t pid = fork();
+    if (pid < 0) die("fork");
+    if (pid == 0) {
+        SCHED_RATIO = 5; apply_args(SCHED[k].args);
+        int st = attempt(lim, SCHED_RATIO, base, pj, 0);
+        fflush(stdout); _exit(st > 0 ? 10 : st < 0 ? 20 : 0);
+    }
+    int ws; waitpid(pid, &ws, 0);
+    if (WIFEXITED(ws) && WEXITSTATUS(ws) == 10) return 1;
+    if (WIFEXITED(ws) && WEXITSTATUS(ws) == 20) return -1;
+    return 0;
+}
 static int schedule(double limit, const char *base, const char *pj) {
-    int n = sizeof SCHED / sizeof SCHED[0]; double slice = 0.05;
+    int n = sizeof SCHED / sizeof SCHED[0]; double top = 0;
     fflush(stdout);
-    for (;;) {
+    for (int k = 0; k < n; k++) {   /* the fitted schedule */
+        double left = T0 + limit - now_s(); if (left <= 0.005) return 0;
+        double lim = SCHED[k].secs < left ? SCHED[k].secs : left; if (SCHED[k].secs > top) top = SCHED[k].secs;
+        int st = run_child(k, lim, base, pj); if (st) return st;
+    }
+    for (double slice = 2 * top;; slice *= 2)   /* then every setting again, with doubling slices */
         for (int k = 0; k < n; k++) {
             double left = T0 + limit - now_s(); if (left <= 0.005) return 0;
-            double lim = slice < left ? slice : left;
-            pid_t pid = fork();
-            if (pid < 0) die("fork");
-            if (pid == 0) {
-                const config *c = &SCHED[k]; MAGIC = c->magic; RES = c->res;
-                if (c->cycle) set_cycle(c->cycle);
-                if (c->wt) sscanf(c->wt, "%d,%d,%lf,%d", &FW, &VW, &HM, &LP);
-                int st = attempt(lim, c->ratio, base, pj, 0);
-                fflush(stdout); _exit(st > 0 ? 10 : st < 0 ? 20 : 0);
-            }
-            int ws; waitpid(pid, &ws, 0);
-            if (WIFEXITED(ws) && WEXITSTATUS(ws) == 10) return 1;
-            if (WIFEXITED(ws) && WEXITSTATUS(ws) == 20) return -1;
+            int st = run_child(k, slice < left ? slice : left, base, pj); if (st) return st;
         }
-        slice *= 2;
-    }
 }
 
 int main(int argc, char **argv) {
@@ -853,6 +882,7 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--magic")) MAGIC = SINGLE = 1;
         else if (!strcmp(argv[i], "--res")) RES = SINGLE = 1;
         else if (!strcmp(argv[i], "--single")) SINGLE = 1;
+        else if (!strcmp(argv[i], "--sel") && i + 1 < argc) SELMODE = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--maxw") && i + 1 < argc) MAXW = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--wt") && i + 1 < argc) { sscanf(argv[++i], "%d,%d,%lf,%d", &FW, &VW, &HM, &LP); }
         else if (!strcmp(argv[i], "--cycle") && i + 1 < argc) set_cycle(argv[++i]);
