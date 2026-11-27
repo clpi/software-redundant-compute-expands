@@ -207,7 +207,7 @@ typedef struct { int atom, rule, np, par0, w; long age; char st; } unit;   /* st
 static unit *U; static int NU, CU;
 static int *PAR; static long NPAR, CPAR;
 static dtree KEPT, ACT;
-static int OUT_OF_CLASS, MAGIC, RES, SINGLE; static const char *WHY = "";
+static int OUT_OF_CLASS, MAGIC, RES, SINGLE, MAXW, DROPPED, EQ = -1, HAS_EQ;   /* DROPPED: the weight bound discarded a clause, so saturation proves nothing */ static const char *WHY = "";
 
 /* ---------------- TPTP CNF reader with nested terms */
 typedef struct { char *s; int kind; } tok;   /* kind: 'w' word, 'V' variable, 'q' quoted, 'p' punctuation */
@@ -272,7 +272,10 @@ static void parse_toks(const char *root, char **sel, int nsel) {
             if (at(",")) break;
             int ng = 0; if (at("~")) { ng = 1; TI++; }
             int t = term_p();
-            if (at("=") || at("!=")) { OUT_OF_CLASS = 1; WHY = "equality"; return; }
+            if (at("=") || at("!=")) {   /* an equation is the atom =(l, r); != negates it */
+                int ne = at("!="); TI++; int t2 = term_p(); if (EQ < 0) EQ = sym_of("=", 2);
+                int a2[2] = { t, t2 }; t = mk(EQ, 2, a2); if (ne) ng = !ng; HAS_EQ = 1;
+            }
             const char *pn = SY[T[t].f].name;
             if (!strcmp(pn, "$true")) { if (!ng) taut = 1; continue; }
             if (!strcmp(pn, "$false")) { if (ng) taut = 1; continue; }
@@ -373,6 +376,7 @@ static void conclude(int r) {
     rule *ru = &R[r];
     if (ru->head < 0) { REF_RULE = r; for (int k = 0; k < ru->nb; k++) REF_PAR[k] = CH[k]; return; }
     int a = inst(ru->head, 0, NULL);
+    if (MAXW && T[a].w > MAXW) { DROPPED = 1; return; }   /* weight bound: incomplete, like Otter's max_weight */
     if (seen(a) || subsumed(a)) { SUBS_FWD++; return; }
     add_unit(a, r, ru->nb, CH);
 }
@@ -465,7 +469,7 @@ static int kbo(int s, int t) {
     if (r == KLT) return le ? KLT : KINC;
     return r;
 }
-typedef struct { int head, nb, b0, w, p1, p2, lit, src; long age; char st, eh; uint64_t eb; } clause;   /* src: problem clause for an input */
+typedef struct { int head, nb, b0, w, p1, p2, lit, src, pp0, plen; long age; char st, eh, kind, dir; uint64_t eb; } clause;   /* src: problem clause for an input; kind 0 resolution, 1 superposition (dir, path), 2 equality resolution */
 static clause *C; static int NC, CC;
 static int FW = 2, VW = 1, LP = 0; static double HM = 1.0;   /* clause weight: symbols FW, variables VW, head times HM, LP per body literal */
 static int lwt(int t) { return FW * (T[t].w - T[t].vo) + VW * T[t].vo; }
@@ -515,16 +519,26 @@ static int csubsumed(int d) {
     return 0;
 }
 /* build a clause from literals under bindings, renaming variables jointly; -1 if a tautology */
+/* the replacement for a superposition: literal REP_I of the list (-2 the head, -3 none) has the
+   subterm at REP_PATH replaced by REP_T under bank REP_B */
+static int REP_I = -3, REP_LEN, REP_T, REP_B; static const int *REP_PATH;
+static int inst_replace(int t, int b, const int *path, int len) {
+    if (len == 0) return inst_rec(REP_T, REP_B);
+    deref(&t, &b);
+    int a[64]; for (int i = 0; i < T[t].n; i++) a[i] = i == path[0] ? inst_replace(ARG(t, i), b, path + 1, len - 1) : inst_rec(ARG(t, i), b);
+    return mk(T[t].f, T[t].n, a);
+}
 static int new_clause(int hd, int hb, int *lits, int *banks, int n, int p1, int p2, int lit, int src) {
-    RMN = 0; int h = hd >= 0 ? inst_rec(hd, hb) : -1; int b[1024], nb = 0;
+    RMN = 0; int h = hd >= 0 ? (REP_I == -2 ? inst_replace(hd, hb, REP_PATH, REP_LEN) : inst_rec(hd, hb)) : -1; int b[1024], nb = 0;
     if (n > 1000) return -1;
-    for (int i = 0; i < n; i++) { int a = inst_rec(lits[i], banks[i]); int dup = 0; for (int j = 0; j < nb; j++) if (b[j] == a) dup = 1; if (!dup) b[nb++] = a; if (a == h) return -1; }
+    if (h >= 0 && T[h].f == EQ && ARG(h, 0) == ARG(h, 1)) return -1;   /* t = t holds */
+    for (int i = 0; i < n; i++) { int a = i == REP_I ? inst_replace(lits[i], banks[i], REP_PATH, REP_LEN) : inst_rec(lits[i], banks[i]); int dup = 0; for (int j = 0; j < nb; j++) if (b[j] == a) dup = 1; if (!dup) b[nb++] = a; if (a == h) return -1; }
     if (nb > 62) return -1;
     if (NC == CC) { CC = CC ? CC * 2 : 4096; C = xrealloc(C, CC * sizeof(clause)); }
     if (NCB + nb > CCB) { while (NCB + nb > CCB) CCB = CCB ? CCB * 2 : 1 << 16; CB = xrealloc(CB, CCB * sizeof(int)); }
     int c = NC++; clause *x = &C[c]; x->head = h; x->nb = nb; x->b0 = (int)NCB; memcpy(CB + NCB, b, nb * sizeof(int)); NCB += nb;
     x->w = h >= 0 ? (int)(HM * lwt(h)) : 0; for (int i = 0; i < nb; i++) x->w += lwt(b[i]); x->w += LP * nb;
-    x->p1 = p1; x->p2 = p2; x->lit = lit; x->src = src; x->age = AGE++; x->st = 0;
+    x->p1 = p1; x->p2 = p2; x->lit = lit; x->src = src; x->age = AGE++; x->st = 0; x->kind = 0; x->dir = 0; x->pp0 = 0; x->plen = 0;
     return c;
 }
 static void keep_clause(int c) {
@@ -539,8 +553,92 @@ static void resolvent(int hc, int bc, int k) {   /* head of hc (bank 1) against 
     int c = new_clause(C[bc].head, 2, lits, banks, n, hc, bc, k, -1);
     if (c < 0) return;
     if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; }
+    if (MAXW && C[c].w > MAXW) { NC--; NCB -= C[c].nb; DROPPED = 1; return; }
     if (csubsumed(c)) { NC--; NCB -= C[c].nb; SUBS_FWD++; return; }
     keep_clause(c);
+}
+/* ---------------- equality: superposition and equality resolution (--res with = in the input).
+   From an eligible positive equation l = r (l not smaller than r, l not a variable) into a
+   non-variable subterm of an eligible literal of another clause: replace it by r under the
+   unifier and add the equation's body. Equality resolution removes an eligible negative
+   equation s = t whose sides unify. With resolution this is complete for Horn clauses. */
+typedef struct { int c, slot, pp0, plen; } spos;   /* slot -1 the head, k body literal k */
+static spos *SP; static int NSP, CSP;
+static int *PB; static long NPB, CPB;
+static dtree RSUB, RHE;
+static int PTMP[512];
+static int lit_of(int c, int slot) { return slot < 0 ? C[c].head : LIT(c, slot); }
+static int sub_at(int t, const int *path, int len) { for (int i = 0; i < len; i++) t = ARG(t, path[i]); return t; }
+static int savepath(const int *p, int len) {
+    if (NPB + len > CPB) { while (NPB + len > CPB) CPB = CPB ? CPB * 2 : 1 << 16; PB = xrealloc(PB, CPB * sizeof(int)); }
+    memcpy(PB + NPB, p, len * sizeof(int)); NPB += len; return (int)(NPB - len);
+}
+static void pos_rec(int c, int slot, int t, int depth) {
+    if (ISVAR(t) || depth > 500) return;
+    if (NSP == CSP) { CSP = CSP ? CSP * 2 : 4096; SP = xrealloc(SP, CSP * sizeof(spos)); }
+    int id = NSP++; SP[id].c = c; SP[id].slot = slot; SP[id].plen = depth; SP[id].pp0 = savepath(PTMP, depth);
+    dt_insert(&RSUB, t, id);
+    for (int j = 0; j < T[t].n; j++) { PTMP[depth] = j; pos_rec(c, slot, ARG(t, j), depth + 1); }
+}
+static void add_positions(int c, int slot) { int a = lit_of(c, slot); for (int i = 0; i < T[a].n; i++) { PTMP[0] = i; pos_rec(c, slot, ARG(a, i), 1); } }
+static void superpose(int fc, int dir, int rec) {   /* fc in bank 1, the target in bank 2, unified already */
+    GENERATED++;
+    int ic = SP[rec].c, slot = SP[rec].slot, len = SP[rec].plen; int path[512]; memcpy(path, PB + SP[rec].pp0, len * sizeof(int));   /* PB may move */
+    int lits[1024], banks[1024], n = 0;
+    for (int i = 0; i < C[ic].nb && n < 1000; i++) { lits[n] = LIT(ic, i); banks[n++] = 2; }
+    for (int i = 0; i < C[fc].nb && n < 1000; i++) { lits[n] = LIT(fc, i); banks[n++] = 1; }
+    REP_I = slot < 0 ? -2 : slot; REP_PATH = path; REP_LEN = len; REP_T = ARG(C[fc].head, 1 - dir); REP_B = 1;
+    int c = new_clause(C[ic].head, 2, lits, banks, n, fc, ic, slot, -1);
+    REP_I = -3;
+    if (c < 0) return;
+    C[c].kind = 1; C[c].dir = dir; C[c].pp0 = savepath(path, len); C[c].plen = len;
+    if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; }
+    if (MAXW && C[c].w > MAXW) { NC--; NCB -= C[c].nb; DROPPED = 1; return; }
+    if (csubsumed(c)) { NC--; NCB -= C[c].nb; SUBS_FWD++; return; }
+    keep_clause(c);
+}
+static void eq_resolve(int g, int k) {   /* sides of body literal k unified in bank 1 */
+    GENERATED++;
+    int lits[1024], banks[1024], n = 0;
+    for (int i = 0; i < C[g].nb; i++) if (i != k) { lits[n] = LIT(g, i); banks[n++] = 1; }
+    int c = new_clause(C[g].head, 1, lits, banks, n, g, -1, k, -1);
+    if (c < 0) return;
+    C[c].kind = 2;
+    if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; }
+    if (csubsumed(c)) { NC--; NCB -= C[c].nb; SUBS_FWD++; return; }
+    keep_clause(c);
+}
+static void eq_give(int g) {
+    /* index g: its eligible literals' positions, and its eligible equation sides */
+    if (C[g].eh) add_positions(g, -1);
+    for (int k = 0; k < C[g].nb; k++) if (C[g].eb >> k & 1) add_positions(g, k);
+    int h = C[g].head;
+    if (C[g].eh && h >= 0 && T[h].f == EQ)
+        for (int d = 0; d < 2; d++) { int l = ARG(h, d), r = ARG(h, 1 - d); if (!ISVAR(l) && kbo(r, l) != KGT) dt_insert(&RHE, l, g * 2 + d); }
+    /* from g into active positions (g's own included) */
+    if (C[g].eh && h >= 0 && T[h].f == EQ)
+        for (int d = 0; d < 2 && RREF < 0; d++) {
+            int l = ARG(h, d), r = ARG(h, 1 - d); if (ISVAR(l) || kbo(r, l) == KGT) continue;
+            flatten(l); NCAND = 0; dt_unif(&RSUB, 0, 0);
+            long n = NCAND; int *cs = xmalloc((n + 1) * sizeof(int)); memcpy(cs, CAND, n * sizeof(int));
+            for (long i = 0; i < n && RREF < 0; i++) { spos *q = &SP[cs[i]]; if (C[q->c].st != 1) continue;
+                int sub = sub_at(lit_of(q->c, q->slot), PB + q->pp0, q->plen);
+                int m = NTR; if (unify(l, 1, sub, 2)) superpose(g, d, cs[i]); undo_to(m); }
+            free(cs);
+        }
+    /* from active equations into g's positions */
+    for (int rec = 0; rec < NSP && RREF < 0; rec++) { if (SP[rec].c != g) continue;
+        int sub = sub_at(lit_of(g, SP[rec].slot), PB + SP[rec].pp0, SP[rec].plen);
+        flatten(sub); NCAND = 0; dt_unif(&RHE, 0, 0);
+        long n = NCAND; int *cs = xmalloc((n + 1) * sizeof(int)); memcpy(cs, CAND, n * sizeof(int));
+        for (long i = 0; i < n && RREF < 0; i++) { int fc = cs[i] / 2, d = cs[i] % 2; if (fc == g || C[fc].st != 1) continue;
+            int m = NTR; if (unify(ARG(C[fc].head, d), 1, sub, 2)) superpose(fc, d, rec); undo_to(m); }
+        free(cs);
+    }
+    /* equality resolution on g's eligible negative equations */
+    for (int k = 0; k < C[g].nb && RREF < 0; k++) if ((C[g].eb >> k & 1) && T[LIT(g, k)].f == EQ) {
+        int a = LIT(g, k); int m = NTR; if (unify(ARG(a, 0), 1, ARG(a, 1), 1)) eq_resolve(g, k); undo_to(m);
+    }
 }
 static void res_give(int g) {
     if (csubsumed(g)) { C[g].st = 2; SUBS_FWD++; return; }
@@ -565,16 +663,21 @@ static void res_give(int g) {
         for (long i = 0; i < n && RREF < 0; i++) { int b = cs[i] / 64, k = cs[i] % 64; if (C[b].st != 1 || b == g) continue; int m = NTR; if (unify(C[g].head, 1, LIT(b, k), 2)) resolvent(g, b, k); undo_to(m); }
         free(cs);
     }
+    if (HAS_EQ && RREF < 0 && C[g].st == 1) eq_give(g);
 }
 static void put_clause(FILE *f, int c) {
     fprintf(f, "{\"id\":%d,\"head\":", c); if (C[c].head >= 0) put_term(f, C[c].head); else fputs("null", f);
     fputs(",\"body\":[", f); for (int i = 0; i < C[c].nb; i++) { if (i) fputc(',', f); put_term(f, LIT(c, i)); } fputc(']', f);
     if (C[c].src >= 0) { fputs(",\"input\":", f); put_str(f, SY[R[C[c].src].name].name); }
+    else if (C[c].kind == 1) { fprintf(f, ",\"rule\":\"sup\",\"from\":[%d,%d,%d],\"dir\":%d,\"path\":[", C[c].p1, C[c].p2, C[c].lit, C[c].dir);
+        for (int i = 0; i < C[c].plen; i++) fprintf(f, "%s%d", i ? "," : "", PB[C[c].pp0 + i]);
+        fputc(']', f); }
+    else if (C[c].kind == 2) fprintf(f, ",\"rule\":\"eqres\",\"from\":[%d,%d]", C[c].p1, C[c].lit);
     else fprintf(f, ",\"from\":[%d,%d,%d]", C[c].p1, C[c].p2, C[c].lit);
     fputc('}', f);
 }
 static char *CNEED;
-static void cneed(int c) { if (CNEED[c]) return; CNEED[c] = 1; if (C[c].src < 0) { cneed(C[c].p1); cneed(C[c].p2); } }
+static void cneed(int c) { if (CNEED[c]) return; CNEED[c] = 1; if (C[c].src < 0) { cneed(C[c].p1); if (C[c].kind != 2) cneed(C[c].p2); } }
 static long res_proof(FILE *f) {
     CNEED = xmalloc(NC + 1); memset(CNEED, 0, NC + 1); cneed(RREF);
     long n = 0; if (f) fputc('[', f);
@@ -598,7 +701,7 @@ static int res_run(double ratio) {
             if (x < 0) { x = hpop(QA, &NQA, cla); if (x < 0) break; }
             if (C[x].st == 0) g = x; else if (q == 2 && x >= 0) { picks++; }
         }
-        if (g < 0) return -1;
+        if (g < 0) return DROPPED ? 0 : -1;
         picks++; res_give(g);
     }
     return 1;
@@ -611,7 +714,7 @@ static int attempt(double limit, int ratio, const char *base, const char *pj, in
     DEADLINE = now_s() + limit;
     if (MAGIC) magic_transform();
     if (RES) {
-        dt_init(&RH); dt_init(&RB); dt_init(&SH); dt_init(&SU); dt_init(&SG);
+        dt_init(&RH); dt_init(&RB); dt_init(&SH); dt_init(&SU); dt_init(&SG); dt_init(&RSUB); dt_init(&RHE);
         int st = res_run(ratio); double secs = now_s() - T0;
         if (st > 0) {
             printf("%% SZS status Unsatisfiable for %s\n", base);
@@ -633,7 +736,7 @@ static int attempt(double limit, int ratio, const char *base, const char *pj, in
             if (x < 0) { x = byage ? hpop(HW, &NHW, lessw) : hpop(HA, &NHA, lessa); if (x < 0) break; }
             if (U[x].st == 0) u = x;
         }
-        if (u < 0) { sat = 1; break; }
+        if (u < 0) { sat = !DROPPED; if (DROPPED) DEADLINE = 0; break; }
         picks++; give(u);
     }
     double secs = now_s() - T0;
@@ -699,6 +802,7 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--magic")) MAGIC = SINGLE = 1;
         else if (!strcmp(argv[i], "--res")) RES = SINGLE = 1;
         else if (!strcmp(argv[i], "--single")) SINGLE = 1;
+        else if (!strcmp(argv[i], "--maxw") && i + 1 < argc) MAXW = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--wt") && i + 1 < argc) { sscanf(argv[++i], "%d,%d,%lf,%d", &FW, &VW, &HM, &LP); }
         else if (!strcmp(argv[i], "--cycle") && i + 1 < argc) set_cycle(argv[++i]);
     }

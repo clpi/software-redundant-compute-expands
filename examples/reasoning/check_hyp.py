@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Independent checker for the term engine's refutations: hyperresolution (engine hyper) and binary
-ordered resolution (engine res, clause steps, see check_resolution) over Horn CNF.
+ordered resolution with superposition and equality resolution (engine res, clause steps, see
+check_resolution) over Horn CNF. Equations are atoms =(l, r); superposition and equality
+resolution are sound for the theory of equality, so a checked proof refutes the problem in
+first-order logic with equality.
 
 Hyperresolution of Horn CNF with function symbols (engine hyper).
 
@@ -111,8 +114,10 @@ def read_problem(path, root, sel=None, out=None):
                 neg = True
                 r.take()
             a = r.term(vs)
-            if r.peek() in ("=", "!="):
-                raise SyntaxError("equality")
+            if r.peek() in ("=", "!="):   # an equation is the atom =(l, r); != negates it
+                ne = r.take() == "!="
+                a = ("=", a, r.term(vs))
+                neg = neg != ne
             lits.append((neg, a))
         d = 0
         while not (r.peek() == "." and d <= 0):
@@ -259,6 +264,63 @@ def check_resolution(cls, steps):
             src = cls.get(st["input"])
             if src is None or not clause_variant(cl, src):
                 print(f"REJECTED: step {n}: not a variant of problem clause {st['input']}")
+                return 1
+        elif st.get("rule") == "sup":
+            f, i, slot = st["from"]
+            d, path = st["dir"], st["path"]
+            if f not in have or i not in have:
+                print(f"REJECTED: step {n}: a premise is not established earlier")
+                return 1
+            (hf, bf), (hi, bi) = have[f], have[i]
+            if hf is None or hf[0] != "=" or d not in (0, 1):
+                print(f"REJECTED: step {n}: the first premise has no equation head")
+                return 1
+            lhs, rhs = hf[1 + d], hf[2 - d]
+            target = hi if slot == -1 else (bi[slot] if 0 <= slot < len(bi) else None)
+            if target is None or not path:
+                print(f"REJECTED: step {n}: no such literal or position")
+                return 1
+            try:
+                sub = target
+                for q in path:
+                    sub = sub[1 + q]
+            except (IndexError, TypeError):
+                print(f"REJECTED: step {n}: no such position")
+                return 1
+            if sub[0] == "?":
+                print(f"REJECTED: step {n}: superposition into a variable")
+                return 1
+            s = unify(rename(lhs, "f"), rename(sub, "i"), {})
+            if s is None:
+                print(f"REJECTED: step {n}: the equation side and the subterm do not unify")
+                return 1
+
+            def put(t, p, x):
+                if not p:
+                    return x
+                return t[:1 + p[0]] + (put(t[1 + p[0]], p[1:], x),) + t[2 + p[0]:]
+            newlit = put(rename(target, "i"), path, rename(rhs, "f"))
+            head = subst(newlit, s) if slot == -1 else (subst(rename(hi, "i"), s) if hi is not None else None)
+            body = [subst(newlit if q == slot else rename(a, "i"), s) for q, a in enumerate(bi)] + [subst(rename(a, "f"), s) for a in bf]
+            if not clause_variant(cl, (head, body)):
+                print(f"REJECTED: step {n}: not a variant of the superposition")
+                return 1
+        elif st.get("rule") == "eqres":
+            c, k = st["from"]
+            if c not in have:
+                print(f"REJECTED: step {n}: a premise is not established earlier")
+                return 1
+            hc, bc = have[c]
+            if not 0 <= k < len(bc) or bc[k][0] != "=":
+                print(f"REJECTED: step {n}: no negative equation there")
+                return 1
+            s = unify(bc[k][1], bc[k][2], {})
+            if s is None:
+                print(f"REJECTED: step {n}: the sides do not unify")
+                return 1
+            res = (subst(hc, s) if hc is not None else None, [subst(a, s) for q, a in enumerate(bc) if q != k])
+            if not clause_variant(cl, res):
+                print(f"REJECTED: step {n}: not a variant of the equality resolvent")
                 return 1
         else:
             i, j, k = st["from"]
