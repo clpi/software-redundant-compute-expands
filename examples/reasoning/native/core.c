@@ -351,6 +351,18 @@ static int samevars(const int *a, const int *b) {
     for (int k = 1; k < alen(b); k++) if (b[k] < 0) { int f = 0; for (int j = 1; j < alen(a); j++) if (a[j] == b[k]) f = 1; if (!f) return 0; }
     return 1;
 }
+/* lexicographic order on atoms by symbol id, from the first argument; a variable is treated as
+   larger than every constant and equal to itself, which keeps the order fixed under the goals'
+   own variables (it is only used to make each rewrite step go down) */
+static int alt(const int *a, const int *b) {
+    for (int k = 1; k < alen(a); k++) {
+        int x = a[k], y = b[k]; if (x == y) continue;
+        if (x < 0 && y < 0) return x > y;
+        if (x < 0) return 0; if (y < 0) return 1;
+        return x < y;
+    }
+    return 0;
+}
 /* rewrite to normal form; records the rewrite rules used (into rec, up to cap) */
 static int *eqb_norm(eqb *q, const int *a0, int *rec, int *nrec, int cap) {
     int *a = adup(a0); *nrec = 0;
@@ -361,7 +373,7 @@ static int *eqb_norm(eqb *q, const int *a0, int *rec, int *nrec, int cap) {
             if (match_at(q->RW[i].l, a, q->M, q->mtr, &nt)) {
                 int *b = adup(q->RW[i].r); for (int k = 1; k < alen(b); k++) if (b[k] < 0) b[k] = q->M[-b[k] - 1];
                 undo(q->M, q->mtr, 0, &nt);
-                if (aeq(a, b)) { free(b); continue; }
+                if (!alt(b, a)) { free(b); continue; }   /* only descending steps: normal forms exist */
                 free(a); a = b; hit = i;
             } else undo(q->M, q->mtr, 0, &nt);
         }
@@ -524,8 +536,14 @@ static void eqb_init(eqb *q, int orient) {
         int v = aeq(a1, a2) && aeq(b1, b2) && samevars(q->SR[i].st, q->SR[i].head);
         free(a1); free(b1); free(a2); free(b2);
         if (!v || !orient) continue;
+        /* orient the pair so that every argument the rewrite changes becomes a constant: then a
+           rewrite fixes part of the state (an object put into a truck) instead of permuting it
+           (a cube move), and normal forms stay meaningful; pairs that only permute are skipped */
+        int ok_ij = 1, ok_ji = 1; const int *a = q->SR[i].st, *b = q->SR[i].head;
+        for (int k = 1; k < alen(a); k++) if (a[k] != b[k]) { if (b[k] < 0) ok_ij = 0; if (a[k] < 0) ok_ji = 0; }
+        if (!ok_ij && !ok_ji) continue;
         q->RW = xrealloc(q->RW, (q->NRW + 1) * sizeof(rwr)); rwr *w = &q->RW[q->NRW++];
-        if (orient > 0) { w->l = q->SR[i].st; w->r = q->SR[i].head; w->rule = q->SR[i].rule; w->back = q->SR[j].rule; }
+        if (ok_ij) { w->l = q->SR[i].st; w->r = q->SR[i].head; w->rule = q->SR[i].rule; w->back = q->SR[j].rule; }
         else { w->l = q->SR[j].st; w->r = q->SR[j].head; w->rule = q->SR[j].rule; w->back = q->SR[i].rule; }
     }
     /* goals with exactly one state literal */

@@ -333,7 +333,8 @@ static void add_rule_from_lits(int name) {
     if (EACH && (DECIDED || REFUTED >= 0)) return;   /* a refuted prefix stays refuted: no more work */
     int from = known_consts_n; int grew = CONSTS.n > known_consts_n; known_consts_n = CONSTS.n;
     if (ru->nb == 0) { int bind[64]; for (int v = 0; v < NV; v++) bind[v] = INT32_MIN; fire(r, bind, NULL, 0); }
-    else { int bind[64]; char done[64] = {0}; int prem[64]; for (int v = 0; v < NV; v++) bind[v] = INT32_MIN; join(r, done, ru->nb, bind, prem, 0); }
+    else if (QH > 0) {   /* facts already taken off the queue must meet the new rule now; queued facts meet it when taken */
+        int bind[64]; char done[64] = {0}; int prem[64]; for (int v = 0; v < NV; v++) bind[v] = INT32_MIN; join(r, done, ru->nb, bind, prem, 0); }
     if (grew) {   /* new constants widen every unsafe head variable seen before */
         int np0 = NPEND;
         for (int i = 0; i < np0; i++) if (PEND[i].r != r) {
