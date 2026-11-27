@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Independent checker for hyperresolution refutations of Horn CNF with function symbols (engine hyper).
+"""Independent checker for the term engine's refutations: hyperresolution (engine hyper) and binary
+ordered resolution (engine res, clause steps, see check_resolution) over Horn CNF.
+
+Hyperresolution of Horn CNF with function symbols (engine hyper).
 
 The proof is a JSON list of steps. A step {"id", "atom", "rule", "parents"} claims that atom is a
 positive unit derived from problem clause `rule`: with no parents, the atom must be a variant of
@@ -209,11 +212,88 @@ def from_json(j):
     return (j[0],) + tuple(from_json(a) for a in j[1:])
 
 
+def clause_variant(c, d):
+    """clauses (head, body) equal under a bijective renaming of variables, bodies as sets"""
+    (h1, b1), (h2, b2) = c, d
+    b1, b2 = list(dict.fromkeys(b1)), list(dict.fromkeys(b2))
+    if (h1 is None) != (h2 is None) or len(b1) != len(b2):
+        return False
+
+    def go(m, inv, x, y):
+        if x[0] == "?" or y[0] == "?":
+            if x[0] != "?" or y[0] != "?":
+                return None
+            if m.get(x, y) != y or inv.get(y, x) != x:
+                return None
+            m2, i2 = dict(m), dict(inv)
+            m2[x], i2[y] = y, x
+            return m2, i2
+        if x[0] != y[0] or len(x) != len(y):
+            return None
+        for p, q in zip(x[1:], y[1:]):
+            r = go(m, inv, p, q)
+            if r is None:
+                return None
+            m, inv = r
+        return m, inv
+
+    def body(m, inv, rest, avail):
+        if not rest:
+            return True
+        for j, y in enumerate(avail):
+            r = go(m, inv, rest[0], y)
+            if r is not None and body(r[0], r[1], rest[1:], avail[:j] + avail[j + 1:]):
+                return True
+        return False
+    start = ({}, {}) if h1 is None else go({}, {}, h1, h2)
+    return start is not None and body(start[0], start[1], b1, b2)
+
+
+def check_resolution(cls, steps):
+    """steps are clauses: {"input": name} must be a variant of that problem clause; {"from": [i, j, k]}
+    must be a variant of the binary resolvent of clause i's head with body literal k of clause j"""
+    have = {}
+    for n, st in enumerate(steps):
+        cl = (from_json(st["head"]) if st["head"] is not None else None, [from_json(a) for a in st["body"]])
+        if "input" in st:
+            src = cls.get(st["input"])
+            if src is None or not clause_variant(cl, src):
+                print(f"REJECTED: step {n}: not a variant of problem clause {st['input']}")
+                return 1
+        else:
+            i, j, k = st["from"]
+            if i not in have or j not in have:
+                print(f"REJECTED: step {n}: a premise is not established earlier")
+                return 1
+            (hi, bi), (hj, bj) = have[i], have[j]
+            if hi is None or not 0 <= k < len(bj):
+                print(f"REJECTED: step {n}: no such head or body literal")
+                return 1
+            s = unify(rename(hi, "i"), rename(bj[k], "j"), {})
+            if s is None:
+                print(f"REJECTED: step {n}: the head and the body literal do not unify")
+                return 1
+            res = (subst(rename(hj, "j"), s) if hj is not None else None,
+                   [subst(rename(a, "j"), s) for q, a in enumerate(bj) if q != k] + [subst(rename(a, "i"), s) for a in bi])
+            if not clause_variant(cl, res):
+                print(f"REJECTED: step {n}: not a variant of the resolvent")
+                return 1
+        have[st["id"]] = cl
+    last = steps[-1]
+    if last["head"] is None and not last["body"]:
+        print("CHECKED")
+        return 0
+    print("REJECTED: the last clause is not empty")
+    return 1
+
+
 def main():
     prob, pf = sys.argv[1], sys.argv[2]
     root = sys.argv[sys.argv.index("--root") + 1] if "--root" in sys.argv else os.path.dirname(os.path.dirname(os.path.dirname(prob)))
     cls = read_problem(prob, root)
     steps = json.load(open(pf))
+    if steps and ("input" in steps[0] or "from" in steps[0]):
+        return check_resolution(cls, steps)
     have = {}
     for n, st in enumerate(steps):
         rule = cls.get(st["rule"])
