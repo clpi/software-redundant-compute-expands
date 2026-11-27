@@ -874,7 +874,7 @@ static int attempt_inner(double limit, int ratio, const char *base, const char *
    the superposition here skips steps from variable sides, so neither is complete there */
 
 /* ---------------- definition unfolding. A positive unit equation f(X1..Xn) = t, with distinct
-   variables Xi, f absent from t and every variable of t among the Xi, defines f. Replacing every f
+   variables Xi (n >= 1), f absent from t and every variable of t among the Xi, defines f. Replacing every f
    term by the matching instance of t and dropping the equation keeps the clause set
    equisatisfiable: each new clause follows from an old clause and the equation, and a model of the
    new set becomes a model of the old one by reading f as t. Definitions are unfolded one at a time,
@@ -886,7 +886,7 @@ static int DF, DRHS, DN, DV[64];
 static int occurs_sym(int t, int f) { if (ISVAR(t)) return 0; if (T[t].f == f) return 1; for (int i = 0; i < T[t].n; i++) if (occurs_sym(ARG(t, i), f)) return 1; return 0; }
 static int vars_within(int t) { if (ISVAR(t)) { for (int i = 0; i < DN; i++) if (DV[i] == VNO(t)) return 1; return 0; } for (int i = 0; i < T[t].n; i++) if (!vars_within(ARG(t, i))) return 0; return 1; }
 static int is_def(int l, int r) {
-    if (ISVAR(l) || T[l].f == EQ || T[l].n > 64) return 0;
+    if (ISVAR(l) || T[l].f == EQ || T[l].n > 64 || T[l].n == 0) return 0;   /* a constant naming a term is an abbreviation, better kept */
     DN = T[l].n; for (int i = 0; i < DN; i++) { int a = ARG(l, i); if (!ISVAR(a)) return 0; DV[i] = VNO(a); for (int j = 0; j < i; j++) if (DV[j] == DV[i]) return 0; }
     if (occurs_sym(r, T[l].f) || !vars_within(r)) return 0;
     DF = T[l].f; DRHS = r; return 1;
@@ -1089,6 +1089,7 @@ int main(int argc, char **argv) {
     const char *base = strrchr(path, '/'); base = base ? base + 1 : path;
     if (getenv("HYPER_DUMP")) for (int r = 0; r < NR; r++) { fprintf(stderr, "%s: head %d nb %d nv %d\n", SY[R[r].name].name, R[r].head, R[r].nb, R[r].nv); }
     EQSYM = EQ;
+    if (getenv("HYPER_CLASS")) { printf("%s eq %d defs %d out %d\n", base, HAS_EQ, NDEF, OUT_OF_CLASS); return 0; }
     if (OUT_OF_CLASS) { printf("%% SZS status GaveUp for %s\n%% reason %s\n", base, WHY); return 0; }
     if (SINGLE) { attempt(limit, ratio, base, pj, 1); return 0; }
     int st = schedule(limit, base, pj);
