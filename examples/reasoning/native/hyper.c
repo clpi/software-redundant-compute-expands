@@ -665,13 +665,19 @@ static int inst_nr(int t, int b) {   /* instantiate without renaming; an unbound
     int a[64]; for (int i = 0; i < T[t].n; i++) a[i] = inst_nr(ARG(t, i), b);
     return mk(T[t].f, T[t].n, a);
 }
+static int wsub(int t) {   /* weight of t under the match bindings of bank MB, without building it */
+    if (T[t].gr) return T[t].w;
+    if (ISVAR(t)) { int u = BT[MB][VNO(t)]; return u >= 0 ? T[u].w : 1; }
+    int w = 1; for (int i = 0; i < T[t].n; i++) w += wsub(ARG(t, i)); return w;
+}
 static int dem_find(int t, int depth, int *u, int *d) {   /* outermost first; PTMP holds the path */
     if (ISVAR(t) || depth > 500) return -1;
     flatten(t); NCAND = 0; dt_gen(&RDEM, 0, 0);
     for (long i = 0; i < NCAND; i++) { int c = CAND[i] / 2, dd = CAND[i] % 2; if (C[c].st != 1) continue;
         int m = NTR; if (match(ARG(C[c].head, dd), t)) {
             /* an unorientable unit rewrites only where its instance decreases (ordered rewriting) */
-            if (kbo(ARG(C[c].head, dd), ARG(C[c].head, 1 - dd)) == KGT || kbo(t, inst_nr(ARG(C[c].head, 1 - dd), MB)) == KGT) { *u = c; *d = dd; return depth; } }
+            int rr = ARG(C[c].head, 1 - dd);
+            if (kbo(ARG(C[c].head, dd), rr) == KGT || (wsub(rr) <= T[t].w && kbo(t, inst_nr(rr, MB)) == KGT)) { *u = c; *d = dd; return depth; } }
         undo_to(m); }
     for (int j = 0; j < T[t].n; j++) { PTMP[depth] = j; int r = dem_find(ARG(t, j), depth + 1, u, d); if (r >= 0) return r; }
     return -1;
@@ -1019,6 +1025,9 @@ static const config SCHED_EQ[] = {   /* Horn with equality after unfolding; fitt
     { "--res --wt 2,1,1,3 --cycle gwwa", 2.0 },
     { "--res --wt 1,1,1,0 --cycle ga --sel 5", 5.0 },
 };
+static const config SCHED_UF[] = {   /* Horn whose equality unfolding removed; fitted on the training half of those (bench/sched-uf-v1) */
+    { "--single", 1.0 },
+};
 static const config *SCH = SCHED; static int NSCH = sizeof SCHED / sizeof SCHED[0];
 static void apply_args(const char *a) {   /* a setting is a string of the command-line options */
     char buf[512]; snprintf(buf, sizeof buf, "%s", a); char *tok[32]; int n = 0;
@@ -1052,6 +1061,7 @@ static int run_child(int k, double lim, const char *base, const char *pj) {
 }
 static int schedule(double limit, const char *base, const char *pj) {
     if (HAS_EQ) { SCH = SCHED_EQ; NSCH = sizeof SCHED_EQ / sizeof SCHED_EQ[0]; }
+    else if (NDEF) { SCH = SCHED_UF; NSCH = sizeof SCHED_UF / sizeof SCHED_UF[0]; }   /* equality removed by unfolding */
     int n = NSCH; double top = 0;
     fflush(stdout);
     for (int k = 0; k < n; k++) {   /* the fitted schedule */
