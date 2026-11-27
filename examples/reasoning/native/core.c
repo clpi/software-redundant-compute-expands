@@ -414,6 +414,10 @@ static int eqb_add_goal(eqb *q, int *raw, int parent, int rule, int np, int **pr
     g->nrw = nrec; g->rw = nrec ? xmalloc(nrec * sizeof(int)) : NULL; if (nrec) memcpy(g->rw, rec, nrec * sizeof(int));
     q->GH[slot] = id; q->GHN++; q->GH = hs_grow(q->GH, &q->GHC, q->GHN, get_g, q, q->NGN);
     eqb_meet_index(q, id);
+    if (aground(nf)) {   /* a ground goal meets a state only if that very state was reached */
+        long s2; int f = hs_find(q->FH, q->FHC, nf, get_f, q, &s2);
+        if (f >= 0 && q->refuted_g < 0) { q->refuted_f = f; q->refuted_g = id; }
+    } else
     for (long i = 0; i < q->nall && q->refuted_g < 0; i++) {     /* against every state seen so far */
         int f = q->allst[i];
         int nt = 0; int ok = match_at(nf, q->FN[f].a, q->M, q->mtr, &nt); undo(q->M, q->mtr, 0, &nt);

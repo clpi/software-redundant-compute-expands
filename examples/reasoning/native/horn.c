@@ -295,7 +295,8 @@ static void literal(void) {
 }
 
 static int known_consts_n;
-static int EACH, NOSCHED; static long NCLAUSES;   /* --each: answer after every appended clause */
+static int EACH, NOSCHED, NGOAL, DECIDED; static long NCLAUSES;
+static void schedule_each(void);   /* --each: answer after every appended clause */
 static void add_rule_from_lits(int name) {
     int npos = 0, hi = -1;
     for (int i = 0; i < NL; i++) if (!LITS[i].neg) { npos++; hi = i; }
@@ -328,6 +329,8 @@ static void add_rule_from_lits(int name) {
         while (p >= NBYP) { BYP = xrealloc(BYP, (NBYP + 1) * sizeof(ivec)); memset(&BYP[NBYP++], 0, sizeof(ivec)); }
         ipush(&BYP[p], r * 256 + i);
     }
+    if (!ru->has_head) NGOAL++;
+    if (EACH && (DECIDED || REFUTED >= 0)) return;   /* a refuted prefix stays refuted: no more work */
     int from = known_consts_n; int grew = CONSTS.n > known_consts_n; known_consts_n = CONSTS.n;
     if (ru->nb == 0) { int bind[64]; for (int v = 0; v < NV; v++) bind[v] = INT32_MIN; fire(r, bind, NULL, 0); }
     else { int bind[64]; char done[64] = {0}; int prem[64]; for (int v = 0; v < NV; v++) bind[v] = INT32_MIN; join(r, done, ru->nb, bind, prem, 0); }
@@ -342,7 +345,10 @@ static void add_rule_from_lits(int name) {
        saturated now. Otherwise saturation waits until every clause is in: saturating each prefix
        would explore the closure of the first few rules alone (on a Rubik's cube problem, the
        subgroup the first four moves generate) before the rules that reach the goal arrive. */
-    if (EACH) run_queue();
+    /* A Horn set with no all-negative clause is satisfied by making every atom true, so with
+       --each the queue waits until a goal clause is in; then it is drained in order, which loses
+       no derivation (pending facts still join every rule when they come off the queue). */
+    if (EACH && NGOAL && !DECIDED) { if (NOSCHED) run_queue(); else schedule_each(); }
 }
 
 static void parse_file(const char *path, const char *root, char **sel, int nsel);
@@ -388,7 +394,7 @@ static void parse_tokens(const char *root, char **sel, int nsel) {
         }
         NL = w;
         if (keep && !taut) add_rule_from_lits(intern(name));
-        if (keep && EACH) { NCLAUSES++; printf("%% after %ld %s ops %ld facts %d\n", NCLAUSES, REFUTED >= 0 ? "Unsatisfiable" : "Satisfiable", OPS, NF); }
+        if (keep && EACH) { NCLAUSES++; printf("%% after %ld %s ops %ld facts %d\n", NCLAUSES, (REFUTED >= 0 || DECIDED) ? "Unsatisfiable" : "Satisfiable", OPS, NF); fflush(stdout); }
     }
 }
 static void parse_file(const char *path, const char *root, char **sel, int nsel) {
@@ -420,29 +426,38 @@ static long proof_steps(int *order_out) {   /* iterative post-order over the der
 #include "core.c"
 
 /* forward chaining gets four parts of every round, each other engine one; rounds double */
-static int WINNER;   /* 0 forward chaining, 1/2 ordered resolution (two orderings), 3 equivalence search */
+static int WINNER, ONLY;   /* ONLY: run just one engine (1 ord-, 2 ord+, 3 eqb), for measuring each */   /* 0 forward chaining, 1/2 ordered resolution (two orderings), 3 equivalence search */
 static ord *O1, *O2; static eqb *Q1;
 static void schedule(void) {
     double slice = 0.02;
     int o1 = 1, o2 = 1, q1 = 1;
+    if (ONLY) { o1 = ONLY == 1; o2 = ONLY == 2; q1 = ONLY == 3; }
     for (;;) {
-        RQ_DEADLINE = now_s() + 4 * slice; run_queue(); RQ_DEADLINE = 1e300;
-        if (REFUTED >= 0 || QH >= QT) { WINNER = 0; return; }
+        if (!ONLY) { RQ_DEADLINE = now_s() + 4 * slice; run_queue(); RQ_DEADLINE = 1e300; }
+        if (!ONLY && (REFUTED >= 0 || QH >= QT)) { WINNER = 0; return; }
         if (o1) { if (!O1) { O1 = xmalloc(sizeof(ord)); ord_init(O1, -1); } ord_run(O1, now_s() + slice); if (O1->refuted >= 0) { WINNER = 1; return; } if (O1->done) o1 = 0; }
         if (o2) { if (!O2) { O2 = xmalloc(sizeof(ord)); ord_init(O2, 1); } ord_run(O2, now_s() + slice); if (O2->refuted >= 0) { WINNER = 2; return; } if (O2->done) o2 = 0; }
         if (q1) { if (!Q1) { Q1 = xmalloc(sizeof(eqb)); eqb_init(Q1, 1); } if (Q1->refuted_g < 0) eqb_run(Q1, now_s() + slice); if (Q1->refuted_g >= 0) { WINNER = 3; return; } if (Q1->done) q1 = 0; }
-        if (!o1 && !o2 && !q1) { run_queue(); WINNER = 0; return; }
+        if (!o1 && !o2 && !q1) { if (!ONLY) run_queue(); WINNER = 0; return; }
         slice *= 2;
     }
+}
+
+/* --each: the engines other than forward chaining start afresh on the clauses so far, and once
+   one refutes a prefix every longer prefix is unsatisfiable too */
+static void schedule_each(void) {
+    O1 = O2 = NULL; Q1 = NULL; WINNER = 0;
+    schedule();
+    if (WINNER) DECIDED = 1;
 }
 
 int main(int argc, char **argv) {
     if (argc < 2) { fprintf(stderr, "usage: horn PROBLEM.p [--root DIR] [--proof-json FILE]\n"); return 2; }
     const char *path = argv[1], *root = ".", *pj = NULL;
-    for (int i = 2; i < argc; i++) { if (!strcmp(argv[i], "--root") && i + 1 < argc) root = argv[++i]; else if (!strcmp(argv[i], "--proof-json") && i + 1 < argc) pj = argv[++i]; else if (!strcmp(argv[i], "--each")) EACH = 1; else if (!strcmp(argv[i], "--fc-only")) NOSCHED = 1; }
+    for (int i = 2; i < argc; i++) { if (!strcmp(argv[i], "--root") && i + 1 < argc) root = argv[++i]; else if (!strcmp(argv[i], "--proof-json") && i + 1 < argc) pj = argv[++i]; else if (!strcmp(argv[i], "--each")) EACH = 1; else if (!strcmp(argv[i], "--fc-only")) NOSCHED = 1; else if (!strcmp(argv[i], "--only") && i + 1 < argc) { i++; ONLY = !strcmp(argv[i], "ord-") ? 1 : !strcmp(argv[i], "ord+") ? 2 : !strcmp(argv[i], "eqb") ? 3 : 0; } }
     struct timespec t0, t1; clock_gettime(CLOCK_MONOTONIC, &t0);
     parse_file(path, root, NULL, -1);
-    if (!OUT_OF_CLASS) { if (EACH || NOSCHED) run_queue(); else schedule(); }
+    if (!OUT_OF_CLASS && !DECIDED) { if (NOSCHED) run_queue(); else if (EACH) schedule_each(); else schedule(); }
     clock_gettime(CLOCK_MONOTONIC, &t1);
     double secs = (t1.tv_sec - t0.tv_sec) + (t1.tv_nsec - t0.tv_nsec) / 1e9;
     const char *base = strrchr(path, '/'); base = base ? base + 1 : path;
