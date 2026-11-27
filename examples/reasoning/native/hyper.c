@@ -450,7 +450,8 @@ static void vcount(int t, int d) {
     if (ISVAR(t)) { int v = VNO(t); if (!VC[v]) VT[NVT++] = v; VC[v] += d; if (!VC[v]) VC[v] = 0; return; }
     for (int i = 0; i < T[t].n; i++) vcount(ARG(t, i), d);
 }
-static int prec_gt(int f, int g) { return SY[f].arity != SY[g].arity ? SY[f].arity > SY[g].arity : f > g; }
+static int EQSYM = -1;   /* set to EQ once known: equality is the smallest symbol, so a conditional equation resolves its conditions first */
+static int prec_gt(int f, int g) { if (f == EQSYM) return 0; if (g == EQSYM) return 1; return SY[f].arity != SY[g].arity ? SY[f].arity > SY[g].arity : f > g; }
 static int kbo_rec(int s, int t) {   /* lexicographic part, both sides already weighed */
     if (s == t) return KEQ;
     if (ISVAR(s) || ISVAR(t)) return KINC;
@@ -958,6 +959,7 @@ int main(int argc, char **argv) {
     parse_file(path, root, NULL, -1);
     const char *base = strrchr(path, '/'); base = base ? base + 1 : path;
     if (getenv("HYPER_DUMP")) for (int r = 0; r < NR; r++) { fprintf(stderr, "%s: head %d nb %d nv %d\n", SY[R[r].name].name, R[r].head, R[r].nb, R[r].nv); }
+    EQSYM = EQ;
     if (OUT_OF_CLASS) { printf("%% SZS status GaveUp for %s\n%% reason %s\n", base, WHY); return 0; }
     if (SINGLE) { attempt(limit, ratio, base, pj, 1); return 0; }
     int st = schedule(limit, base, pj);
