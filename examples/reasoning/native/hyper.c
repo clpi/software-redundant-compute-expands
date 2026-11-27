@@ -1026,7 +1026,16 @@ static const config SCHED_EQ[] = {   /* Horn with equality after unfolding; fitt
     { "--res --wt 1,1,1,0 --cycle ga --sel 5", 5.0 },
 };
 static const config SCHED_UF[] = {   /* Horn whose equality unfolding removed; fitted on the training half of those (bench/sched-uf-v1) */
-    { "--single", 1.0 },
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa", 0.05 },
+    { "--res --wt 3,2,1,0 --gw 1 --cycle gwa", 0.1 },
+    { "--res --wt 2,1,1,3 --cycle gwwa", 0.05 },
+    { "--res --wt 1,1,1,0 --sel 1 --cycle ga", 0.05 },
+    { "--single", 0.1 },
+    { "--res --wt 1,1,1,0 --cycle gw", 0.1 },
+    { "--res --wt 1,1,1,0 --sel 1 --cycle ga", 0.1 },
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa", 0.5 },
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa", 5.0 },
+    { "--res --wt 1,1,1,0 --cycle gw", 2.0 },
 };
 static const config *SCH = SCHED; static int NSCH = sizeof SCHED / sizeof SCHED[0];
 static void apply_args(const char *a) {   /* a setting is a string of the command-line options */
