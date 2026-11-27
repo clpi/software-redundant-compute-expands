@@ -1,0 +1,717 @@
+/* hyper: positive unit hyperresolution for Horn CNF with function symbols and no equality.
+
+   Every derived clause is a positive unit (an atom, possibly with variables). A given-clause loop
+   picks units by weight with an age turn every few picks; a picked unit becomes active and is
+   resolved against every body literal of every rule, the other body literals taking active units.
+   New units are dropped when an existing unit subsumes them, and they remove the existing units
+   they subsume. A rule without a head (a negated conjecture) that fires is a refutation.
+   Positive hyperresolution is refutation complete for Horn clauses, and the loop is fair, so on an
+   unsatisfiable input it finds a refutation given time; it never answers Satisfiable.
+
+   Terms are hash-consed. Unification is structure sharing over banks (one per clause copy) with an
+   occurs check. Discrimination trees give candidate units for subsumption and unification.
+
+   Usage: hyper PROBLEM.p [--root DIR] [--limit SECONDS] [--proof-json FILE]
+   Prints "% SZS status Unsatisfiable|GaveUp|Timeout for NAME", then counts. */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <time.h>
+#include <ctype.h>
+
+static void die(const char *m) { fprintf(stderr, "hyper: %s\n", m); exit(2); }
+static void *xmalloc(size_t n) { void *p = malloc(n ? n : 1); if (!p) die("out of memory"); return p; }
+static void *xrealloc(void *p, size_t n) { p = realloc(p, n ? n : 1); if (!p) die("out of memory"); return p; }
+static double now_s(void) { struct timespec t; clock_gettime(CLOCK_MONOTONIC, &t); return t.tv_sec + t.tv_nsec / 1e9; }
+
+/* ---------------- symbols */
+typedef struct { char *name; int arity; } sym;
+static sym *SY; static int NSY, CSY;
+static int *SYH; static int SYHC;
+static uint64_t hstr(const char *s, int a) { uint64_t h = 1469598103934665603ULL ^ (uint64_t)a; while (*s) h = (h ^ (unsigned char)*s++) * 1099511628211ULL; return h; }
+static int sym_of(const char *s, int a) {
+    if (!SYHC) { SYHC = 1024; SYH = xmalloc(SYHC * sizeof(int)); for (int i = 0; i < SYHC; i++) SYH[i] = -1; }
+    uint64_t h = hstr(s, a) & (SYHC - 1);
+    while (SYH[h] >= 0) { sym *y = &SY[SYH[h]]; if (y->arity == a && !strcmp(y->name, s)) return SYH[h]; h = (h + 1) & (SYHC - 1); }
+    if (NSY == CSY) { CSY = CSY ? CSY * 2 : 256; SY = xrealloc(SY, CSY * sizeof(sym)); }
+    SY[NSY].name = strdup(s); SY[NSY].arity = a; SYH[h] = NSY;
+    if ((NSY + 1) * 2 > SYHC) {
+        int nc = SYHC * 2; int *nt = xmalloc(nc * sizeof(int)); for (int i = 0; i < nc; i++) nt[i] = -1;
+        for (int i = 0; i <= NSY; i++) { uint64_t g = hstr(SY[i].name, SY[i].arity) & (nc - 1); while (nt[g] >= 0) g = (g + 1) & (nc - 1); nt[g] = i; }
+        free(SYH); SYH = nt; SYHC = nc;
+    }
+    return NSY++;
+}
+
+/* ---------------- hash-consed terms: f >= 0 a symbol, f < 0 the variable -f-1 */
+typedef struct { int f, n, a0, w, gr, vo; } term;   /* vo = variable occurrences */   /* args in AR[a0 .. a0+n), w = symbol count, gr = ground */
+static term *T; static int NT, CT;
+static int *AR; static long NAR, CAR;
+static int *TH; static long THC, THN;
+static uint64_t hterm(int f, int n, const int *a) { uint64_t h = (uint64_t)(f + 7) * 0x9E3779B97F4A7C15ULL; for (int i = 0; i < n; i++) h = (h ^ (uint64_t)(unsigned)a[i]) * 1099511628211ULL; return h; }
+static int mk(int f, int n, const int *a) {
+    if (!THC) { THC = 1 << 16; TH = xmalloc(THC * sizeof(int)); for (long i = 0; i < THC; i++) TH[i] = -1; }
+    uint64_t h = hterm(f, n, a) & (THC - 1);
+    while (TH[h] >= 0) { term *t = &T[TH[h]]; if (t->f == f && t->n == n && !memcmp(AR + t->a0, a, n * sizeof(int))) return TH[h]; h = (h + 1) & (THC - 1); }
+    if (NT == CT) { CT = CT ? CT * 2 : 1 << 16; T = xrealloc(T, CT * sizeof(term)); }
+    if (NAR + n > CAR) { while (NAR + n > CAR) CAR = CAR ? CAR * 2 : 1 << 16; AR = xrealloc(AR, CAR * sizeof(int)); }
+    int id = NT++; T[id].f = f; T[id].n = n; T[id].a0 = (int)NAR; memcpy(AR + NAR, a, n * sizeof(int)); NAR += n;
+    int w = 1, gr = f >= 0, vo = f < 0; for (int i = 0; i < n; i++) { w += T[a[i]].w; gr &= T[a[i]].gr; vo += T[a[i]].vo; } T[id].w = w; T[id].gr = gr; T[id].vo = vo;
+    TH[h] = id; THN++;
+    if (THN * 2 > THC) {
+        long nc = THC * 2; int *nt = xmalloc(nc * sizeof(int)); for (long i = 0; i < nc; i++) nt[i] = -1;
+        for (int i = 0; i < NT; i++) { uint64_t g = hterm(T[i].f, T[i].n, AR + T[i].a0) & (nc - 1); while (nt[g] >= 0) g = (g + 1) & (nc - 1); nt[g] = i; }
+        free(TH); TH = nt; THC = nc;
+    }
+    return id;
+}
+static int mkvar(int v) { return mk(-v - 1, 0, NULL); }
+#define ISVAR(t) (T[t].f < 0)
+#define VNO(t) (-T[t].f - 1)
+#define ARG(t, i) (AR[T[t].a0 + (i)])
+
+/* ---------------- banks: bindings for clause copies */
+#define MAXV 256
+#define MAXB 66
+static int BT[MAXB][MAXV], BB[MAXB][MAXV];   /* BT = bound term or -1, BB = its bank */
+static int TRB[1 << 16], TRV[1 << 16]; static int NTR;
+static void bind(int b, int v, int t, int tb) { BT[b][v] = t; BB[b][v] = tb; TRB[NTR] = b; TRV[NTR] = v; NTR++; if (NTR >= (1 << 16)) die("trail overflow"); }
+static void undo_to(int m) { while (NTR > m) { NTR--; BT[TRB[NTR]][TRV[NTR]] = -1; } }
+static inline void deref(int *t, int *b) { while (ISVAR(*t)) { int v = VNO(*t); if (v >= MAXV) die("too many variables"); int u = BT[*b][v]; if (u < 0) return; *b = BB[*b][v]; *t = u; } }
+static int occurs(int v, int vb, int t, int b) {
+    deref(&t, &b);
+    if (ISVAR(t)) return VNO(t) == v && b == vb;
+    for (int i = 0; i < T[t].n; i++) if (occurs(v, vb, ARG(t, i), b)) return 1;
+    return 0;
+}
+static int unify(int s, int sb, int t, int tb) {
+    deref(&s, &sb); deref(&t, &tb);
+    if (s == t && (sb == tb || T[s].gr)) return 1;
+    if (ISVAR(s)) { if (ISVAR(t) && VNO(s) == VNO(t) && sb == tb) return 1; if (occurs(VNO(s), sb, t, tb)) return 0; bind(sb, VNO(s), t, tb); return 1; }
+    if (ISVAR(t)) { if (occurs(VNO(t), tb, s, sb)) return 0; bind(tb, VNO(t), s, sb); return 1; }
+    if (T[s].f != T[t].f || T[s].n != T[t].n) return 0;
+    for (int i = 0; i < T[s].n; i++) if (!unify(ARG(s, i), sb, ARG(t, i), tb)) return 0;
+    return 1;
+}
+/* one-way match: variables of general g (bank MB) may bind; specific s is taken literally */
+#define MB (MAXB - 1)
+static int match(int g, int s) {
+    if (ISVAR(g)) { int v = VNO(g); if (BT[MB][v] >= 0) return BT[MB][v] == s; bind(MB, v, s, 0); return 1; }
+    if (g == s && T[g].gr) return 1;
+    if (ISVAR(s) || T[g].f != T[s].f || T[g].n != T[s].n) return 0;
+    for (int i = 0; i < T[g].n; i++) if (!match(ARG(g, i), ARG(s, i))) return 0;
+    return 1;
+}
+/* instantiate under bindings, renaming variables to 0.. in order of first occurrence */
+static int RMB[1 << 14], RMV[1 << 14], RMN;
+static int inst_rec(int t, int b) {
+    deref(&t, &b);
+    if (ISVAR(t)) { int v = VNO(t); for (int i = 0; i < RMN; i++) if (RMB[i] == b && RMV[i] == v) return mkvar(i); if (RMN >= MAXV) die("too many variables in a unit"); RMB[RMN] = b; RMV[RMN] = v; return mkvar(RMN++); }
+    if (!T[t].n) return t;
+    int a[64]; if (T[t].n > 64) die("arity above 64");
+    for (int i = 0; i < T[t].n; i++) a[i] = inst_rec(ARG(t, i), b);
+    return mk(T[t].f, T[t].n, a);
+}
+static int inst(int t, int b, int *nv) { RMN = 0; int r = inst_rec(t, b); if (nv) *nv = RMN; return r; }
+
+
+/* ---------------- discrimination trees: preorder symbol strings, a variable stored as STAR */
+#define STAR (-1)
+#define QVAR (-3)
+typedef struct { int sym, parent, child, sib; int *ent; int nent, cent; } dnode;
+typedef struct { dnode *N; int nn, cn; int *H; long HC, HN; } dtree;
+static void dt_init(dtree *d) {
+    d->cn = 1024; d->N = xmalloc(d->cn * sizeof(dnode)); d->nn = 1;
+    d->N[0] = (dnode){ -2, -1, -1, -1, NULL, 0, 0 };
+    d->HC = 4096; d->H = xmalloc(d->HC * sizeof(int)); for (long i = 0; i < d->HC; i++) d->H[i] = -1; d->HN = 0;
+}
+static uint64_t dh(int p, int s) { return ((uint64_t)(unsigned)p * 0x9E3779B97F4A7C15ULL) ^ ((uint64_t)(unsigned)(s + 3) * 0xC2B2AE3D27D4EB4FULL); }
+static int dt_get(dtree *d, int p, int s) {
+    uint64_t h = dh(p, s) & (d->HC - 1);
+    while (d->H[h] >= 0) { int c = d->H[h]; if (d->N[c].parent == p && d->N[c].sym == s) return c; h = (h + 1) & (d->HC - 1); }
+    return -1;
+}
+static int dt_add(dtree *d, int p, int s) {
+    if (d->nn == d->cn) { d->cn *= 2; d->N = xrealloc(d->N, d->cn * sizeof(dnode)); }
+    int c = d->nn++; d->N[c] = (dnode){ s, p, -1, d->N[p].child, NULL, 0, 0 }; d->N[p].child = c;
+    if ((d->HN + 1) * 2 > d->HC) {
+        long nc = d->HC * 2; int *nt = xmalloc(nc * sizeof(int)); for (long i = 0; i < nc; i++) nt[i] = -1;
+        for (int i = 1; i < d->nn; i++) { uint64_t g = dh(d->N[i].parent, d->N[i].sym) & (nc - 1); while (nt[g] >= 0) g = (g + 1) & (nc - 1); nt[g] = i; }
+        free(d->H); d->H = nt; d->HC = nc; d->HN = d->nn - 1;
+    } else {
+        uint64_t h = dh(p, s) & (d->HC - 1); while (d->H[h] >= 0) h = (h + 1) & (d->HC - 1); d->H[h] = c; d->HN++;
+    }
+    return c;
+}
+static void dt_insert_rec(dtree *d, int *node, int t) {
+    int s = ISVAR(t) ? STAR : T[t].f;
+    int c = dt_get(d, *node, s); if (c < 0) c = dt_add(d, *node, s); *node = c;
+    if (!ISVAR(t)) for (int i = 0; i < T[t].n; i++) dt_insert_rec(d, node, ARG(t, i));
+}
+static void dt_insert(dtree *d, int t, int e) {
+    int node = 0; dt_insert_rec(d, &node, t);
+    dnode *n = &d->N[node]; if (n->nent == n->cent) { n->cent = n->cent ? n->cent * 2 : 2; n->ent = xrealloc(n->ent, n->cent * sizeof(int)); }
+    n->ent[n->nent++] = e;
+}
+/* the query, flattened */
+static int QS[1 << 16], QE[1 << 16], QN;
+static int flat_rec(int t) {
+    int i = QN++; if (QN >= (1 << 16)) die("query too large");
+    if (ISVAR(t)) QS[i] = QVAR; else { QS[i] = T[t].f; for (int k = 0; k < T[t].n; k++) flat_rec(ARG(t, k)); }
+    QE[i] = QN; return i;
+}
+static void flatten(int t) { QN = 0; flat_rec(t); }
+/* the query is a term under bindings: flatten through them, without building it */
+static int flat_rec_b(int t, int b) {
+    deref(&t, &b);
+    int i = QN++; if (QN >= (1 << 16)) die("query too large");
+    if (ISVAR(t)) QS[i] = QVAR; else { QS[i] = T[t].f; for (int k = 0; k < T[t].n; k++) flat_rec_b(ARG(t, k), b); }
+    QE[i] = QN; return i;
+}
+static void flatten_b(int t, int b) { QN = 0; flat_rec_b(t, b); }
+static int *CAND; static long NCAND, CCAND;
+static void take(dnode *n) { if (NCAND + n->nent > CCAND) { while (NCAND + n->nent > CCAND) CCAND = CCAND ? CCAND * 2 : 1024; CAND = xrealloc(CAND, CCAND * sizeof(int)); } memcpy(CAND + NCAND, n->ent, n->nent * sizeof(int)); NCAND += n->nent; }
+static int sym_arity(int s) { return s == STAR ? 0 : SY[s].arity; }
+/* generalizations of the query: stored terms that may match onto it */
+static void dt_gen(dtree *d, int node, int i) {
+    if (i == QN) { take(&d->N[node]); return; }
+    int c = dt_get(d, node, STAR); if (c >= 0) dt_gen(d, c, QE[i]);
+    if (QS[i] >= 0) { c = dt_get(d, node, QS[i]); if (c >= 0) dt_gen(d, c, i + 1); }
+}
+static void dt_inst(dtree *d, int node, int i);
+static void dt_unif(dtree *d, int node, int i);
+/* skip k stored subterms below node, then continue the query at position i in mode m */
+static void dt_skip(dtree *d, int node, int k, int i, int m) {
+    if (k == 0) { if (m) dt_unif(d, node, i); else dt_inst(d, node, i); return; }
+    for (int c = d->N[node].child; c >= 0; c = d->N[c].sib) dt_skip(d, c, k - 1 + sym_arity(d->N[c].sym), i, m);
+}
+/* instances of the query */
+static void dt_inst(dtree *d, int node, int i) {
+    if (i == QN) { take(&d->N[node]); return; }
+    if (QS[i] == QVAR) { dt_skip(d, node, 1, QE[i], 0); return; }
+    int c = dt_get(d, node, QS[i]); if (c >= 0) dt_inst(d, c, i + 1);
+}
+/* terms that may unify with the query */
+static void dt_unif(dtree *d, int node, int i) {
+    if (i == QN) { take(&d->N[node]); return; }
+    if (QS[i] == QVAR) { dt_skip(d, node, 1, QE[i], 1); return; }
+    int c = dt_get(d, node, STAR); if (c >= 0) dt_unif(d, c, QE[i]);
+    c = dt_get(d, node, QS[i]); if (c >= 0) dt_unif(d, c, i + 1);
+}
+
+/* ---------------- clauses and units */
+typedef struct { int head, nb, *body, nv, name, orig, guard; } rule;   /* orig: problem clause, -1 for a magic rule; guard: body[0] is the magic literal */
+static rule *R; static int NR, CR;
+typedef struct { int atom, rule, np, par0, w; long age; char st; } unit;   /* st: 0 passive, 1 active, 2 dead */
+static unit *U; static int NU, CU;
+static int *PAR; static long NPAR, CPAR;
+static dtree KEPT, ACT;
+static int OUT_OF_CLASS, MAGIC, RES, SINGLE; static const char *WHY = "";
+
+/* ---------------- TPTP CNF reader with nested terms */
+typedef struct { char *s; int kind; } tok;   /* kind: 'w' word, 'V' variable, 'q' quoted, 'p' punctuation */
+static tok *TK; static int NTK, CTK, TI;
+static void lex(const char *b) {
+    NTK = 0; TI = 0;
+    for (const char *p = b; *p;) {
+        if (isspace((unsigned char)*p)) { p++; continue; }
+        if (*p == '%') { while (*p && *p != '\n') p++; continue; }
+        if (p[0] == '/' && p[1] == '*') { p += 2; while (*p && !(p[0] == '*' && p[1] == '/')) p++; if (*p) p += 2; continue; }
+        const char *st = p; int kind;
+        if (*p == '\'' || *p == '"') { char q = *p++; while (*p && *p != q) { if (*p == '\\' && p[1]) p++; p++; } if (*p) p++; kind = 'q'; }
+        else if (isalnum((unsigned char)*p) || *p == '_' || *p == '$') { int up = isupper((unsigned char)*p) || *p == '_'; while (isalnum((unsigned char)*p) || *p == '_' || *p == '$') p++; kind = up ? 'V' : 'w'; }
+        else if (p[0] == '!' && p[1] == '=') { p += 2; kind = 'p'; }
+        else { p++; kind = 'p'; }
+        if (NTK == CTK) { CTK = CTK ? CTK * 2 : 4096; TK = xrealloc(TK, CTK * sizeof(tok)); }
+        TK[NTK].s = strndup(st, p - st); TK[NTK].kind = kind; NTK++;
+    }
+}
+static int at(const char *s) { return TI < NTK && !strcmp(TK[TI].s, s); }
+static void expect(const char *s) { if (!at(s)) { OUT_OF_CLASS = 1; WHY = "syntax"; } else TI++; }
+static char *CVN[MAXV]; static int CNV;
+static int term_p(void) {
+    if (TI >= NTK) { OUT_OF_CLASS = 1; WHY = "syntax"; return mkvar(0); }
+    tok *k = &TK[TI++];
+    if (k->kind == 'V') {
+        for (int i = 0; i < CNV; i++) if (!strcmp(CVN[i], k->s)) return mkvar(i);
+        if (CNV == MAXV) die("clause has too many variables");
+        CVN[CNV] = k->s; return mkvar(CNV++);
+    }
+    int a[64], n = 0;
+    if (at("(")) { TI++; do { if (n == 64) die("arity above 64"); a[n++] = term_p(); } while (at(",") && ++TI); expect(")"); }
+    return mk(sym_of(k->s, n), n, a);
+}
+static char *readall(const char *path) {
+    FILE *f = fopen(path, "rb"); if (!f) return NULL;
+    fseek(f, 0, SEEK_END); long n = ftell(f); fseek(f, 0, SEEK_SET);
+    char *b = xmalloc(n + 1); if (fread(b, 1, n, f) != (size_t)n) die("read"); b[n] = 0; fclose(f); return b;
+}
+static void parse_file(const char *path, const char *root, char **sel, int nsel);
+static void parse_toks(const char *root, char **sel, int nsel) {
+    while (TI < NTK && !OUT_OF_CLASS) {
+        char *kw = TK[TI++].s;
+        if (!strcmp(kw, "include")) {
+            expect("("); char *fn = TK[TI++].s; char *sub[4096]; int ns = 0, has = 0;
+            if (at(",")) { TI++; expect("["); has = 1; while (TI < NTK && !at("]")) { if (!at(",")) { if (ns < 4096) sub[ns++] = TK[TI].s; } TI++; } expect("]"); }
+            expect(")"); expect(".");
+            char name[4096]; size_t L = strlen(fn); snprintf(name, sizeof name, "%s/%.*s", root, (int)(L - 2), fn + 1);
+            int savTI = TI, savN = NTK; tok *savT = TK; int savC = CTK; TK = NULL; NTK = CTK = 0;
+            parse_file(name, root, has ? sub : NULL, has ? ns : -1);
+            TK = savT; NTK = savN; CTK = savC; TI = savTI;
+            continue;
+        }
+        if (strcmp(kw, "cnf")) { OUT_OF_CLASS = 1; WHY = "non-CNF formula"; return; }
+        expect("("); char *name = TK[TI++].s; expect(","); TI++; expect(",");
+        int keep = 1; if (nsel >= 0) { keep = 0; for (int i = 0; i < nsel; i++) if (!strcmp(sel[i], name)) keep = 1; }
+        CNV = 0; int lits[1024], neg[1024], nl = 0, taut = 0, depth = 0;
+        while (TI < NTK) {
+            if (at("(")) { depth++; TI++; continue; }
+            if (at(")")) { if (depth == 0) break; depth--; TI++; continue; }
+            if (at("|")) { TI++; continue; }
+            if (at(",")) break;
+            int ng = 0; if (at("~")) { ng = 1; TI++; }
+            int t = term_p();
+            if (at("=") || at("!=")) { OUT_OF_CLASS = 1; WHY = "equality"; return; }
+            const char *pn = SY[T[t].f].name;
+            if (!strcmp(pn, "$true")) { if (!ng) taut = 1; continue; }
+            if (!strcmp(pn, "$false")) { if (ng) taut = 1; continue; }
+            if (nl == 1024) die("clause too long");
+            lits[nl] = t; neg[nl] = ng; nl++;
+        }
+        int depth2 = 0; while (TI < NTK && !(at(".") && depth2 <= 0)) { if (at("(")) depth2++; if (at(")")) depth2--; TI++; }
+        TI++;
+        if (!keep || taut) continue;
+        int npos = 0, head = -1; for (int i = 0; i < nl; i++) if (!neg[i]) { npos++; head = lits[i]; }
+        if (npos > 1) { OUT_OF_CLASS = 1; WHY = "non-Horn clause"; return; }
+        if (NR == CR) { CR = CR ? CR * 2 : 256; R = xrealloc(R, CR * sizeof(rule)); }
+        rule *r = &R[NR++]; r->head = head; r->nb = nl - npos; r->body = xmalloc((r->nb + 1) * sizeof(int)); r->nv = CNV; r->name = sym_of(name, -1); r->orig = NR - 1; r->guard = 0;
+        int k = 0; for (int i = 0; i < nl; i++) if (neg[i]) r->body[k++] = lits[i];
+        if (r->nb + 1 >= MAXB - 3) { OUT_OF_CLASS = 1; WHY = "rule body too long"; return; }
+    }
+}
+static void parse_file(const char *path, const char *root, char **sel, int nsel) {
+    char *b = readall(path); if (!b) { OUT_OF_CLASS = 1; WHY = "cannot open an included file"; return; }
+    lex(b); free(b); parse_toks(root, sel, nsel);
+}
+
+/* ---------------- magic sets: hyperresolution that only derives what the goal can use.
+   Each rule H <- B1..Bn becomes H <- m(H), B1..Bn, with m(Bi) <- m(H), B1..B(i-1); a goal
+   <- G1..Gm adds m(Gi) <- G1..G(i-1). The m predicates are fresh, so reading every m atom as true
+   turns each new clause into a problem clause or a tautology: a refutation of the new set is a
+   refutation of the problem. Arguments are kept whole, so m atoms are subgoals with variables and
+   the loop runs as tabled top-down resolution. Proofs drop the m steps and m parents; a kept step
+   is then an instance of what the problem clause gives, which the checker accepts. */
+static int magic_of(int a) { int n = T[a].n; int args[64]; for (int i = 0; i < n; i++) args[i] = ARG(a, i); char nm[4096]; snprintf(nm, sizeof nm, "$m_%s", SY[T[a].f].name); return mk(sym_of(nm, n), n, args); }
+static int is_magic(int a) { return !strncmp(SY[T[a].f].name, "$m_", 3); }
+static void add_rule(int head, int nb, const int *body, int nv, int name, int orig, int guard) {
+    if (NR == CR) { CR = CR ? CR * 2 : 256; R = xrealloc(R, CR * sizeof(rule)); }
+    rule *r = &R[NR++]; r->head = head; r->nb = nb; r->body = xmalloc((nb + 1) * sizeof(int)); memcpy(r->body, body, nb * sizeof(int));
+    r->nv = nv; r->name = name; r->orig = orig; r->guard = guard;
+}
+static void magic_transform(void) {
+    int n0 = NR; rule *old = R; R = NULL; NR = CR = 0;
+    for (int r = 0; r < n0; r++) {
+        rule *o = &old[r]; int b[MAXB];
+        if (o->nb == 0) { add_rule(o->head, 0, NULL, o->nv, o->name, r, 0); continue; }
+        if (o->head >= 0) {
+            b[0] = magic_of(o->head); memcpy(b + 1, o->body, o->nb * sizeof(int));
+            add_rule(o->head, o->nb + 1, b, o->nv, o->name, r, 1);
+            for (int i = 0; i < o->nb; i++) add_rule(magic_of(o->body[i]), i + 1, b, o->nv, o->name, -1, 0);
+        } else {
+            add_rule(-1, o->nb, o->body, o->nv, o->name, r, 0);
+            for (int i = 0; i < o->nb; i++) add_rule(magic_of(o->body[i]), i, o->body, o->nv, o->name, -1, 0);
+        }
+    }
+}
+
+/* ---------------- given-clause loop */
+static long AGE, KEPTN, GIVEN, GENERATED, SUBS_FWD, SUBS_BWD;
+static int REF_RULE = -1, REF_PAR[MAXB];
+static int *HW, *HA; static long NHW, NHA, CHW, CHA;   /* heaps by weight and by age */
+static int lessw(int a, int b) { return U[a].w < U[b].w || (U[a].w == U[b].w && U[a].age < U[b].age); }
+static int lessa(int a, int b) { return U[a].age < U[b].age; }
+static void hpush(int **h, long *n, long *c, int x, int (*lt)(int, int)) {
+    if (*n == *c) { *c = *c ? *c * 2 : 1024; *h = xrealloc(*h, *c * sizeof(int)); }
+    long i = (*n)++; (*h)[i] = x;
+    while (i > 0) { long p = (i - 1) / 2; if (!lt((*h)[i], (*h)[p])) break; int t = (*h)[i]; (*h)[i] = (*h)[p]; (*h)[p] = t; i = p; }
+}
+static int hpop(int *h, long *n, int (*lt)(int, int)) {
+    if (!*n) return -1;
+    int top = h[0]; h[0] = h[--(*n)]; long i = 0;
+    for (;;) { long l = 2 * i + 1, r = l + 1, m = i; if (l < *n && lt(h[l], h[m])) m = l; if (r < *n && lt(h[r], h[m])) m = r; if (m == i) break; int t = h[i]; h[i] = h[m]; h[m] = t; i = m; }
+    return top;
+}
+/* DISCOUNT loop: only active units simplify. A new unit is dropped if it is a variant of any kept
+   unit (variants are one hash-consed term) or an active unit subsumes it; a picked unit is checked
+   again, and retires the active units it subsumes, before it becomes active itself. */
+static char *SEEN; static long CSEEN;
+static int seen(int a) { if (a >= CSEEN) { long n = CSEEN ? CSEEN : 1 << 16; while (n <= a) n *= 2; SEEN = xrealloc(SEEN, n); memset(SEEN + CSEEN, 0, n - CSEEN); CSEEN = n; } return SEEN[a]; }
+static int subsumed(int a) {   /* forward: a live active unit matches onto a */
+    flatten(a); NCAND = 0; dt_gen(&ACT, 0, 0);
+    for (long i = 0; i < NCAND; i++) { int c = CAND[i]; if (U[c].st == 2) continue; int m = NTR; int ok = match(U[c].atom, a); undo_to(m); if (ok) return 1; }
+    return 0;
+}
+static int CH[MAXB];
+static int add_unit(int a, int r, int np, const int *par) {
+    if (NU == CU) { CU = CU ? CU * 2 : 4096; U = xrealloc(U, CU * sizeof(unit)); }
+    int id = NU++; unit *u = &U[id]; u->atom = a; u->rule = r; u->np = np; u->par0 = (int)NPAR; u->w = T[a].w; u->age = AGE++; u->st = 0;
+    if (NPAR + np > CPAR) { while (NPAR + np > CPAR) CPAR = CPAR ? CPAR * 2 : 4096; PAR = xrealloc(PAR, CPAR * sizeof(int)); }
+    memcpy(PAR + NPAR, par, np * sizeof(int)); NPAR += np;
+    seen(a); SEEN[a] = 1; KEPTN++;
+    hpush(&HW, &NHW, &CHW, id, lessw); hpush(&HA, &NHA, &CHA, id, lessa);
+    /* a one-literal goal that unifies refutes at once */
+    for (int g = 0; g < NR && REF_RULE < 0; g++) if (R[g].head < 0 && R[g].nb == 1) {
+        int m = NTR; if (unify(R[g].body[0], MAXB - 2, a, MAXB - 3)) { REF_RULE = g; REF_PAR[0] = id; } undo_to(m);   /* own banks: a rule's bindings may be live */
+    }
+    return id;
+}
+static int GU, GJ;
+static double DEADLINE; static long TICK;
+static void conclude(int r) {
+    GENERATED++;
+    rule *ru = &R[r];
+    if (ru->head < 0) { REF_RULE = r; for (int k = 0; k < ru->nb; k++) REF_PAR[k] = CH[k]; return; }
+    int a = inst(ru->head, 0, NULL);
+    if (seen(a) || subsumed(a)) { SUBS_FWD++; return; }
+    add_unit(a, r, ru->nb, CH);
+}
+static void extend(int r, int k) {
+    if (REF_RULE >= 0) return;
+    if ((++TICK & 1023) == 0 && now_s() > DEADLINE) return;
+    rule *ru = &R[r];
+    if (k == ru->nb) { conclude(r); return; }
+    if (k == GJ) { extend(r, k + 1); return; }
+    flatten_b(ru->body[k], 0); NCAND = 0; dt_unif(&ACT, 0, 0);
+    long n = NCAND; int *cs = xmalloc((n + 1) * sizeof(int)); memcpy(cs, CAND, n * sizeof(int));
+    for (long i = 0; i < n && REF_RULE < 0; i++) {
+        int c = cs[i]; if (U[c].st != 1) continue; if (k < GJ && c == GU) continue;
+        int m = NTR;
+        if (unify(ru->body[k], 0, U[c].atom, k + 1)) { CH[k] = c; extend(r, k + 1); }
+        undo_to(m);
+    }
+    free(cs);
+}
+static void give(int u) {
+    int a = U[u].atom;
+    if (subsumed(a)) { U[u].st = 2; SUBS_FWD++; return; }
+    flatten(a); NCAND = 0; dt_inst(&ACT, 0, 0);
+    for (long i = 0; i < NCAND; i++) { int c = CAND[i]; if (U[c].st != 1) continue; int m = NTR; int ok = match(a, U[c].atom); undo_to(m); if (ok) { U[c].st = 2; SUBS_BWD++; } }
+    U[u].st = 1; dt_insert(&ACT, a, u); GIVEN++;
+    for (int r = 0; r < NR && REF_RULE < 0; r++) for (int j = 0; j < R[r].nb && REF_RULE < 0; j++) {
+        int m = NTR;
+        if (unify(R[r].body[j], 0, U[u].atom, j + 1)) { GU = u; GJ = j; CH[j] = u; extend(r, 0); }
+        undo_to(m);
+    }
+}
+
+/* ---------------- proof output */
+static void put_str(FILE *f, const char *s) { fputc('"', f); for (; *s; s++) { if (*s == '"' || *s == '\\') fputc('\\', f); fputc(*s, f); } fputc('"', f); }
+static void put_term(FILE *f, int t) {
+    if (ISVAR(t)) { fprintf(f, "\"?%d\"", VNO(t)); return; }
+    fputc('[', f); put_str(f, SY[T[t].f].name);
+    for (int i = 0; i < T[t].n; i++) { fputc(',', f); put_term(f, ARG(t, i)); }
+    fputc(']', f);
+}
+static char *NEED;
+static void need(int u) { if (NEED[u]) return; NEED[u] = 1; for (int i = 0; i < U[u].np; i++) need(PAR[U[u].par0 + i]); }
+static long proof(FILE *f) {
+    NEED = xmalloc(NU + 1); memset(NEED, 0, NU + 1);
+    for (int k = 0; k < R[REF_RULE].nb; k++) need(REF_PAR[k]);
+    long n = 0; if (f) fputc('[', f);
+    for (int u = 0; u < NU; u++) if (NEED[u] && !is_magic(U[u].atom)) {   /* magic steps and magic parents are left out */
+        int g = R[U[u].rule].guard;
+        if (f) { if (n) fputs(",\n", f); fprintf(f, "{\"id\":%d,\"atom\":", u); put_term(f, U[u].atom); fputs(",\"rule\":", f); put_str(f, SY[R[U[u].rule].name].name);
+            fputs(",\"parents\":[", f); for (int i = g; i < U[u].np; i++) fprintf(f, "%s%d", i > g ? "," : "", PAR[U[u].par0 + i]); fputs("]}", f); }
+        n++;
+    }
+    if (f) { if (n) fputs(",\n", f); fputs("{\"atom\":null,\"rule\":", f); put_str(f, SY[R[REF_RULE].name].name); fputs(",\"parents\":[", f);
+        for (int k = 0; k < R[REF_RULE].nb; k++) fprintf(f, "%s%d", k ? "," : "", REF_PAR[k]);
+        fputs("]}]\n", f); }
+    return n + 1;
+}
+
+/* ---------------- ordered resolution over Horn clauses (--res): rules compose into lemmas.
+   Binary resolution of a head with a body literal, restricted to literals that are maximal in
+   their clause under a Knuth-Bendix order (all symbols weight 1, precedence by arity then symbol
+   number), in a DISCOUNT given-clause loop with clause subsumption. Ordered resolution is
+   refutation complete for Horn clauses. */
+#define KGT 1
+#define KLT 2
+#define KEQ 3
+#define KINC 0
+static int VC[1 << 14]; static int VT[1 << 14], NVT;
+static void vcount(int t, int d) {
+    if (ISVAR(t)) { int v = VNO(t); if (!VC[v]) VT[NVT++] = v; VC[v] += d; if (!VC[v]) VC[v] = 0; return; }
+    for (int i = 0; i < T[t].n; i++) vcount(ARG(t, i), d);
+}
+static int prec_gt(int f, int g) { return SY[f].arity != SY[g].arity ? SY[f].arity > SY[g].arity : f > g; }
+static int kbo_rec(int s, int t) {   /* lexicographic part, both sides already weighed */
+    if (s == t) return KEQ;
+    if (ISVAR(s) || ISVAR(t)) return KINC;
+    int ws = T[s].w, wt = T[t].w;
+    if (ws != wt) return ws > wt ? KGT : KLT;
+    if (T[s].f != T[t].f) return prec_gt(T[s].f, T[t].f) ? KGT : KLT;
+    for (int i = 0; i < T[s].n; i++) { int r = kbo_rec(ARG(s, i), ARG(t, i)); if (r != KEQ) return r; }
+    return KEQ;
+}
+static int kbo(int s, int t) {
+    if (s == t) return KEQ;
+    NVT = 0; vcount(s, 1); vcount(t, -1);
+    int ge = 1, le = 1; for (int i = 0; i < NVT; i++) { int v = VT[i]; if (VC[v] < 0) ge = 0; if (VC[v] > 0) le = 0; VC[v] = 0; }
+    int r = kbo_rec(s, t);
+    /* a weight or precedence decision counts only if the variable condition agrees */
+    if (r == KGT) return ge ? KGT : KINC;
+    if (r == KLT) return le ? KLT : KINC;
+    return r;
+}
+typedef struct { int head, nb, b0, w, p1, p2, lit, src; long age; char st, eh; uint64_t eb; } clause;   /* src: problem clause for an input */
+static clause *C; static int NC, CC;
+static int FW = 2, VW = 1, LP = 0; static double HM = 1.0;   /* clause weight: symbols FW, variables VW, head times HM, LP per body literal */
+static int lwt(int t) { return FW * (T[t].w - T[t].vo) + VW * T[t].vo; }
+static int *CB; static long NCB, CCB;
+static dtree RH, RB, SH, SU, SG;   /* SH: heads of active non-units, SU: active units */   /* active: eligible heads, eligible body literals; subsumption: heads, first literal of headless */
+static int *QW, *QA, *QS2; static long NQW, NQA, CQW, CQA, NQS, CQS;   /* by weight, by age, goal clauses (no head) by weight */
+static int clw(int a, int b) { return C[a].w < C[b].w || (C[a].w == C[b].w && C[a].age < C[b].age); }
+static int cla(int a, int b) { return C[a].age < C[b].age; }
+static int RREF = -1;
+#define LIT(c, k) (CB[C[c].b0 + (k)])
+/* literal selection: a Horn clause whose head is its unique maximal literal resolves on the head;
+   any other clause selects its heaviest body literal (the first among equals) and resolves on that
+   alone. Selecting a body literal in every clause that has one keeps ordered resolution complete. */
+static void eligible(int c) {
+    clause *x = &C[c]; x->eh = 0; x->eb = 0;
+    if (x->head >= 0) {
+        int top = 1; for (int i = 0; i < x->nb && top; i++) if (kbo(x->head, LIT(c, i)) != KGT) top = 0;
+        if (top) { x->eh = 1; return; }
+    }
+    if (!x->nb) { x->eh = 1; return; }
+    int best = 0; for (int i = 1; i < x->nb; i++) if (T[LIT(c, i)].w > T[LIT(c, best)].w) best = i;
+    x->eb = 1ULL << best;
+}
+/* subsumption of clause d by clause s: one substitution sends s's head to d's head and every body literal of s to some body literal of d */
+static int sub_body(int s, int k, int d, uint64_t used) {   /* multiset: distinct literals of d */
+    if (k == C[s].nb) return 1;
+    int a = LIT(s, k);
+    for (int j = 0; j < C[d].nb; j++) { if (used >> j & 1) continue; int b = LIT(d, j); if (T[b].f != T[a].f || T[b].w < T[a].w) continue;
+        int m = NTR; if (match(a, b) && sub_body(s, k + 1, d, used | 1ULL << j)) { undo_to(m); return 1; } undo_to(m); }
+    return 0;
+}
+static int subsumes(int s, int d) {
+    if (C[s].nb > C[d].nb || C[s].w > C[d].w) return 0;   /* an instance is never lighter */
+    if ((C[s].head >= 0) != 0 && C[d].head < 0) return 0;
+    int m = NTR; int ok = 1;
+    if (C[s].head >= 0) ok = match(C[s].head, C[d].head);
+    if (ok) ok = sub_body(s, 0, d, 0);
+    undo_to(m); return ok;
+}
+static int csubsumed(int d) {
+    if (C[d].head >= 0) {
+        flatten(C[d].head);
+        NCAND = 0; dt_gen(&SU, 0, 0); for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (s != d && C[s].st == 1) { int m = NTR; int ok = match(C[s].head, C[d].head); undo_to(m); if (ok) return 1; } }
+        if (C[d].nb) { NCAND = 0; dt_gen(&SH, 0, 0); for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (s != d && C[s].st == 1 && subsumes(s, d)) return 1; } }
+    }
+    for (int j = 0; j < C[d].nb; j++) { flatten(LIT(d, j)); NCAND = 0; dt_gen(&SG, 0, 0); for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (s != d && C[s].st == 1 && subsumes(s, d)) return 1; } }
+    return 0;
+}
+/* build a clause from literals under bindings, renaming variables jointly; -1 if a tautology */
+static int new_clause(int hd, int hb, int *lits, int *banks, int n, int p1, int p2, int lit, int src) {
+    RMN = 0; int h = hd >= 0 ? inst_rec(hd, hb) : -1; int b[1024], nb = 0;
+    if (n > 1000) return -1;
+    for (int i = 0; i < n; i++) { int a = inst_rec(lits[i], banks[i]); int dup = 0; for (int j = 0; j < nb; j++) if (b[j] == a) dup = 1; if (!dup) b[nb++] = a; if (a == h) return -1; }
+    if (nb > 62) return -1;
+    if (NC == CC) { CC = CC ? CC * 2 : 4096; C = xrealloc(C, CC * sizeof(clause)); }
+    if (NCB + nb > CCB) { while (NCB + nb > CCB) CCB = CCB ? CCB * 2 : 1 << 16; CB = xrealloc(CB, CCB * sizeof(int)); }
+    int c = NC++; clause *x = &C[c]; x->head = h; x->nb = nb; x->b0 = (int)NCB; memcpy(CB + NCB, b, nb * sizeof(int)); NCB += nb;
+    x->w = h >= 0 ? (int)(HM * lwt(h)) : 0; for (int i = 0; i < nb; i++) x->w += lwt(b[i]); x->w += LP * nb;
+    x->p1 = p1; x->p2 = p2; x->lit = lit; x->src = src; x->age = AGE++; x->st = 0;
+    return c;
+}
+static void keep_clause(int c) {
+    if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; }
+    hpush(&QW, &NQW, &CQW, c, clw); hpush(&QA, &NQA, &CQA, c, cla); if (C[c].head < 0) hpush(&QS2, &NQS, &CQS, c, clw); KEPTN++;
+}
+static void resolvent(int hc, int bc, int k) {   /* head of hc (bank 1) against body literal k of bc (bank 2), unified already */
+    GENERATED++;
+    int lits[1024], banks[1024], n = 0;
+    for (int i = 0; i < C[bc].nb && n < 1000; i++) if (i != k) { lits[n] = LIT(bc, i); banks[n++] = 2; }
+    for (int i = 0; i < C[hc].nb && n < 1000; i++) { lits[n] = LIT(hc, i); banks[n++] = 1; }
+    int c = new_clause(C[bc].head, 2, lits, banks, n, hc, bc, k, -1);
+    if (c < 0) return;
+    if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; }
+    if (csubsumed(c)) { NC--; NCB -= C[c].nb; SUBS_FWD++; return; }
+    keep_clause(c);
+}
+static void res_give(int g) {
+    if (csubsumed(g)) { C[g].st = 2; SUBS_FWD++; return; }
+    eligible(g);
+    /* backward subsumption among active clauses */
+    if (C[g].head >= 0) { flatten(C[g].head); NCAND = 0; dt_inst(&SH, 0, 0); if (!C[g].nb) dt_inst(&SU, 0, 0); for (long i = 0; i < NCAND; i++) { int s = CAND[i]; if (s != g && C[s].st == 1 && subsumes(g, s)) { C[s].st = 2; SUBS_BWD++; } } }
+    C[g].st = 1; GIVEN++;
+    if (C[g].head >= 0) dt_insert(C[g].nb ? &SH : &SU, C[g].head, g); else if (C[g].nb) dt_insert(&SG, LIT(g, 0), g);
+    if (C[g].eh) dt_insert(&RH, C[g].head, g);
+    for (int k = 0; k < C[g].nb; k++) if (C[g].eb >> k & 1) dt_insert(&RB, LIT(g, k), g * 64 + k);
+    /* g's eligible body literals against active eligible heads */
+    for (int k = 0; k < C[g].nb && RREF < 0; k++) if (C[g].eb >> k & 1) {
+        flatten(LIT(g, k)); NCAND = 0; dt_unif(&RH, 0, 0);
+        long n = NCAND; int *cs = xmalloc((n + 1) * sizeof(int)); memcpy(cs, CAND, n * sizeof(int));
+        for (long i = 0; i < n && RREF < 0; i++) { int h = cs[i]; if (C[h].st != 1) continue; int m = NTR; if (unify(C[h].head, 1, LIT(g, k), 2)) resolvent(h, g, k); undo_to(m); if (C[g].st != 1) break; }
+        free(cs);
+    }
+    /* g's eligible head against active eligible body literals */
+    if (C[g].eh && RREF < 0) {
+        flatten(C[g].head); NCAND = 0; dt_unif(&RB, 0, 0);
+        long n = NCAND; int *cs = xmalloc((n + 1) * sizeof(int)); memcpy(cs, CAND, n * sizeof(int));
+        for (long i = 0; i < n && RREF < 0; i++) { int b = cs[i] / 64, k = cs[i] % 64; if (C[b].st != 1 || b == g) continue; int m = NTR; if (unify(C[g].head, 1, LIT(b, k), 2)) resolvent(g, b, k); undo_to(m); }
+        free(cs);
+    }
+}
+static void put_clause(FILE *f, int c) {
+    fprintf(f, "{\"id\":%d,\"head\":", c); if (C[c].head >= 0) put_term(f, C[c].head); else fputs("null", f);
+    fputs(",\"body\":[", f); for (int i = 0; i < C[c].nb; i++) { if (i) fputc(',', f); put_term(f, LIT(c, i)); } fputc(']', f);
+    if (C[c].src >= 0) { fputs(",\"input\":", f); put_str(f, SY[R[C[c].src].name].name); }
+    else fprintf(f, ",\"from\":[%d,%d,%d]", C[c].p1, C[c].p2, C[c].lit);
+    fputc('}', f);
+}
+static char *CNEED;
+static void cneed(int c) { if (CNEED[c]) return; CNEED[c] = 1; if (C[c].src < 0) { cneed(C[c].p1); cneed(C[c].p2); } }
+static long res_proof(FILE *f) {
+    CNEED = xmalloc(NC + 1); memset(CNEED, 0, NC + 1); cneed(RREF);
+    long n = 0; if (f) fputc('[', f);
+    for (int c = 0; c < NC; c++) if (CNEED[c]) { if (f) { if (n) fputs(",\n", f); put_clause(f, c); } n++; }
+    if (f) fputs("]\n", f);
+    return n;
+}
+static int CYCLE[16] = { 2, 0, 2, 0, 1, 0 }, CYCLE_N = 6;
+static int res_run(double ratio) {
+    (void)ratio;
+    for (int r = 0; r < NR && RREF < 0; r++) { int banks[MAXB]; for (int i = 0; i < R[r].nb; i++) banks[i] = 0; int c = new_clause(R[r].head, 0, R[r].body, banks, R[r].nb, -1, -1, -1, r); if (c >= 0) keep_clause(c); }
+    long picks = 0;
+    while (RREF < 0) {
+        if (now_s() > DEADLINE) return 0;
+        int g = -1;
+        while (g < 0) {
+            /* a cycle of picks: goal clauses (backward from the conjecture), lightest, oldest */
+            int slot = picks % CYCLE_N, q = CYCLE[slot];
+            int x = q == 2 ? hpop(QS2, &NQS, clw) : q == 1 ? hpop(QA, &NQA, cla) : hpop(QW, &NQW, clw);
+            if (x < 0) x = hpop(QW, &NQW, clw);
+            if (x < 0) { x = hpop(QA, &NQA, cla); if (x < 0) break; }
+            if (C[x].st == 0) g = x; else if (q == 2 && x >= 0) { picks++; }
+        }
+        if (g < 0) return -1;
+        picks++; res_give(g);
+    }
+    return 1;
+}
+
+static void set_cycle(const char *c) { CYCLE_N = 0; for (; *c && CYCLE_N < 16; c++) CYCLE[CYCLE_N++] = *c == 'g' ? 2 : *c == 'a' ? 1 : 0; }
+static double T0;
+/* one attempt with the configuration in the globals; prints only a refutation unless loud */
+static int attempt(double limit, int ratio, const char *base, const char *pj, int loud) {
+    DEADLINE = now_s() + limit;
+    if (MAGIC) magic_transform();
+    if (RES) {
+        dt_init(&RH); dt_init(&RB); dt_init(&SH); dt_init(&SU); dt_init(&SG);
+        int st = res_run(ratio); double secs = now_s() - T0;
+        if (st > 0) {
+            printf("%% SZS status Unsatisfiable for %s\n", base);
+            FILE *o = pj ? fopen(pj, "w") : NULL; if (pj && !o) die("cannot write proof");
+            long ps = res_proof(o); if (o) fclose(o);
+            printf("%% engine res\n%% secs %.4f given %ld kept %ld generated %ld proof_steps %ld\n", secs, GIVEN, KEPTN, GENERATED, ps);
+        } else if (loud && st < 0) printf("%% SZS status Satisfiable for %s\n%% secs %.4f given %ld kept %ld\n", base, secs, GIVEN, KEPTN);
+        else if (loud) printf("%% SZS status Timeout for %s\n%% secs %.4f given %ld kept %ld generated %ld\n", base, secs, GIVEN, KEPTN, GENERATED);
+        return st;
+    }
+    for (int r = 0; r < NR && REF_RULE < 0; r++) if (R[r].nb == 0 && R[r].head >= 0) { int a = inst(R[r].head, 0, NULL); if (!seen(a)) add_unit(a, r, 0, NULL); }
+    long picks = 0; int sat = 0;
+    while (REF_RULE < 0) {
+        if (now_s() > DEADLINE) break;
+        int u = -1;
+        while (u < 0) {
+            int byage = ratio > 0 && picks % ratio == ratio - 1;
+            int x = byage ? hpop(HA, &NHA, lessa) : hpop(HW, &NHW, lessw);
+            if (x < 0) { x = byage ? hpop(HW, &NHW, lessw) : hpop(HA, &NHA, lessa); if (x < 0) break; }
+            if (U[x].st == 0) u = x;
+        }
+        if (u < 0) { sat = 1; break; }
+        picks++; give(u);
+    }
+    double secs = now_s() - T0;
+    if (REF_RULE >= 0) {
+        printf("%% SZS status Unsatisfiable for %s\n", base);
+        FILE *o = pj ? fopen(pj, "w") : NULL; if (pj && !o) die("cannot write proof");
+        long ps = proof(o); if (o) fclose(o);
+        printf("%% engine hyper\n%% secs %.4f given %ld kept %ld generated %ld proof_steps %ld\n", secs, GIVEN, KEPTN, GENERATED, ps);
+        return 1;
+    }
+    if (loud && sat) printf("%% SZS status Satisfiable for %s\n%% secs %.4f given %ld kept %ld\n", base, secs, GIVEN, KEPTN);
+    else if (loud) printf("%% SZS status Timeout for %s\n%% secs %.4f given %ld kept %ld generated %ld\n", base, secs, GIVEN, KEPTN, GENERATED);
+    return sat ? -1 : 0;
+}
+/* the strategy schedule: every configuration in turn, in a fresh child process, with a time slice
+   that doubles each round; the first refutation wins. A configuration that saturates proves the
+   input satisfiable (each is complete for Horn clauses), and the schedule stops. */
+typedef struct { int magic, res, ratio; const char *cycle, *wt; } config;
+static const config SCHED[] = {
+    { 0, 1, 5, "w", "1,1,1,0" },
+    { 0, 0, 5, NULL, NULL },
+    { 0, 1, 5, "w", "2,1,1,3" },
+    { 1, 0, 5, NULL, NULL },
+    { 0, 1, 5, "gwwww", "1,1,1,0" },
+    { 0, 1, 5, "w", "2,1,0.7,0" },
+    { 0, 1, 5, "gwwwwwwwwwwa", "1,1,1,0" },
+};
+#include <sys/wait.h>
+#include <unistd.h>
+static int schedule(double limit, const char *base, const char *pj) {
+    int n = sizeof SCHED / sizeof SCHED[0]; double slice = 0.05;
+    fflush(stdout);
+    for (;;) {
+        for (int k = 0; k < n; k++) {
+            double left = T0 + limit - now_s(); if (left <= 0.005) return 0;
+            double lim = slice < left ? slice : left;
+            pid_t pid = fork();
+            if (pid < 0) die("fork");
+            if (pid == 0) {
+                const config *c = &SCHED[k]; MAGIC = c->magic; RES = c->res;
+                if (c->cycle) set_cycle(c->cycle);
+                if (c->wt) sscanf(c->wt, "%d,%d,%lf,%d", &FW, &VW, &HM, &LP);
+                int st = attempt(lim, c->ratio, base, pj, 0);
+                fflush(stdout); _exit(st > 0 ? 10 : st < 0 ? 20 : 0);
+            }
+            int ws; waitpid(pid, &ws, 0);
+            if (WIFEXITED(ws) && WEXITSTATUS(ws) == 10) return 1;
+            if (WIFEXITED(ws) && WEXITSTATUS(ws) == 20) return -1;
+        }
+        slice *= 2;
+    }
+}
+
+int main(int argc, char **argv) {
+    if (argc < 2) { fprintf(stderr, "usage: hyper PROBLEM.p [--root DIR] [--limit S] [--proof-json FILE]\n"); return 2; }
+    const char *path = argv[1], *pj = NULL; char root[4096]; double limit = 30; int ratio = 5;
+    { const char *q = strstr(path, "Problems/"); if (q) snprintf(root, sizeof root, "%.*s", (int)(q - path), path); else strcpy(root, "."); if (!root[0]) strcpy(root, "."); }
+    for (int i = 2; i < argc; i++) {
+        if (!strcmp(argv[i], "--root") && i + 1 < argc) snprintf(root, sizeof root, "%s", argv[++i]);
+        else if (!strcmp(argv[i], "--limit") && i + 1 < argc) limit = atof(argv[++i]);
+        else if (!strcmp(argv[i], "--proof-json") && i + 1 < argc) pj = argv[++i];
+        else if (!strcmp(argv[i], "--ratio") && i + 1 < argc) ratio = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--magic")) MAGIC = SINGLE = 1;
+        else if (!strcmp(argv[i], "--res")) RES = SINGLE = 1;
+        else if (!strcmp(argv[i], "--single")) SINGLE = 1;
+        else if (!strcmp(argv[i], "--wt") && i + 1 < argc) { sscanf(argv[++i], "%d,%d,%lf,%d", &FW, &VW, &HM, &LP); }
+        else if (!strcmp(argv[i], "--cycle") && i + 1 < argc) set_cycle(argv[++i]);
+    }
+    T0 = now_s();
+    for (int b = 0; b < MAXB; b++) for (int v = 0; v < MAXV; v++) BT[b][v] = -1;
+    dt_init(&KEPT); dt_init(&ACT);
+    parse_file(path, root, NULL, -1);
+    const char *base = strrchr(path, '/'); base = base ? base + 1 : path;
+    if (getenv("HYPER_DUMP")) for (int r = 0; r < NR; r++) { fprintf(stderr, "%s: head %d nb %d nv %d\n", SY[R[r].name].name, R[r].head, R[r].nb, R[r].nv); }
+    if (OUT_OF_CLASS) { printf("%% SZS status GaveUp for %s\n%% reason %s\n", base, WHY); return 0; }
+    if (SINGLE) { attempt(limit, ratio, base, pj, 1); return 0; }
+    int st = schedule(limit, base, pj);
+    if (st < 0) printf("%% SZS status Satisfiable for %s\n%% secs %.4f\n", base, now_s() - T0);
+    else if (st == 0) printf("%% SZS status Timeout for %s\n%% secs %.4f\n", base, now_s() - T0);
+    return 0;
+}
