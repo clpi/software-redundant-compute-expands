@@ -472,6 +472,7 @@ int main(int argc, char **argv) {
         printf("%% secs %.4f ops %ld facts %d proof_steps %ld\n", secs, OPS, NF, ps);
         return 0;
     }
+    if (ONLY && REFUTED < 0) { printf("%% SZS status GaveUp for %s\n%% reason the one engine asked for found no refutation\n", base); return 0; }
     if (REFUTED >= 0) {
         printf("%% SZS status Unsatisfiable for %s\n", base);
         int *order = xmalloc((NF + 1) * sizeof(int));
