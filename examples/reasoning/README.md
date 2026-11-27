@@ -67,8 +67,10 @@ Vampire 509, E 519. Held-out half (not used to fit the schedule): native 253, Va
 Every native proof checks. Native solves 3 that neither baseline solves. On the 490 all three
 solve, median wall is 18.6 ms native, 21.3 ms Vampire, 12.9 ms E, and median peak memory 2.1 MB,
 9.2 MB, 5.7 MB. Open: E solves 20 problems native does not, mostly condensed-detachment logic
-calculi (LCL), and is faster by median. The equality class (450 problems, CNF_UNS_RFO_SEQ_HRN)
-has baselines (Vampire 415, E 372); its native schedule is not fitted yet.
+calculi (LCL), and is faster by median. The equality class
+(450 problems, CNF_UNS_RFO_SEQ_HRN) is well behind: native 270, Vampire 415, E 372 (held-out half:
+133, 204, 183), every native proof checked. Superposition here is plain; its heuristics are the
+next work.
 
 ## Measured (receipts in the project files, `reasoning/receipts-hrn254-v4`)
 
