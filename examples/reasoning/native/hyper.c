@@ -653,6 +653,47 @@ static int ewt(int c, const double *p) {
         double l = elit(lit[i], p); if (mx) l *= p[3]; if (x->head >= 0 && i == n - 1) l *= p[4]; w += l; }
     return (int)(10 * w + 0.5);
 }
+/* E's clause queues (--eh SPEC): segments joined by '/', each "<picks><kind><params>": kind s is
+   ConjectureRelativeSymbolWeight with the set of support first (E's SimulateSOS), c the same with no
+   priority, n non-goals first, r Refinedweight with the set of support first, R with no priority, f
+   FIFO; CRSW params conj,fw,vw,maxterm,maxlit,pos and Refinedweight params fw,vw,maxterm,maxlit,pos.
+   Picks go round the queues in proportion to their counts, as in E's weighted round robin. */
+typedef struct { int pr, w; long age; int c; } hent;
+static int NEHQ = 0, EHN[8], ECYC[128], NECYC; static char EHK[8]; static double EHP[8][6];
+static hent *EHH[8]; static long NEHH[8], CEHH[8];
+static int hlt(const hent *a, const hent *b) { return a->pr != b->pr ? a->pr < b->pr : a->w != b->w ? a->w < b->w : a->age < b->age; }
+static void ehpush(int q, hent e) {
+    if (NEHH[q] == CEHH[q]) { CEHH[q] = CEHH[q] ? 2 * CEHH[q] : 1024; EHH[q] = xrealloc(EHH[q], CEHH[q] * sizeof(hent)); }
+    hent *h = EHH[q]; long i = NEHH[q]++; h[i] = e;
+    while (i > 0) { long pa = (i - 1) / 2; if (!hlt(&h[i], &h[pa])) break; hent t = h[i]; h[i] = h[pa]; h[pa] = t; i = pa; }
+}
+static int ehpop(int q) {
+    if (!NEHH[q]) return -1; hent *h = EHH[q]; int top = h[0].c; h[0] = h[--NEHH[q]]; long i = 0, n = NEHH[q];
+    for (;;) { long l = 2 * i + 1, r = l + 1, m = i; if (l < n && hlt(&h[l], &h[m])) m = l; if (r < n && hlt(&h[r], &h[m])) m = r; if (m == i) break; hent t = h[i]; h[i] = h[m]; h[m] = t; i = m; }
+    return top;
+}
+static void eh_parse(const char *spec) {
+    NEHQ = 0; NECYC = 0; const char *p = spec;
+    while (*p && NEHQ < 8) {
+        int n = 0; while (*p >= '0' && *p <= '9') n = n * 10 + (*p++ - '0'); if (n <= 0) n = 1;
+        char k = *p ? *p++ : 'f'; double v[6] = { 0 }; int nv = 0;
+        while (*p && *p != '/' && nv < 6) { v[nv++] = strtod(p, (char **)&p); if (*p == ',') p++; }
+        if (*p == '/') p++;
+        double *e = EHP[NEHQ];   /* FW,VW,MT,ML,PM,CM */
+        if (k == 's' || k == 'c' || k == 'n') { e[5] = v[0]; e[0] = v[1]; e[1] = v[2]; e[2] = v[3]; e[3] = v[4]; e[4] = v[5]; }
+        else if (k == 'r' || k == 'R') { e[0] = v[0]; e[1] = v[1]; e[2] = v[2]; e[3] = v[3]; e[4] = v[4]; e[5] = 1; }
+        EHK[NEHQ] = k; EHN[NEHQ] = n; NEHQ++;
+    }
+    /* spread the picks: queue q at slots (j + 0.5) * total / n_q */
+    int tot = 0; for (int q = 0; q < NEHQ; q++) tot += EHN[q]; if (tot > 128) tot = 128;
+    double nextp[8]; for (int q = 0; q < NEHQ; q++) nextp[q] = 0.5 * tot / EHN[q];
+    for (int i = 0; i < tot; i++) { int b = 0; for (int q = 1; q < NEHQ; q++) if (nextp[q] < nextp[b]) b = q; ECYC[NECYC++] = b; nextp[b] += (double)tot / EHN[b]; }
+}
+static void eh_keep(int c) {
+    for (int q = 0; q < NEHQ; q++) { hent e; e.c = c; e.age = C[c].age; char k = EHK[q];
+        e.pr = (k == 's' || k == 'r') ? !C[c].sos : k == 'n' ? C[c].head < 0 : 0;
+        e.w = k == 'f' ? 0 : ewt(c, EHP[q]); ehpush(q, e); }
+}
 static void set_w(int c) {
     clause *x = &C[c]; int h = x->head, nb = x->nb; const int *b = CB + x->b0;
     if (EW1 || EW2) { if (EW1) x->w = ewt(c, EP1); else { x->w = h >= 0 ? (int)(HM * lwt(h)) : 0; for (int i = 0; i < nb; i++) x->w += lwt(b[i]); x->w += LP * nb; }
@@ -680,6 +721,7 @@ static void keep_clause(int c) {
     if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; }
     if (c >= CKEPTF) { long n = CKEPTF ? CKEPTF : 1 << 16; while (n <= c) n *= 2; KEPTF = xrealloc(KEPTF, n); memset(KEPTF + CKEPTF, 0, n - CKEPTF); CKEPTF = n; }
     KEPTF[c] = 1;
+    if (NEHQ) eh_keep(c);
     hpush(&QW, &NQW, &CQW, c, clw); hpush(&QA, &NQA, &CQA, c, cla); if (SOSM ? C[c].sos : C[c].head < 0) hpush(&QS2, &NQS, &CQS, c, clw); if (W2ON) hpush(&QW2, &NQW2, &CQW2, c, clw2); KEPTN++;
 }
 static void finish(int c);
@@ -1099,7 +1141,7 @@ static int res_run(double ratio) {
         for (int f = 0; f < NSY; f++) { int rank = 1; for (int i = 0; i < nf; i++) { if (fs[i] == SFREQ[f]) break; if (i == 0 || fs[i] != fs[i - 1]) rank++; } SWT[f] = SFREQ[f] > 0 ? rank : 1; }
         free(fs);
     }
-    if (GW || W2ON || EW1 || EW2) { GSYM = xmalloc(NSY + 1); memset(GSYM, 0, NSY + 1); for (int r = 0; r < NR; r++) if (R[r].head < 0 || (SOSM && R[r].conj)) { for (int i = 0; i < R[r].nb; i++) gmark(R[r].body[i]); if (R[r].head >= 0) gmark(R[r].head); } }
+    if (GW || W2ON || EW1 || EW2 || NEHQ) { GSYM = xmalloc(NSY + 1); memset(GSYM, 0, NSY + 1); for (int r = 0; r < NR; r++) if (R[r].head < 0 || (SOSM && R[r].conj)) { for (int i = 0; i < R[r].nb; i++) gmark(R[r].body[i]); if (R[r].head >= 0) gmark(R[r].head); } }
     NGTV = 0; if (GTW) { for (int r = 0; r < NR; r++) if (R[r].head < 0 || (SOSM && R[r].conj)) { for (int i = 0; i < R[r].nb; i++) for (int k = 0; k < T[R[r].body[i]].n; k++) gt_add(ARG(R[r].body[i], k)); if (R[r].head >= 0) for (int k = 0; k < T[R[r].head].n; k++) gt_add(ARG(R[r].head, k)); }
         qsort(GTV, NGTV, sizeof(int), icmp); }
     for (int r = 0; r < NR && RREF < 0; r++) { int banks[MAXB]; for (int i = 0; i < R[r].nb; i++) banks[i] = 0; int c = new_clause(R[r].head, 0, R[r].body, banks, R[r].nb, -1, -1, -1, r); if (c >= 0) keep_clause(c); }
@@ -1114,6 +1156,7 @@ static int res_run(double ratio) {
         int g = -1;
         while (g < 0) {
             /* a cycle of picks: goal clauses (backward from the conjecture), lightest, oldest */
+            if (NEHQ) { int q = ECYC[picks % NECYC], x = ehpop(q); for (int k = 1; x < 0 && k < NEHQ; k++) x = ehpop((q + k) % NEHQ); if (x < 0) break; if (C[x].st == 0) g = x; continue; }
             int slot = picks % CYCLE_N, q = CYCLE[slot];
             int x = q == 2 ? hpop(QS2, &NQS, clw) : q == 1 ? hpop(QA, &NQA, cla) : q == 3 && W2ON ? hpop(QW2, &NQW2, clw2) : hpop(QW, &NQW, clw);
             if (x < 0) x = hpop(QW, &NQW, clw);
@@ -1327,7 +1370,7 @@ static const config *SCH = SCHED; static int NSCH = sizeof SCHED / sizeof SCHED[
 static void apply_args(const char *a) {   /* a setting is a string of the command-line options */
     char buf[512]; snprintf(buf, sizeof buf, "%s", a); char *tok[32]; int n = 0;
     for (char *t = strtok(buf, " "); t && n < 32; t = strtok(NULL, " ")) tok[n++] = t;
-    MAGIC = RES = 0; MAXW = 0; FW = 2; VW = 1; HM = 1.0; LP = 0; SELMODE = 0; GW = 0; PREC = 0; KWON = 0; W2ON = 0; SOSM = 0; SATC = 0; SIMM = 0; EW1 = EW2 = 0; GTW = 0; TGTM = 0;
+    MAGIC = RES = 0; MAXW = 0; FW = 2; VW = 1; HM = 1.0; LP = 0; SELMODE = 0; GW = 0; PREC = 0; KWON = 0; W2ON = 0; SOSM = 0; SATC = 0; SIMM = 0; EW1 = EW2 = 0; GTW = 0; TGTM = 0; NEHQ = 0;
     for (int i = 0; i < n; i++) {
         if (!strcmp(tok[i], "--magic")) MAGIC = 1;
         else if (!strcmp(tok[i], "--res")) RES = 1;
@@ -1342,6 +1385,7 @@ static void apply_args(const char *a) {   /* a setting is a string of the comman
         else if (!strcmp(tok[i], "--sos") && i + 1 < n) SOSM = atoi(tok[++i]);
         else if (!strcmp(tok[i], "--satc") && i + 1 < n) SATC = atoi(tok[++i]);
         else if (!strcmp(tok[i], "--sim") && i + 1 < n) SIMM = atoi(tok[++i]);
+        else if (!strcmp(tok[i], "--eh") && i + 1 < n) eh_parse(tok[++i]);
         else if (!strcmp(tok[i], "--tgt") && i + 1 < n) TGTM = atoi(tok[++i]);
         else if (!strcmp(tok[i], "--gt") && i + 1 < n) GTW = atoi(tok[++i]);
         else if (!strcmp(tok[i], "--ew") && i + 1 < n) { EW1 = 1; sscanf(tok[++i], "%lf,%lf,%lf,%lf,%lf,%lf", EP1, EP1 + 1, EP1 + 2, EP1 + 3, EP1 + 4, EP1 + 5); }
@@ -1400,6 +1444,7 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--sos") && i + 1 < argc) SOSM = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--satc") && i + 1 < argc) SATC = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--sim") && i + 1 < argc) SIMM = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--eh") && i + 1 < argc) eh_parse(argv[++i]);
         else if (!strcmp(argv[i], "--tgt") && i + 1 < argc) TGTM = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--gt") && i + 1 < argc) GTW = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--ew") && i + 1 < argc) { EW1 = 1; sscanf(argv[++i], "%lf,%lf,%lf,%lf,%lf,%lf", EP1, EP1 + 1, EP1 + 2, EP1 + 3, EP1 + 4, EP1 + 5); }
