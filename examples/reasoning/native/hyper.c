@@ -494,7 +494,7 @@ static int kbo(int s, int t) {
     if (r == KLT) return le ? KLT : KINC;
     return r;
 }
-typedef struct { int head, nb, b0, w, w2, p1, p2, lit, src, pp0, plen; long age; char st, eh, kind, dir, sos; uint64_t eb; } clause;   /* src: problem clause for an input; kind 0 resolution, 1 superposition (dir, path), 2 equality resolution */
+typedef struct { int head, nb, b0, w, w2, p1, p2, lit, src, pp0, plen; long age; char st, eh, kind, dir, sos, sim; uint64_t eb; } clause;   /* src: problem clause for an input; kind 0 resolution, 1 superposition (dir, path), 2 equality resolution */
 static clause *C; static int NC, CC;
 static int FW = 2, VW = 1, LP = 0; static double HM = 1.0;   /* clause weight: symbols FW, variables VW, head times HM, LP per body literal */
 /* goal-relative weight (--gw G): a symbol that occurs in a goal clause of the input weighs G instead of FW */
@@ -511,7 +511,15 @@ static void gmark(int t) { if (ISVAR(t)) return; GSYM[T[t].f] = 1; for (int i = 
    different goal factors in one schedule of picks */
 static int W2ON = 0, FW2 = 10, VW2 = 10, GW2 = 1, SOSM = 0;   /* SOSM (--sos 1): goal picks and goal symbols follow the conjecture and hypotheses and every clause derived from them, as E's set of support */
 static int lwt2(int t) { int g = gcount(t); return FW2 * (T[t].w - T[t].vo - g) + GW2 * g + VW2 * T[t].vo; }
-static int lwt(int t) { if (!GW) return FW * (T[t].w - T[t].vo) + VW * T[t].vo; int g = gcount(t); return FW * (T[t].w - T[t].vo - g) + GW * g + VW * T[t].vo; }
+/* goal terms (--gt W, after Twee's goal transformation as in Vampire's tgt=ground): a ground
+   compound subterm of a goal clause weighs W, as if it had been named by a fresh constant, so
+   clauses that build the goal's own terms rank first; only the clause choice changes */
+static int GTW = 0, *GTV, NGTV, CGTV;
+static int in_gt(int t) { int lo = 0, hi = NGTV - 1; while (lo <= hi) { int m = (lo + hi) / 2; if (GTV[m] == t) return 1; if (GTV[m] < t) lo = m + 1; else hi = m - 1; } return 0; }
+static int lwt_gt(int t, int d) { if (ISVAR(t)) return VW; if (d > 0 && in_gt(t)) return GTW; int w = GW && GSYM && GSYM[T[t].f] ? GW : FW; for (int i = 0; i < T[t].n; i++) w += lwt_gt(ARG(t, i), d + 1); return w; }
+static void gt_add(int t) { if (ISVAR(t) || !T[t].n) return; if (T[t].gr) { if (NGTV == CGTV) { CGTV = CGTV ? 2 * CGTV : 64; GTV = xrealloc(GTV, CGTV * sizeof(int)); } GTV[NGTV++] = t; } for (int i = 0; i < T[t].n; i++) gt_add(ARG(t, i)); }
+static int icmp(const void *a, const void *b) { int x = *(const int *)a, y = *(const int *)b; return x < y ? -1 : x > y; }
+static int lwt(int t) { if (GTW) return lwt_gt(t, 0); if (!GW) return FW * (T[t].w - T[t].vo) + VW * T[t].vo; int g = gcount(t); return FW * (T[t].w - T[t].vo - g) + GW * g + VW * T[t].vo; }
 static int *CB; static long NCB, CCB;
 static dtree RH, RB, SH, SU, SG;   /* SH: heads of active non-units, SU: active units */   /* active: eligible heads, eligible body literals; subsumption: heads, first literal of headless */
 static int *QW, *QA, *QS2, *QW2; static long NQW, NQA, CQW, CQA, NQS, CQS, NQW2, CQW2;   /* by weight, by age, goal clauses (no head) by weight */
@@ -536,6 +544,18 @@ static void eligible(int c) {
             long w2 = -(long)(T[a].w - T[a].vo), w3 = x->head >= 0 && T[x->head].f == T[a].f;
             long k = (w1 * 1000000 + (w2 + 500000)) * 2 + w3;
             if (best < 0 || k < bk) { bk = k; best = i; } }
+        x->eb = 1ULL << best; return;
+    }
+    if ((SELMODE == 8 || SELMODE == 9) && x->nb) {   /* E's selection as E applies it: a clause with a negative literal always selects one, even
+                                                         when its head is maximal, so units feed rules forward. 8: SelectNewComplexAHP (lightest ground
+                                                         literal, else lightest non-equational, else heaviest equation); 9: the most instantiated literal,
+                                                         ground first (SelectComplexG). Ties avoid the head's predicate. Selection keeps ordered resolution complete. */
+        int best = 0; long bk = 0;
+        for (int i = 0; i < x->nb; i++) { int a = LIT(c, i); long k;
+            long w3 = x->head >= 0 && T[x->head].f == T[a].f;
+            if (SELMODE == 8) { long w1 = T[a].gr ? 0 : T[a].f != EQ ? 10 : 20, w2 = w1 == 20 ? -T[a].w : T[a].w; k = (w1 * 100000 + (w2 + 50000)) * 2 + w3; }
+            else { long w1 = T[a].gr ? 0 : 1, w2 = -(long)(T[a].w - T[a].vo); k = (w1 * 1000000 + (w2 + 500000)) * 2 + w3; }
+            if (i == 0 || k < bk) { bk = k; best = i; } }
         x->eb = 1ULL << best; return;
     }
     if (x->head >= 0) {
@@ -627,6 +647,73 @@ static int inst_replace(int t, int b, const int *path, int len) {
     int a[64]; for (int i = 0; i < T[t].n; i++) a[i] = i == path[0] ? inst_replace(ARG(t, i), b, path + 1, len - 1) : inst_rec(ARG(t, i), b);
     return mk(T[t].f, T[t].n, a);
 }
+/* E-style clause weights (--ew / --ew2 FW,VW,MT,ML,PM,CM, as E's Refinedweight and
+   ConjectureRelativeSymbolWeight): FW per symbol (times CM for a symbol of the conjecture and
+   hypotheses), VW per variable; the maximal sides of each equation (a predicate atom is its own
+   maximal side, against $true) times MT, maximal literals times ML, the positive literal times PM */
+static int EW1 = 0, EW2 = 0; static double EP1[6], EP2[6];
+static double eterm(int t, const double *p) { if (ISVAR(t)) return p[1]; double w = p[0] * (GSYM && GSYM[T[t].f] ? p[5] : 1.0); for (int i = 0; i < T[t].n; i++) w += eterm(ARG(t, i), p); return w; }
+static double elit(int a, const double *p) {
+    if (T[a].f != EQ) return eterm(a, p) * p[2] + p[0];
+    int s = ARG(a, 0), t = ARG(a, 1), k = kbo(s, t); double ws = eterm(s, p), wt = eterm(t, p);
+    return (k == KLT ? ws : ws * p[2]) + (k == KGT ? wt : wt * p[2]);
+}
+static int ewt(int c, const double *p) {
+    clause *x = &C[c]; int n = 0, lit[64]; for (int i = 0; i < x->nb; i++) lit[n++] = CB[x->b0 + i]; if (x->head >= 0) lit[n++] = x->head;
+    double w = 0;
+    for (int i = 0; i < n; i++) { int mx = 1; for (int j = 0; j < n && mx; j++) if (j != i && kbo(lit[j], lit[i]) == KGT) mx = 0;
+        double l = elit(lit[i], p); if (mx) l *= p[3]; if (x->head >= 0 && i == n - 1) l *= p[4]; w += l; }
+    return (int)(10 * w + 0.5);
+}
+/* E's clause queues (--eh SPEC): segments joined by '/', each "<picks><kind><params>": kind s is
+   ConjectureRelativeSymbolWeight with the set of support first (E's SimulateSOS), c the same with no
+   priority, n non-goals first, r Refinedweight with the set of support first, R with no priority, f
+   FIFO; CRSW params conj,fw,vw,maxterm,maxlit,pos and Refinedweight params fw,vw,maxterm,maxlit,pos.
+   Picks go round the queues in proportion to their counts, as in E's weighted round robin. */
+typedef struct { int pr, w; long age; int c; } hent;
+static int NEHQ = 0, EHN[8], ECYC[128], NECYC; static char EHK[8]; static double EHP[8][6];
+static hent *EHH[8]; static long NEHH[8], CEHH[8];
+static int hlt(const hent *a, const hent *b) { return a->pr != b->pr ? a->pr < b->pr : a->w != b->w ? a->w < b->w : a->age < b->age; }
+static void ehpush(int q, hent e) {
+    if (NEHH[q] == CEHH[q]) { CEHH[q] = CEHH[q] ? 2 * CEHH[q] : 1024; EHH[q] = xrealloc(EHH[q], CEHH[q] * sizeof(hent)); }
+    hent *h = EHH[q]; long i = NEHH[q]++; h[i] = e;
+    while (i > 0) { long pa = (i - 1) / 2; if (!hlt(&h[i], &h[pa])) break; hent t = h[i]; h[i] = h[pa]; h[pa] = t; i = pa; }
+}
+static int ehpop(int q) {
+    if (!NEHH[q]) return -1; hent *h = EHH[q]; int top = h[0].c; h[0] = h[--NEHH[q]]; long i = 0, n = NEHH[q];
+    for (;;) { long l = 2 * i + 1, r = l + 1, m = i; if (l < n && hlt(&h[l], &h[m])) m = l; if (r < n && hlt(&h[r], &h[m])) m = r; if (m == i) break; hent t = h[i]; h[i] = h[m]; h[m] = t; i = m; }
+    return top;
+}
+static void eh_parse(const char *spec) {
+    NEHQ = 0; NECYC = 0; const char *p = spec;
+    while (*p && NEHQ < 8) {
+        int n = 0; while (*p >= '0' && *p <= '9') n = n * 10 + (*p++ - '0'); if (n <= 0) n = 1;
+        char k = *p ? *p++ : 'f'; double v[6] = { 0 }; int nv = 0;
+        while (*p && *p != '/' && nv < 6) { v[nv++] = strtod(p, (char **)&p); if (*p == ',') p++; }
+        if (*p == '/') p++;
+        double *e = EHP[NEHQ];   /* FW,VW,MT,ML,PM,CM */
+        if (k == 's' || k == 'c' || k == 'n') { e[5] = v[0]; e[0] = v[1]; e[1] = v[2]; e[2] = v[3]; e[3] = v[4]; e[4] = v[5]; }
+        else if (k == 'r' || k == 'R') { e[0] = v[0]; e[1] = v[1]; e[2] = v[2]; e[3] = v[3]; e[4] = v[4]; e[5] = 1; }
+        EHK[NEHQ] = k; EHN[NEHQ] = n; NEHQ++;
+    }
+    /* spread the picks: queue q at slots (j + 0.5) * total / n_q */
+    int tot = 0; for (int q = 0; q < NEHQ; q++) tot += EHN[q]; if (tot > 128) tot = 128;
+    double nextp[8]; for (int q = 0; q < NEHQ; q++) nextp[q] = 0.5 * tot / EHN[q];
+    for (int i = 0; i < tot; i++) { int b = 0; for (int q = 1; q < NEHQ; q++) if (nextp[q] < nextp[b]) b = q; ECYC[NECYC++] = b; nextp[b] += (double)tot / EHN[b]; }
+}
+static void eh_keep(int c) {
+    for (int q = 0; q < NEHQ; q++) { hent e; e.c = c; e.age = C[c].age; char k = EHK[q];
+        e.pr = (k == 's' || k == 'r') ? !C[c].sos : k == 'n' ? C[c].head < 0 : 0;
+        e.w = k == 'f' ? 0 : ewt(c, EHP[q]); ehpush(q, e); }
+}
+static void set_w(int c) {
+    clause *x = &C[c]; int h = x->head, nb = x->nb; const int *b = CB + x->b0;
+    if (EW1 || EW2) { if (EW1) x->w = ewt(c, EP1); else { x->w = h >= 0 ? (int)(HM * lwt(h)) : 0; for (int i = 0; i < nb; i++) x->w += lwt(b[i]); x->w += LP * nb; }
+        x->w2 = 0; if (W2ON) { if (EW2) x->w2 = ewt(c, EP2); else { x->w2 = h >= 0 ? (int)(HM * lwt2(h)) : 0; for (int i = 0; i < nb; i++) x->w2 += lwt2(b[i]); x->w2 += LP * nb; } }
+        return; }
+    x->w = h >= 0 ? (int)(HM * lwt(h)) : 0; for (int i = 0; i < nb; i++) x->w += lwt(b[i]); x->w += LP * nb;
+    x->w2 = 0; if (W2ON) { x->w2 = h >= 0 ? (int)(HM * lwt2(h)) : 0; for (int i = 0; i < nb; i++) x->w2 += lwt2(b[i]); x->w2 += LP * nb; }
+}
 static int new_clause(int hd, int hb, int *lits, int *banks, int n, int p1, int p2, int lit, int src) {
     RMN = 0; int h = hd >= 0 ? (REP_I == -2 ? inst_replace(hd, hb, REP_PATH, REP_LEN) : inst_rec(hd, hb)) : -1; int b[1024], nb = 0;
     if (n > 1000) return -1;
@@ -636,9 +723,8 @@ static int new_clause(int hd, int hb, int *lits, int *banks, int n, int p1, int 
     if (NC == CC) { CC = CC ? CC * 2 : 4096; C = xrealloc(C, CC * sizeof(clause)); }
     if (NCB + nb > CCB) { while (NCB + nb > CCB) CCB = CCB ? CCB * 2 : 1 << 16; CB = xrealloc(CB, CCB * sizeof(int)); }
     int c = NC++; clause *x = &C[c]; x->head = h; x->nb = nb; x->b0 = (int)NCB; memcpy(CB + NCB, b, nb * sizeof(int)); NCB += nb;
-    x->w = h >= 0 ? (int)(HM * lwt(h)) : 0; for (int i = 0; i < nb; i++) x->w += lwt(b[i]); x->w += LP * nb;
-    x->w2 = 0; if (W2ON) { x->w2 = h >= 0 ? (int)(HM * lwt2(h)) : 0; for (int i = 0; i < nb; i++) x->w2 += lwt2(b[i]); x->w2 += LP * nb; }
-    x->p1 = p1; x->p2 = p2; x->lit = lit; x->src = src; x->age = AGE++; x->st = 0; x->kind = 0; x->dir = 0; x->pp0 = 0; x->plen = 0;
+    set_w(c);
+    x->p1 = p1; x->p2 = p2; x->lit = lit; x->src = src; x->age = AGE++; x->st = 0; x->kind = 0; x->dir = 0; x->sim = 0; x->pp0 = 0; x->plen = 0;
     x->sos = src >= 0 ? (char)R[src].conj : (char)((p1 >= 0 && C[p1].sos) || (p2 >= 0 && C[p2].sos));
     return c;
 }
@@ -647,6 +733,7 @@ static void keep_clause(int c) {
     if (C[c].head < 0 && C[c].nb == 0) { RREF = c; return; }
     if (c >= CKEPTF) { long n = CKEPTF ? CKEPTF : 1 << 16; while (n <= c) n *= 2; KEPTF = xrealloc(KEPTF, n); memset(KEPTF + CKEPTF, 0, n - CKEPTF); CKEPTF = n; }
     KEPTF[c] = 1;
+    if (NEHQ) eh_keep(c);
     hpush(&QW, &NQW, &CQW, c, clw); hpush(&QA, &NQA, &CQA, c, cla); if (SOSM ? C[c].sos : C[c].head < 0) hpush(&QS2, &NQS, &CQS, c, clw); if (W2ON) hpush(&QW2, &NQW2, &CQW2, c, clw2); KEPTN++;
 }
 static void finish(int c);
@@ -685,8 +772,30 @@ static void pos_rec(int c, int slot, int t, int depth) {
 }
 static void add_positions_to(dtree *d, int c, int slot) { POS_TREE = d; int a = lit_of(c, slot); for (int i = 0; i < T[a].n; i++) { PTMP[0] = i; pos_rec(c, slot, ARG(a, i), 1); } }
 static void add_positions(int c, int slot) { add_positions_to(&RSUB, c, slot); }
+/* simultaneous superposition (--sim 1, E's ParamodSim): every other occurrence of the instance u of
+   the rewritten subterm in the new clause is replaced by the instance v of the other side too, which
+   is sound under the same equation instance. The checker redoes it (step field "sim"). */
+static int SIMM = 0;
+static int rall(int t, int u, int v, int d) {
+    if (t == u) return v; if (ISVAR(t) || T[t].n == 0 || d > 500) return t;
+    int a[64], ch = 0; for (int i = 0; i < T[t].n; i++) { a[i] = rall(ARG(t, i), u, v, d + 1); ch |= a[i] != ARG(t, i); }
+    return ch ? mk(T[t].f, T[t].n, a) : t;
+}
+static int sim_rewrite(int c, int sub, int rhs) {   /* sub in bank 2, rhs in bank 1, under the unifier; -1 if c became a tautology (removed) */
+    int u = inst_rec(sub, 2), v = inst_rec(rhs, 1); if (u == v) return 0;
+    clause *x = &C[c]; int h = x->head, ch = 0;
+    if (h >= 0) { int h2 = rall(h, u, v, 0); ch |= h2 != h; h = h2; }
+    int b[64], nb = 0;
+    for (int i = 0; i < x->nb; i++) { int a = rall(CB[x->b0 + i], u, v, 0); ch |= a != CB[x->b0 + i]; int dup = 0; for (int j = 0; j < nb; j++) if (b[j] == a) dup = 1; if (!dup) b[nb++] = a; }
+    if (!ch) return 0;
+    int taut = h >= 0 && T[h].f == EQ && ARG(h, 0) == ARG(h, 1); for (int i = 0; i < nb; i++) if (b[i] == h) taut = 1;
+    if (taut) { if (c == NC - 1) { NCB = x->b0; NC--; } return -1; }
+    x->head = h; memcpy(CB + x->b0, b, nb * sizeof(int)); if (c == NC - 1) NCB = x->b0 + nb; x->nb = nb; x->sim = 1; set_w(c);
+    return 0;
+}
+static long NSUPC, NRESC, NEQRC;
 static void superpose(int fc, int dir, int rec) {   /* fc in bank 1, the target in bank 2, unified already */
-    GENERATED++;
+    GENERATED++; NSUPC++;
     int ic = SP[rec].c, slot = SP[rec].slot, len = SP[rec].plen; int path[512]; memcpy(path, PB + SP[rec].pp0, len * sizeof(int));   /* PB may move */
     int lits[1024], banks[1024], n = 0;
     for (int i = 0; i < C[ic].nb && n < 1000; i++) { lits[n] = LIT(ic, i); banks[n++] = 2; }
@@ -695,11 +804,12 @@ static void superpose(int fc, int dir, int rec) {   /* fc in bank 1, the target 
     int c = new_clause(C[ic].head, 2, lits, banks, n, fc, ic, slot, -1);
     REP_I = -3;
     if (c < 0) return;
+    if (SIMM && sim_rewrite(c, sub_at(lit_of(ic, slot), path, len), ARG(C[fc].head, 1 - dir)) < 0) return;
     C[c].kind = 1; C[c].dir = dir; C[c].pp0 = savepath(path, len); C[c].plen = len;
     finish(c);
 }
 static void eq_resolve(int g, int k) {   /* sides of body literal k unified in bank 1 */
-    GENERATED++;
+    GENERATED++; NEQRC++;
     int lits[1024], banks[1024], n = 0;
     for (int i = 0; i < C[g].nb; i++) if (i != k) { lits[n] = LIT(g, i); banks[n++] = 1; }
     int c = new_clause(C[g].head, 1, lits, banks, n, g, -1, k, -1);
@@ -710,7 +820,7 @@ static void eq_resolve(int g, int k) {   /* sides of body literal k unified in b
 /* forward demodulation by active oriented unit equations l = r (l > r in the order, so every
    instance is oriented too): each rewrite is recorded as a superposition step with that unit */
 static dtree RDEM;
-static int ORW = 1;
+static int ORW = 1, ORW0 = 1;
 static int inst_nr(int t, int b) {   /* instantiate without renaming; an unbound variable of bank MB becomes a fresh one */
     deref(&t, &b);
     if (ISVAR(t)) return b == MB ? mkvar(MAXV - 1 - VNO(t)) : t;
@@ -903,7 +1013,7 @@ static void put_clause(FILE *f, int c) {
     if (C[c].src >= 0) { fputs(",\"input\":", f); put_str(f, SY[R[C[c].src].name].name); put_unfold(f); }
     else if (C[c].kind == 1) { fprintf(f, ",\"rule\":\"sup\",\"from\":[%d,%d,%d],\"dir\":%d,\"path\":[", C[c].p1, C[c].p2, C[c].lit, C[c].dir);
         for (int i = 0; i < C[c].plen; i++) fprintf(f, "%s%d", i ? "," : "", PB[C[c].pp0 + i]);
-        fputc(']', f); }
+        fputc(']', f); if (C[c].sim) fputs(",\"sim\":1", f); }
     else if (C[c].kind == 2) fprintf(f, ",\"rule\":\"eqres\",\"from\":[%d,%d]", C[c].p1, C[c].lit);
     else fprintf(f, ",\"from\":[%d,%d,%d]", C[c].p1, C[c].p2, C[c].lit);
     fputc('}', f);
@@ -1043,7 +1153,9 @@ static int res_run(double ratio) {
         for (int f = 0; f < NSY; f++) { int rank = 1; for (int i = 0; i < nf; i++) { if (fs[i] == SFREQ[f]) break; if (i == 0 || fs[i] != fs[i - 1]) rank++; } SWT[f] = SFREQ[f] > 0 ? rank : 1; }
         free(fs);
     }
-    if (GW || W2ON) { GSYM = xmalloc(NSY + 1); memset(GSYM, 0, NSY + 1); for (int r = 0; r < NR; r++) if (R[r].head < 0 || (SOSM && R[r].conj)) { for (int i = 0; i < R[r].nb; i++) gmark(R[r].body[i]); if (R[r].head >= 0) gmark(R[r].head); } }
+    if (GW || W2ON || EW1 || EW2 || NEHQ) { GSYM = xmalloc(NSY + 1); memset(GSYM, 0, NSY + 1); for (int r = 0; r < NR; r++) if (R[r].head < 0 || (SOSM && R[r].conj)) { for (int i = 0; i < R[r].nb; i++) gmark(R[r].body[i]); if (R[r].head >= 0) gmark(R[r].head); } }
+    NGTV = 0; if (GTW) { for (int r = 0; r < NR; r++) if (R[r].head < 0 || (SOSM && R[r].conj)) { for (int i = 0; i < R[r].nb; i++) for (int k = 0; k < T[R[r].body[i]].n; k++) gt_add(ARG(R[r].body[i], k)); if (R[r].head >= 0) for (int k = 0; k < T[R[r].head].n; k++) gt_add(ARG(R[r].head, k)); }
+        qsort(GTV, NGTV, sizeof(int), icmp); }
     for (int r = 0; r < NR && RREF < 0; r++) { int banks[MAXB]; for (int i = 0; i < R[r].nb; i++) banks[i] = 0; int c = new_clause(R[r].head, 0, R[r].body, banks, R[r].nb, -1, -1, -1, r); if (c >= 0) keep_clause(c); }
     long picks = 0;
     int ninput = NC;
@@ -1056,6 +1168,7 @@ static int res_run(double ratio) {
         int g = -1;
         while (g < 0) {
             /* a cycle of picks: goal clauses (backward from the conjecture), lightest, oldest */
+            if (NEHQ) { int q = ECYC[picks % NECYC], x = ehpop(q); for (int k = 1; x < 0 && k < NEHQ; k++) x = ehpop((q + k) % NEHQ); if (x < 0) break; if (C[x].st == 0) g = x; continue; }
             int slot = picks % CYCLE_N, q = CYCLE[slot];
             int x = q == 2 ? hpop(QS2, &NQS, clw) : q == 1 ? hpop(QA, &NQA, cla) : q == 3 && W2ON ? hpop(QW2, &NQW2, clw2) : hpop(QW, &NQW, clw);
             if (x < 0) x = hpop(QW, &NQW, clw);
@@ -1129,11 +1242,42 @@ static void put_unfold(FILE *f) {
     if (!NDEF) return;
     fputs(",\"unfold\":[", f); for (int i = 0; i < NDEF; i++) { if (i) fputc(',', f); fputc('[', f); put_str(f, SY[DEFNAME[i]].name); fprintf(f, ",%d]", DEFDIR[i]); } fputc(']', f);
 }
+static void tgt_on(void); static void tgt_off(void);
 static int attempt(double limit, int ratio, const char *base, const char *pj, int loud) {
-    int st = attempt_inner(limit, ratio, base, pj, loud);
+    tgt_on(); int st = attempt_inner(limit, ratio, base, pj, loud); tgt_off();
     if (st < 0 && HAS_EQ) { if (loud) printf("%% SZS status GaveUp for %s\n%% reason saturated without a refutation, which proves nothing with equality\n", base); return 0; }
     return st;
 }
+/* ---------------- goal naming (--tgt 1, after Twee's goal transformation, Vampire's tgt=ground).
+   Every ground compound subterm s of a goal clause gets a fresh constant c and the unit equation
+   s' = c, where s' is s with its proper ground subterms already named, so the equations are
+   acyclic definitions of fresh constants: a conservative extension. Oriented s' > c, they rewrite
+   every derived occurrence of a goal term to its name, which turns the search toward the goal.
+   Proof steps cite them as inputs named $tgt_K; the checker accepts such a step only as the K-th
+   definition of the fresh constant $tgtcK by a ground term over problem symbols and earlier names. */
+static int TGTM = 0, NTG, TGH[256], TGN[256], TGS[256], TGC[256];
+static int tg_name(int t) {   /* t ground compound: its name after naming its subterms, -1 if over the cap */
+    for (int i = 0; i < NTG; i++) if (TGS[i] == t) return TGC[i];
+    int n = T[t].n, a[64]; for (int i = 0; i < n; i++) { int x = ARG(t, i); a[i] = T[x].n ? tg_name(x) : x; if (a[i] < 0) return -1; }
+    if (NTG == 256) return -1;
+    char nm[32]; snprintf(nm, sizeof nm, "$tgtc%d", NTG); int c = mk(sym_of(nm, 0), 0, NULL);
+    int e2[2] = { mk(T[t].f, n, a), c }; if (EQ < 0) EQ = sym_of("=", 2);
+    snprintf(nm, sizeof nm, "$tgt_%d", NTG);
+    TGS[NTG] = t; TGC[NTG] = c; TGH[NTG] = mk(EQ, 2, e2); TGN[NTG] = sym_of(nm, -1); NTG++;
+    return c;
+}
+static void tg_walk(int t) { if (ISVAR(t) || !T[t].n) return; if (T[t].gr) { tg_name(t); return; } for (int i = 0; i < T[t].n; i++) tg_walk(ARG(t, i)); }
+static void tgt_prepare(void) {
+    NTG = 0;
+    for (int r = 0; r < NR; r++) if (R[r].head < 0) for (int i = 0; i < R[r].nb; i++) { int a = R[r].body[i]; for (int k = 0; k < T[a].n; k++) tg_walk(ARG(a, k)); }
+}
+static int TG_NR0 = -1, TG_EQ0;
+static void tgt_on(void) {
+    if (!TGTM || !NTG) return;
+    TG_NR0 = NR; TG_EQ0 = HAS_EQ; HAS_EQ = 1;
+    for (int i = 0; i < NTG; i++) { add_rule(TGH[i], 0, NULL, 0, TGN[i], NR, 0); R[NR - 1].conj = 1; }
+}
+static void tgt_off(void) { if (TG_NR0 < 0) return; NR = TG_NR0; HAS_EQ = TG_EQ0; TG_NR0 = -1; }
 static int attempt_inner(double limit, int ratio, const char *base, const char *pj, int loud) {
     DEADLINE = now_s() + limit;
     if (MAGIC) magic_transform();
@@ -1145,6 +1289,7 @@ static int attempt_inner(double limit, int ratio, const char *base, const char *
             FILE *o = pj ? fopen(pj, "w") : NULL; if (pj && !o) die("cannot write proof");
             long ps = res_proof(o); if (o) fclose(o);
             printf("%% engine res\n%% secs %.4f given %ld kept %ld generated %ld proof_steps %ld\n", secs, GIVEN, KEPTN, GENERATED, ps);
+            if (getenv("HYPER_STATS")) { long act = 0, actnu = 0; for (int i = 0; i < NC; i++) if (C[i].st == 1) { act++; actnu += C[i].nb > 0; } printf("%% stats sup %ld eqres %ld other %ld active %ld active_nonunit %ld fwdsub %ld bwdsub %ld\n", NSUPC, NEQRC, GENERATED - NSUPC - NEQRC, act, actnu, SUBS_FWD, SUBS_BWD); }
         } else if (loud && st < 0 && !HAS_EQ) printf("%% SZS status Satisfiable for %s\n%% secs %.4f given %ld kept %ld\n", base, secs, GIVEN, KEPTN);
         else if (loud && st == 0) printf("%% SZS status Timeout for %s\n%% secs %.4f given %ld kept %ld generated %ld\n", base, secs, GIVEN, KEPTN, GENERATED);
         return st;
@@ -1201,43 +1346,42 @@ static const config SCHED[] = {   /* Horn without equality; fitted on the traini
     { "--single", 5.0 },
     { "--res --wt 2,1,1,3 --sel 4 --cycle gwwa", 5.0 },
 };
-static const config SCHED_EQ[] = {   /* Horn with equality after unfolding; fitted on the training half of the 288 (bench/sched-eq-v3) */
-    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa", 0.05 },
-    { "--res --wt 1,1,1,0 --cycle ga --prec 1", 0.05 },
-    { "--res --wt 1,1,1,0 --sel 4 --cycle gwwa", 0.05 },
-    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa --sel 6", 0.05 },
+static const config SCHED_EQ[] = {   /* Horn with equality after unfolding; fitted on the training half of the 288 (bench/sched-eq-v4) */
+    { "--res --sel 8 --kw 1 --prec 1 --tgt 1 --eh 1s.5,100,100,1.5,1.5,1/4c.1,100,100,1.5,1.5,1.5/1f/1n.5,100,100,1.5,1.5,1/4r1,1,2,1.5,2", 0.05 },
+    { "--res --sel 7 --kw 1 --prec 1 --sim 1 --eh 1s.5,100,100,1.5,1.5,1/4c.1,100,100,1.5,1.5,1.5/1f/1n.5,100,100,1.5,1.5,1/4r3,2,2,1.5,2", 0.05 },
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa --sos 1 --sim 1", 0.05 },
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa --sos 1 --sim 1 --tgt 1", 0.1 },
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa --sos 1 --sel 8", 0.1 },
     { "--res --wt 1,1,1,0 --cycle ga --sel 5", 0.1 },
-    { "--res --wt 2,1,1,3 --cycle gwwa", 0.05 },
-    { "--res --wt 1,1,1,0 --sel 1 --cycle ga", 0.1 },
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa --sos 1 --sel 9", 0.5 },
+    { "--res --sel 7 --kw 1 --prec 1 --sim 1 --eh 1s.5,100,100,1.5,1.5,1/4c.1,100,100,1.5,1.5,1.5/1f/1n.5,100,100,1.5,1.5,1/4r3,2,2,1.5,2", 0.1 },
+    { "--res --sel 6 --kw 1 --prec 1 --tgt 1 --eh 1s.5,100,100,1.5,1.5,1/4c.1,100,100,1.5,1.5,1.5/1f/1n.5,100,100,1.5,1.5,1/4r1,1,2,1.5,2", 0.1 },
     { "--res --wt 1,3,1,0 --cycle gw --sel 5", 0.2 },
-    { "--res --wt 1,1,1,0", 0.2 },
-    { "--res --wt 1,1,1,0 --cycle ga", 0.5 },
-    { "--res --wt 1,1,1,0 --cycle ga", 1.0 },
-    { "--single", 0.5 },
-    { "--res --wt 1,3,1,0 --cycle gw --sel 5", 0.5 },
-    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa --sel 6", 1.0 },
-    { "--res --wt 2,1,1,3 --cycle gwwa", 2.0 },
-    { "--res --wt 1,1,1,0 --cycle gwwa", 5.0 },
-    { "--res --wt 1,1,1,0 --sel 4 --cycle gwwa", 5.0 },
+    { "--res --sel 6 --eh 1s.5,100,100,1.5,1.5,1/4c.1,100,100,1.5,1.5,1.5/1f/1n.5,100,100,1.5,1.5,1/4r1,1,2,1.5,2", 0.2 },
+    { "--res --sel 7 --kw 1 --prec 1 --sim 1 --eh 1s.5,100,100,1.5,1.5,1/4c.1,100,100,1.5,1.5,1.5/1f/1n.5,100,100,1.5,1.5,1/4r3,2,2,1.5,2", 0.5 },
+    { "--res --wt 1,1,1,0 --cycle ga --sel 8", 0.5 },
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa --sos 1 --tgt 1", 1.0 },
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa --sos 1 --sel 8", 2.0 },
 };
-static const config SCHED_UF[] = {   /* Horn whose equality unfolding removed; fitted on the training half of those (bench/sched-uf-v2) */
+static const config SCHED_UF[] = {   /* Horn whose equality unfolding removed; fitted on the training half of those (bench/sched-uf-v3) */
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwaaa --tgt 1", 0.05 },
     { "--res --wt 2,1,1,0 --gw 1 --cycle gwa", 0.05 },
-    { "--res --wt 3,2,1,0 --gw 1 --cycle gwa", 0.1 },
-    { "--res --wt 1,1,1,0 --sel 1 --cycle ga", 0.05 },
-    { "--res --wt 2,1,1,0 --gw 1 --cycle gwwa", 0.05 },
-    { "--single", 0.1 },
-    { "--res --wt 2,1,1,3 --cycle gwwa", 0.1 },
-    { "--res --wt 1,1,1,0 --cycle gw", 0.1 },
-    { "--res --wt 1,1,1,0 --sel 1 --cycle ga", 0.1 },
-    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa", 0.5 },
-    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa", 5.0 },
-    { "--res --wt 1,1,1,0 --cycle gw", 2.0 },
+    { "--res --wt 3,2,1,0 --gw 1 --cycle gwa --sos 1", 0.1 },
+    { "--res --wt 2,2,1,0 --gw 1 --wt2 10,10,1 --cycle gvvvvavvvvw --sos 1 --sel 7 --prec 1 --kw 1", 0.05 },
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa --sos 1 --tgt 1", 0.05 },
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwaaa --tgt 1", 0.5 },
+    { "--res --sos 1 --wt 2,1,1,0 --gw 1 --ew2 3,2,2,1.5,2,1 --cycle gwavvvv", 0.5 },
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa --sos 1 --tgt 1", 0.5 },
+    { "--res --sel 7 --sos 1 --eh 1s.5,100,100,1.5,1.5,1/4c.1,100,100,1.5,1.5,1.5/1f/1n.5,100,100,1.5,1.5,1/4r3,2,2,1.5,2", 5.0 },
+    { "--res --wt 1,1,1,0 --cycle ga --sos 1", 2.0 },
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa --sos 1 --tgt 1", 2.0 },
+    { "--res --wt 2,1,1,0 --gw 1 --cycle gwa --sos 1 --tgt 1", 5.0 },
 };
 static const config *SCH = SCHED; static int NSCH = sizeof SCHED / sizeof SCHED[0];
 static void apply_args(const char *a) {   /* a setting is a string of the command-line options */
     char buf[512]; snprintf(buf, sizeof buf, "%s", a); char *tok[32]; int n = 0;
     for (char *t = strtok(buf, " "); t && n < 32; t = strtok(NULL, " ")) tok[n++] = t;
-    MAGIC = RES = 0; MAXW = 0; FW = 2; VW = 1; HM = 1.0; LP = 0; SELMODE = 0; GW = 0; PREC = 0; KWON = 0; W2ON = 0; SOSM = 0; SATC = 0;
+    MAGIC = RES = 0; MAXW = 0; FW = 2; VW = 1; HM = 1.0; LP = 0; SELMODE = 0; GW = 0; PREC = 0; KWON = 0; W2ON = 0; SOSM = 0; SATC = 0; SIMM = 0; EW1 = EW2 = 0; GTW = 0; TGTM = 0; NEHQ = 0; ORW = ORW0;
     for (int i = 0; i < n; i++) {
         if (!strcmp(tok[i], "--magic")) MAGIC = 1;
         else if (!strcmp(tok[i], "--res")) RES = 1;
@@ -1251,6 +1395,13 @@ static void apply_args(const char *a) {   /* a setting is a string of the comman
         else if (!strcmp(tok[i], "--kw") && i + 1 < n) KWON = atoi(tok[++i]);
         else if (!strcmp(tok[i], "--sos") && i + 1 < n) SOSM = atoi(tok[++i]);
         else if (!strcmp(tok[i], "--satc") && i + 1 < n) SATC = atoi(tok[++i]);
+        else if (!strcmp(tok[i], "--sim") && i + 1 < n) SIMM = atoi(tok[++i]);
+        else if (!strcmp(tok[i], "--orw") && i + 1 < n) ORW = ORW0 && atoi(tok[++i]);
+        else if (!strcmp(tok[i], "--eh") && i + 1 < n) eh_parse(tok[++i]);
+        else if (!strcmp(tok[i], "--tgt") && i + 1 < n) TGTM = atoi(tok[++i]);
+        else if (!strcmp(tok[i], "--gt") && i + 1 < n) GTW = atoi(tok[++i]);
+        else if (!strcmp(tok[i], "--ew") && i + 1 < n) { EW1 = 1; sscanf(tok[++i], "%lf,%lf,%lf,%lf,%lf,%lf", EP1, EP1 + 1, EP1 + 2, EP1 + 3, EP1 + 4, EP1 + 5); }
+        else if (!strcmp(tok[i], "--ew2") && i + 1 < n) { EW2 = 1; W2ON = 1; sscanf(tok[++i], "%lf,%lf,%lf,%lf,%lf,%lf", EP2, EP2 + 1, EP2 + 2, EP2 + 3, EP2 + 4, EP2 + 5); }
         else if (!strcmp(tok[i], "--wt2") && i + 1 < n) { W2ON = 1; sscanf(tok[++i], "%d,%d,%d", &FW2, &VW2, &GW2); }
     }
 }
@@ -1304,18 +1455,26 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--kw") && i + 1 < argc) KWON = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--sos") && i + 1 < argc) SOSM = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--satc") && i + 1 < argc) SATC = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--sim") && i + 1 < argc) SIMM = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--orw") && i + 1 < argc) ORW = ORW0 && atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--eh") && i + 1 < argc) eh_parse(argv[++i]);
+        else if (!strcmp(argv[i], "--tgt") && i + 1 < argc) TGTM = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--gt") && i + 1 < argc) GTW = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--ew") && i + 1 < argc) { EW1 = 1; sscanf(argv[++i], "%lf,%lf,%lf,%lf,%lf,%lf", EP1, EP1 + 1, EP1 + 2, EP1 + 3, EP1 + 4, EP1 + 5); }
+        else if (!strcmp(argv[i], "--ew2") && i + 1 < argc) { EW2 = 1; W2ON = 1; sscanf(argv[++i], "%lf,%lf,%lf,%lf,%lf,%lf", EP2, EP2 + 1, EP2 + 2, EP2 + 3, EP2 + 4, EP2 + 5); }
         else if (!strcmp(argv[i], "--wt2") && i + 1 < argc) { W2ON = 1; sscanf(argv[++i], "%d,%d,%d", &FW2, &VW2, &GW2); }
         else if (!strcmp(argv[i], "--maxw") && i + 1 < argc) MAXW = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--wt") && i + 1 < argc) { sscanf(argv[++i], "%d,%d,%lf,%d", &FW, &VW, &HM, &LP); }
         else if (!strcmp(argv[i], "--cycle") && i + 1 < argc) set_cycle(argv[++i]);
     }
-    T0 = now_s(); if (getenv("HYPER_NO_USIMP")) USIMP = 0; if (getenv("HYPER_NO_ORW")) ORW = 0; if (getenv("HYPER_NO_ESUB")) ESUB = 0; 
+    T0 = now_s(); if (getenv("HYPER_NO_USIMP")) USIMP = 0; if (getenv("HYPER_NO_ORW")) ORW = ORW0 = 0; if (getenv("HYPER_NO_ESUB")) ESUB = 0; 
     for (int b = 0; b < MAXB; b++) for (int v = 0; v < MAXV; v++) BT[b][v] = -1;
     dt_init(&KEPT); dt_init(&ACT);
     parse_file(path, root, NULL, -1);
     unfold_defs();
     const char *base = strrchr(path, '/'); base = base ? base + 1 : path;
     if (getenv("HYPER_DUMP")) for (int r = 0; r < NR; r++) { fprintf(stderr, "%s: head %d nb %d nv %d\n", SY[R[r].name].name, R[r].head, R[r].nb, R[r].nv); }
+    tgt_prepare();
     EQSYM = EQ;
     if (getenv("HYPER_CLASS")) { printf("%s eq %d defs %d out %d\n", base, HAS_EQ, NDEF, OUT_OF_CLASS); return 0; }
     if (OUT_OF_CLASS) { printf("%% SZS status GaveUp for %s\n%% reason %s\n", base, WHY); return 0; }
