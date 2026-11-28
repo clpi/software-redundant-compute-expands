@@ -546,6 +546,18 @@ static void eligible(int c) {
             if (best < 0 || k < bk) { bk = k; best = i; } }
         x->eb = 1ULL << best; return;
     }
+    if ((SELMODE == 8 || SELMODE == 9) && x->nb) {   /* E's selection as E applies it: a clause with a negative literal always selects one, even
+                                                         when its head is maximal, so units feed rules forward. 8: SelectNewComplexAHP (lightest ground
+                                                         literal, else lightest non-equational, else heaviest equation); 9: the most instantiated literal,
+                                                         ground first (SelectComplexG). Ties avoid the head's predicate. Selection keeps ordered resolution complete. */
+        int best = 0; long bk = 0;
+        for (int i = 0; i < x->nb; i++) { int a = LIT(c, i); long k;
+            long w3 = x->head >= 0 && T[x->head].f == T[a].f;
+            if (SELMODE == 8) { long w1 = T[a].gr ? 0 : T[a].f != EQ ? 10 : 20, w2 = w1 == 20 ? -T[a].w : T[a].w; k = (w1 * 100000 + (w2 + 50000)) * 2 + w3; }
+            else { long w1 = T[a].gr ? 0 : 1, w2 = -(long)(T[a].w - T[a].vo); k = (w1 * 1000000 + (w2 + 500000)) * 2 + w3; }
+            if (i == 0 || k < bk) { bk = k; best = i; } }
+        x->eb = 1ULL << best; return;
+    }
     if (x->head >= 0) {
         int top = 1; for (int i = 0; i < x->nb && top; i++) if (kbo(x->head, LIT(c, i)) != KGT) top = 0;
         if (top) { x->eh = 1; return; }
