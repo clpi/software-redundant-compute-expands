@@ -353,6 +353,18 @@ def check_resolution(cls, steps):
             newlit = put(rename(target, "i"), path, rename(rhs, "f"))
             head = subst(newlit, s) if slot == -1 else (subst(rename(hi, "i"), s) if hi is not None else None)
             body = [subst(newlit if q == slot else rename(a, "i"), s) for q, a in enumerate(bi)] + [subst(rename(a, "f"), s) for a in bf]
+            if st.get("sim"):
+                # simultaneous superposition: every other occurrence of the rewritten instance goes too
+                u, v = subst(rename(sub, "i"), s), subst(rename(rhs, "f"), s)
+
+                def rall(t):
+                    if t == u:
+                        return v
+                    if t[0] == "?":
+                        return t
+                    return t[:1] + tuple(rall(a) for a in t[1:])
+                head = rall(head) if head is not None else None
+                body = [rall(a) for a in body]
             if not clause_variant(cl, (head, body)):
                 print(f"REJECTED: step {n}: not a variant of the superposition")
                 return 1
