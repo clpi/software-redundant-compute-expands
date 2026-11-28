@@ -1,0 +1,457 @@
+#!/usr/bin/env python3
+"""Independent checker for the term engine's refutations: hyperresolution (engine hyper) and binary
+ordered resolution with superposition and equality resolution (engine res, clause steps, see
+check_resolution) over Horn CNF. Equations are atoms =(l, r); superposition and equality
+resolution are sound for the theory of equality, so a checked proof refutes the problem in
+first-order logic with equality.
+
+Hyperresolution of Horn CNF with function symbols (engine hyper).
+
+The proof is a JSON list of steps. A step {"id", "atom", "rule", "parents"} claims that atom is a
+positive unit derived from problem clause `rule`: with no parents, the atom must be a variant of
+that clause (a positive unit clause); otherwise the clause's body literals, in file order, are
+unified simultaneously with the parents' atoms (each renamed apart), and the atom must be a variant
+of the clause head under that most general unifier, or an instance of it (a derived unit holds for
+every instance, so instantiating one is sound). A step may carry "unfold", a list of problem
+equations that define function symbols; the clause is then first rewritten with them (see
+unfold_clause). The last step has atom null: the rule must be
+a clause without a positive literal whose body unifies with its parents. Unification has an occurs
+check. Hyperresolution is sound, so a proof that checks is a refutation.
+
+This file has its own TPTP reader and unification; nothing is shared with the engine.
+
+Usage: check_hyp.py PROBLEM.p PROOF.json [--root TPTP_ROOT]   (exit 0 iff the proof checks)
+"""
+import json
+import os
+import re
+import sys
+
+sys.setrecursionlimit(100000)
+TOK = re.compile(r"\s+|%[^\n]*|/\*.*?\*/|'(?:[^'\\]|\\.)*'|\"(?:[^\"\\]|\\.)*\"|[A-Za-z0-9_$]+|!=|.", re.S)
+
+
+def lex(text):
+    return [t for t in TOK.findall(text) if t.strip() and not t.startswith("%") and not t.startswith("/*")]
+
+
+class Reader:
+    def __init__(self, toks):
+        self.t, self.i = toks, 0
+
+    def peek(self):
+        return self.t[self.i] if self.i < len(self.t) else None
+
+    def take(self, want=None):
+        x = self.t[self.i]
+        if want is not None and x != want:
+            raise SyntaxError(f"expected {want}, got {x}")
+        self.i += 1
+        return x
+
+    def term(self, vs):
+        x = self.take()
+        if x[0].isupper() or x[0] == "_":
+            return ("?", vs.setdefault(x, len(vs)))
+        args = []
+        if self.peek() == "(":
+            self.take("(")
+            args.append(self.term(vs))
+            while self.peek() == ",":
+                self.take(",")
+                args.append(self.term(vs))
+            self.take(")")
+        return (x,) + tuple(args)
+
+
+def read_problem(path, root, sel=None, out=None):
+    out = {} if out is None else out
+    r = Reader(lex(open(path).read()))
+    while r.peek() is not None:
+        kw = r.take()
+        if kw == "include":
+            r.take("(")
+            fn = r.take()[1:-1]
+            names = None
+            if r.peek() == ",":
+                r.take(",")
+                r.take("[")
+                names = []
+                while r.peek() != "]":
+                    x = r.take()
+                    if x != ",":
+                        names.append(x)
+                r.take("]")
+            r.take(")")
+            r.take(".")
+            read_problem(os.path.join(root, fn), root, names, out)
+            continue
+        if kw != "cnf":
+            raise SyntaxError("not CNF")
+        r.take("(")
+        name = r.take()
+        r.take(",")
+        r.take()
+        r.take(",")
+        vs, lits, depth = {}, [], 0
+        while True:
+            p = r.peek()
+            if p == "(":
+                depth += 1
+                r.take()
+                continue
+            if p == ")":
+                if depth == 0:
+                    break
+                depth -= 1
+                r.take()
+                continue
+            if p == "|":
+                r.take()
+                continue
+            if p == ",":
+                break
+            neg = False
+            if p == "~":
+                neg = True
+                r.take()
+            a = r.term(vs)
+            if r.peek() in ("=", "!="):   # an equation is the atom =(l, r); != negates it
+                ne = r.take() == "!="
+                a = ("=", a, r.term(vs))
+                neg = neg != ne
+            lits.append((neg, a))
+        d = 0
+        while not (r.peek() == "." and d <= 0):
+            x = r.take()
+            d += x == "("
+            d -= x == ")"
+        r.take(".")
+        if sel is not None and name not in sel:
+            continue
+        taut = any((a[0] == "$true" and not n) or (a[0] == "$false" and n) for n, a in lits)
+        if taut:
+            continue
+        lits = [(n, a) for n, a in lits if a[0] not in ("$true", "$false")]
+        heads = [a for n, a in lits if not n]
+        if len(heads) > 1:
+            raise SyntaxError("non-Horn")
+        out[name] = (heads[0] if heads else None, [a for n, a in lits if n])
+    return out
+
+
+def walk(t, s):
+    while t[0] == "?" and t in s:
+        t = s[t]
+    return t
+
+
+def occurs(v, t, s):
+    t = walk(t, s)
+    if t == v:
+        return True
+    return t[0] != "?" and any(occurs(v, a, s) for a in t[1:])
+
+
+def unify(a, b, s):
+    stack = [(a, b)]
+    while stack:
+        x, y = stack.pop()
+        x, y = walk(x, s), walk(y, s)
+        if x == y:
+            continue
+        if x[0] == "?":
+            if occurs(x, y, s):
+                return None
+            s[x] = y
+        elif y[0] == "?":
+            if occurs(y, x, s):
+                return None
+            s[y] = x
+        elif x[0] != y[0] or len(x) != len(y):
+            return None
+        else:
+            stack.extend(zip(x[1:], y[1:]))
+    return s
+
+
+def subst(t, s):
+    t = walk(t, s)
+    return t if t[0] == "?" else (t[0],) + tuple(subst(a, s) for a in t[1:])
+
+
+def rename(t, tag):
+    return ("?", (tag, t[1])) if t[0] == "?" else (t[0],) + tuple(rename(a, tag) for a in t[1:])
+
+
+def variant(a, b):
+    m, inv = {}, {}
+
+    def go(x, y):
+        if x[0] == "?" or y[0] == "?":
+            if x[0] != "?" or y[0] != "?":
+                return False
+            if m.setdefault(x, y) != y or inv.setdefault(y, x) != x:
+                return False
+            return True
+        return x[0] == y[0] and len(x) == len(y) and all(go(p, q) for p, q in zip(x[1:], y[1:]))
+    return go(a, b)
+
+
+def instance(a, g):
+    """a is g with its variables replaced by terms (one-way match of g onto a)"""
+    m = {}
+
+    def go(x, y):
+        if y[0] == "?":
+            if y in m:
+                return m[y] == x
+            m[y] = x
+            return True
+        return x[0] == y[0] and len(x) == len(y) and all(go(p, q) for p, q in zip(x[1:], y[1:]))
+    return go(a, g)
+
+
+def from_json(j):
+    if isinstance(j, str):
+        assert j.startswith("?")
+        return ("?", int(j[1:]))
+    return (j[0],) + tuple(from_json(a) for a in j[1:])
+
+
+def clause_variant(c, d):
+    """clauses (head, body) equal under a bijective renaming of variables, bodies as sets"""
+    (h1, b1), (h2, b2) = c, d
+    b1, b2 = list(dict.fromkeys(b1)), list(dict.fromkeys(b2))
+    if (h1 is None) != (h2 is None) or len(b1) != len(b2):
+        return False
+
+    def go(m, inv, x, y):
+        if x[0] == "?" or y[0] == "?":
+            if x[0] != "?" or y[0] != "?":
+                return None
+            if m.get(x, y) != y or inv.get(y, x) != x:
+                return None
+            m2, i2 = dict(m), dict(inv)
+            m2[x], i2[y] = y, x
+            return m2, i2
+        if x[0] != y[0] or len(x) != len(y):
+            return None
+        for p, q in zip(x[1:], y[1:]):
+            r = go(m, inv, p, q)
+            if r is None:
+                return None
+            m, inv = r
+        return m, inv
+
+    def body(m, inv, rest, avail):
+        if not rest:
+            return True
+        for j, y in enumerate(avail):
+            r = go(m, inv, rest[0], y)
+            if r is not None and body(r[0], r[1], rest[1:], avail[:j] + avail[j + 1:]):
+                return True
+        return False
+    start = ({}, {}) if h1 is None else go({}, {}, h1, h2)
+    return start is not None and body(start[0], start[1], b1, b2)
+
+
+def unfold_clause(cls, cl, defs):
+    """rewrite clause cl to normal form with the problem equations named in defs, each a pair
+    [name, side]: the equation's side `side` must be f(X1..Xn) with distinct variables and the other
+    side may use only those variables; f terms are replaced by the instance of the other side.
+    Rewriting a clause with problem equations yields a clause that follows from the problem, so
+    accepting the rewritten clause as an input step is sound. Returns None if a definition is
+    malformed or rewriting does not terminate."""
+    rules = {}
+    for name, side in defs:
+        c = cls.get(name)
+        if c is None or c[1] or c[0] is None or c[0][0] != "=" or side not in (0, 1):
+            return None
+        lhs, rhs = c[0][1 + side], c[0][2 - side]
+        if lhs[0] == "?" or any(a[0] != "?" for a in lhs[1:]) or len({a[1] for a in lhs[1:]}) != len(lhs) - 1:
+            return None
+        lv = {a[1] for a in lhs[1:]}
+
+        def vs(t):
+            return {t[1]} if t[0] == "?" else set().union(*[vs(a) for a in t[1:]])
+        if not vs(rhs) <= lv or (lhs[0], len(lhs) - 1) in rules:
+            return None
+        rules[(lhs[0], len(lhs) - 1)] = ([a[1] for a in lhs[1:]], rhs)
+    budget = [200000]
+
+    def put(t, m):
+        return m[t[1]] if t[0] == "?" else (t[0],) + tuple(put(a, m) for a in t[1:])
+
+    def nf(t):
+        budget[0] -= 1
+        if budget[0] < 0:
+            raise RecursionError
+        if t[0] == "?":
+            return t
+        t = (t[0],) + tuple(nf(a) for a in t[1:])
+        r = rules.get((t[0], len(t) - 1))
+        if r is None:
+            return t
+        return nf(put(r[1], dict(zip(r[0], t[1:]))))
+
+    def atom(a):
+        return None if a is None else (a[0],) + tuple(nf(x) for x in a[1:])
+    try:
+        return (atom(cl[0]), [atom(b) for b in cl[1]])
+    except RecursionError:
+        return None
+
+
+def check_resolution(cls, steps):
+    """steps are clauses: {"input": name} must be a variant of that problem clause; {"from": [i, j, k]}
+    must be a variant of the binary resolvent of clause i's head with body literal k of clause j"""
+    have = {}
+    for n, st in enumerate(steps):
+        cl = (from_json(st["head"]) if st["head"] is not None else None, [from_json(a) for a in st["body"]])
+        if "input" in st:
+            src = cls.get(st["input"])
+            if src is not None and "unfold" in st:
+                src = unfold_clause(cls, src, st["unfold"])
+            if src is None or not clause_variant(cl, src):
+                print(f"REJECTED: step {n}: not a variant of problem clause {st['input']}")
+                return 1
+        elif st.get("rule") == "sup":
+            f, i, slot = st["from"]
+            d, path = st["dir"], st["path"]
+            if f not in have or i not in have:
+                print(f"REJECTED: step {n}: a premise is not established earlier")
+                return 1
+            (hf, bf), (hi, bi) = have[f], have[i]
+            if hf is None or hf[0] != "=" or d not in (0, 1):
+                print(f"REJECTED: step {n}: the first premise has no equation head")
+                return 1
+            lhs, rhs = hf[1 + d], hf[2 - d]
+            target = hi if slot == -1 else (bi[slot] if 0 <= slot < len(bi) else None)
+            if target is None or not path:
+                print(f"REJECTED: step {n}: no such literal or position")
+                return 1
+            try:
+                sub = target
+                for q in path:
+                    sub = sub[1 + q]
+            except (IndexError, TypeError):
+                print(f"REJECTED: step {n}: no such position")
+                return 1
+            if sub[0] == "?":
+                print(f"REJECTED: step {n}: superposition into a variable")
+                return 1
+            s = unify(rename(lhs, "f"), rename(sub, "i"), {})
+            if s is None:
+                print(f"REJECTED: step {n}: the equation side and the subterm do not unify")
+                return 1
+
+            def put(t, p, x):
+                if not p:
+                    return x
+                return t[:1 + p[0]] + (put(t[1 + p[0]], p[1:], x),) + t[2 + p[0]:]
+            newlit = put(rename(target, "i"), path, rename(rhs, "f"))
+            head = subst(newlit, s) if slot == -1 else (subst(rename(hi, "i"), s) if hi is not None else None)
+            body = [subst(newlit if q == slot else rename(a, "i"), s) for q, a in enumerate(bi)] + [subst(rename(a, "f"), s) for a in bf]
+            if not clause_variant(cl, (head, body)):
+                print(f"REJECTED: step {n}: not a variant of the superposition")
+                return 1
+        elif st.get("rule") == "eqres":
+            c, k = st["from"]
+            if c not in have:
+                print(f"REJECTED: step {n}: a premise is not established earlier")
+                return 1
+            hc, bc = have[c]
+            if not 0 <= k < len(bc) or bc[k][0] != "=":
+                print(f"REJECTED: step {n}: no negative equation there")
+                return 1
+            s = unify(bc[k][1], bc[k][2], {})
+            if s is None:
+                print(f"REJECTED: step {n}: the sides do not unify")
+                return 1
+            res = (subst(hc, s) if hc is not None else None, [subst(a, s) for q, a in enumerate(bc) if q != k])
+            if not clause_variant(cl, res):
+                print(f"REJECTED: step {n}: not a variant of the equality resolvent")
+                return 1
+        else:
+            i, j, k = st["from"]
+            if i not in have or j not in have:
+                print(f"REJECTED: step {n}: a premise is not established earlier")
+                return 1
+            (hi, bi), (hj, bj) = have[i], have[j]
+            if hi is None or not 0 <= k < len(bj):
+                print(f"REJECTED: step {n}: no such head or body literal")
+                return 1
+            good = False
+            # an equation head may be read either way round (l = r gives r = l)
+            for h in [hi] + ([("=", hi[2], hi[1])] if hi[0] == "=" else []):
+                s = unify(rename(h, "i"), rename(bj[k], "j"), {})
+                if s is None:
+                    continue
+                res = (subst(rename(hj, "j"), s) if hj is not None else None,
+                       [subst(rename(a, "j"), s) for q, a in enumerate(bj) if q != k] + [subst(rename(a, "i"), s) for a in bi])
+                if clause_variant(cl, res):
+                    good = True
+                    break
+            if not good:
+                print(f"REJECTED: step {n}: not a variant of the resolvent of the head and the body literal")
+                return 1
+        have[st["id"]] = cl
+    last = steps[-1]
+    if last["head"] is None and not last["body"]:
+        print("CHECKED")
+        return 0
+    print("REJECTED: the last clause is not empty")
+    return 1
+
+
+def main():
+    prob, pf = sys.argv[1], sys.argv[2]
+    root = sys.argv[sys.argv.index("--root") + 1] if "--root" in sys.argv else os.path.dirname(os.path.dirname(os.path.dirname(prob)))
+    cls = read_problem(prob, root)
+    steps = json.load(open(pf))
+    if steps and ("input" in steps[0] or "from" in steps[0]):
+        return check_resolution(cls, steps)
+    have = {}
+    for n, st in enumerate(steps):
+        rule = cls.get(st["rule"])
+        if rule is not None and "unfold" in st:
+            rule = unfold_clause(cls, rule, st["unfold"])
+        if rule is None:
+            print(f"REJECTED: step {n}: no clause {st['rule']}")
+            return 1
+        head, body = rule
+        par = st["parents"]
+        if any(p not in have for p in par):
+            print(f"REJECTED: step {n}: a parent is not established earlier")
+            return 1
+        if len(par) != len(body):
+            print(f"REJECTED: step {n}: {len(par)} parents for {len(body)} body literals of {st['rule']}")
+            return 1
+        s = {}
+        for k, (lit, p) in enumerate(zip(body, par)):
+            s = unify(rename(lit, "r"), rename(have[p], k), s)
+            if s is None:
+                print(f"REJECTED: step {n}: body literal {k} of {st['rule']} does not unify with its parent")
+                return 1
+        last = n == len(steps) - 1
+        if st["atom"] is None:
+            if head is not None or not last:
+                print(f"REJECTED: step {n}: an empty conclusion needs a clause without a head, as the last step")
+                return 1
+            print("CHECKED")
+            return 0
+        if head is None:
+            print(f"REJECTED: step {n}: {st['rule']} has no head")
+            return 1
+        atom = from_json(st["atom"])
+        if not instance(atom, subst(rename(head, "r"), s)):
+            print(f"REJECTED: step {n}: atom is not an instance of the head of {st['rule']} under the unifier")
+            return 1
+        have[st["id"]] = atom
+    print("REJECTED: no empty conclusion")
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,0 +1,12 @@
+s5-u8.jsonl	0.05	+36
+s5-uI.jsonl	0.1	+5
+s5-u9.jsonl	0.05	+1
+s5-uJ.jsonl	0.05	+1
+s5-u0.jsonl	0.1	+1
+s5-u3.jsonl	0.1	+1
+s5-u4.jsonl	0.1	+1
+s5-u9.jsonl	0.1	+1
+s5-u8.jsonl	0.5	+3
+s5-u8.jsonl	5	+7
+s5-u4.jsonl	2	+1
+# 58 solved in 8.15 s of schedule

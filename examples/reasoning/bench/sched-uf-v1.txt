@@ -1,0 +1,11 @@
+utrain-u8.jsonl	0.05	+37
+utrain-uI.jsonl	0.1	+5
+utrain-u3.jsonl	0.05	+1
+utrain-u9.jsonl	0.05	+1
+utrain-u0.jsonl	0.1	+1
+utrain-u4.jsonl	0.1	+1
+utrain-u9.jsonl	0.1	+1
+utrain-u8.jsonl	0.5	+3
+utrain-u8.jsonl	5	+7
+utrain-u4.jsonl	2	+1
+# 58 solved in 8.05 s of schedule

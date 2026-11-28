@@ -1,0 +1,19 @@
+ntrain-n4.jsonl	0.05	+85
+ntrain-n1.jsonl	0.05	+6
+ntrain-n6.jsonl	0.05	+2
+ntrain-n0.jsonl	0.05	+1
+ntrain-n9.jsonl	0.05	+1
+ntrain-nA.jsonl	0.05	+1
+ntrain-nB.jsonl	0.05	+1
+ntrain-nB.jsonl	0.1	+1
+ntrain-nE.jsonl	0.1	+1
+ntrain-nD.jsonl	0.5	+3
+ntrain-n0.jsonl	0.2	+1
+ntrain-n7.jsonl	0.2	+1
+ntrain-n2.jsonl	0.5	+2
+ntrain-nB.jsonl	0.5	+2
+ntrain-n1.jsonl	1	+1
+ntrain-n4.jsonl	1	+1
+ntrain-n9.jsonl	2	+2
+ntrain-n2.jsonl	5	+1
+# 113 solved in 11.45 s of schedule
