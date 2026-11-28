@@ -68,12 +68,22 @@ Every native proof checks. Native solves 3 that neither baseline solves. On the 
 solve, median wall is 18.6 ms native, 21.3 ms Vampire, 12.9 ms E, and median peak memory 2.1 MB,
 9.2 MB, 5.7 MB. Open: E solves 20 problems native does not, mostly condensed-detachment logic
 calculi (LCL), and is faster by median. The equality class
-(450 problems, CNF_UNS_RFO_SEQ_HRN) is still behind: native 340, Vampire 415, E 372 (held-out half:
-167, 204, 183), every native proof checked, up from 270 after definition unfolding, unit
-simplification, ordered rewriting, equality subsumption and refitted schedules
-(`bench/sched-eq-v3.txt`, and `bench/sched-uf-v2.txt` for the 162 problems unfolding leaves
-without equality, where native solves 117 against Vampire 149 and E 108). On the 325 all three
-solve, median wall is 13.2 ms native, 125.9 ms Vampire, 23.0 ms E, but total time is higher.
+(450 problems, CNF_UNS_RFO_SEQ_HRN): native 401, Vampire 415, E 372 (held-out half: 198, 204, 183;
+held-out problems that keep equality after unfolding: 130, 130, 131), every native proof checked,
+up from 340 with no problem lost. What closed most of the gap: literal selection as E applies it
+(`--sel 8`, `--sel 9`: a clause with a negative literal always selects one, even when its head is
+maximal, so units feed rules forward), goal naming (`--tgt 1`, after Twee's goal transformation as
+in Vampire's `tgt=ground`: fresh constants name the goal's ground subterms by acyclic definitions,
+which the checker accepts only as such), E's five clause queues (`--eh`), simultaneous superposition
+(`--sim`), and ordered rewriting switchable per setting (`--orw`), with schedules refitted on the
+training halves (`bench/sched-eq-v4.txt`, and `bench/sched-uf-v3.txt` for the 162 problems
+unfolding leaves without equality, where native solves 138 against Vampire 149 and E 108). These
+features came from studying problems Vampire or E win, some of them in the held-out half; the
+schedules saw only the training half. On the 355 all three solve: median wall 11.5 ms native,
+133.0 ms Vampire, 26.8 ms E; total wall 191 s, 365 s, 288 s; median peak memory 3.1 MB, 9.8 MB,
+6.2 MB; median proof steps 34, 33, 38. Native is faster than Vampire on 312 of the 355. Open:
+Vampire solves 25 native does not (LCL condensed detachment 13, COL combinatory logic 7, ANA 2),
+and native's largest peak memory is 178 MB against Vampire's 99 MB.
 
 ## Measured (receipts in the project files, `reasoning/receipts-hrn254-v4`)
 
