@@ -1,0 +1,24 @@
+$ (cd theses/redundant-compute-expands/examples/monotone-synthesis && bash run.sh)
+pin ok software-optimality 34187114afd4714d530b2fdf6e9a3103e6091a8a
+Qualification.lean: OK
+ExecutableClosure.lean: OK
+ClosureStrength.lean: OK
+Lean (version 4.19.0, x86_64-unknown-linux-gnu, commit 6caaee842e94, Release)
+== Lean
+PASS Lean: 30 theorems printed, axioms within propext, Classical.choice, Quot.sound
+== Lean mutants (each must fail to compile)
+mutant killed drop-coverage
+mutant killed drop-premise-check
+mutant killed drop-verifier
+mutant killed drop-never-retired
+mutant killed replace-any-head
+mutant killed unsaturated-exact
+mutant killed abstraction-underived
+mutant killed single-pass-saturated
+mutant killed retire-uncovered-ok
+== loop on real data
+55788bc9de9b69e6a3752dad93c926bc941de87e84dc672ac5fdf676c2a1f938  /tmp/abduction-out/ms3/stream.jsonl
+GATE FAILED (exit 2)
+python3: can't open file '$MONO/theses/redundant-compute-expands/examples/monotone-synthesis/gate.py': [Errno 2] No such file or directory
+
+==> exit 1

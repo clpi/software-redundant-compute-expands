@@ -63,11 +63,23 @@ def edges_of(recs):
     return out
 
 
+def fisher_greater(a, n1, b, n2):
+    """One-sided Fisher exact p (written here again, not imported: the verdict rule is re-derived)."""
+    from math import comb
+    k = a + b
+    return sum(comb(n1, i) * comb(n2, k - i) for i in range(a, min(n1, k) + 1) if 0 <= k - i <= n2) / comb(n1 + n2, k)
+
+
 def main():
     store, rec_dir, cert_dir, gates_path = sys.argv[1:5]
     runlogs = sys.argv[5] if len(sys.argv) > 5 else None
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from gates import symptoms as extract  # the one shared piece: the symptom extractor (a stated premise)
+    EXIT = re.compile(r"\n==> exit (-?\d+)\n$")  # every stored log closes with its exit status: the hash binds both
+
+    def split(txt):
+        m = EXIT.search(txt)
+        return (txt[:m.start()], int(m.group(1))) if m else (txt, None)
 
     def run_ok(r):
         """The run's log exists, hashes to its recorded hash, and yields the recorded symptoms."""
@@ -77,7 +89,17 @@ def main():
         if not os.path.exists(p):
             return False
         txt = open(p).read()
-        return H(txt) == r["log_sha256"] and extract(txt, r["rc"], {}) == r["symptoms"]
+        text, rc = split(txt)
+        return (H(txt) == r["log_sha256"] and rc == r["rc"] and extract(text, rc, {}) == r["symptoms"]
+                and all(log_ok(q["log_sha256"], q["rc"]) for q in r.get("pre", [])))
+
+    def log_ok(h, rc=None):
+        """The log exists, hashes to h, and (when given) closes with exit status rc."""
+        p = os.path.join(runlogs, h + ".log") if runlogs else ""
+        if not (runlogs and os.path.exists(p)):
+            return False
+        txt = open(p).read()
+        return H(txt) == h and (rc is None or split(txt)[1] == rc)
     old = load(store)
     old_bodies = {r["body"] for r in old}
     new_bodies, report = [], {"admitted": [], "refused": []}
@@ -157,15 +179,30 @@ def main():
         g = json.loads(line)
         for rd in g["rounds"]:
             ctrl = rd.get("control", [])
-            for t in rd.get("tested", []):
+            art = [{"cause": rd["artifact"]["cause"], "trials": rd["artifact"]["trials"]}] if rd.get("artifact") else []
+            for t in rd.get("tested", []) + art:
                 for tr in t["trials"]:
                     target = tr["target"]
+                    ctrl = rd.get("control", []) + tr.get("control_extra", [])
                     allruns = ctrl + tr["intervention"] + tr["placebo"]
                     if not all(run_ok(r) for r in allruns):
                         report["refused"].append({"claim": f"{g['gate']}:{t['cause']}", "reason": "a run record does not match its stored log"}); continue
-                    pc = all(all(s in r["symptoms"] for s in target) for r in ctrl) and len(ctrl) >= 2
+                    hit = lambda r: all(s in r["symptoms"] for s in target)
+                    pc = all(map(hit, ctrl)) and len(ctrl) >= 2
                     gone = all(not any(s in r["symptoms"] for s in target) for r in tr["intervention"]) and len(tr["intervention"]) >= 2
-                    pp = all(all(s in r["symptoms"] for s in target) for r in tr["placebo"]) and len(tr["placebo"]) >= 2
+                    pp = all(map(hit, tr["placebo"])) and len(tr["placebo"]) >= 2
+                    if tr.get("signature") and pc and pp and not gone:  # a tree cause that exposes the next failure
+                        def sig_(r):
+                            txt = split(open(os.path.join(runlogs, r["log_sha256"] + ".log")).read())[0]
+                            ls = [l for l in txt.splitlines() if l.strip()]
+                            return [sorted(r["symptoms"]), ls[-1].strip() if ls else ""]
+                        S, T = [sig_(r) for r in ctrl + tr["placebo"]], [sig_(r) for r in tr["intervention"]]
+                        gone = all(x == S[0] for x in S) and all(y == T[0] for y in T) and T[0] != S[0] and len(T) >= 2
+                        target = [f"ends:{S[0][1][:60]}"]
+                    if not pc and any(map(hit, ctrl)) and gone:  # flaky gate: the statistical rule
+                        c, q, ni = sum(map(hit, ctrl)), sum(map(hit, tr["placebo"])), len(tr["intervention"])
+                        pc = fisher_greater(c, len(ctrl), 0, ni) < 0.05
+                        pp = fisher_greater(q, len(tr["placebo"]), 0, ni) < 0.05
                     acquired = tr["why"].startswith("run the hidden step")
                     placeholder = tr["why"].startswith("empty placeholder")
                     repaired = gone and all(r["rc"] == 0 for r in tr["intervention"])
@@ -179,12 +216,32 @@ def main():
                         report["refused"].append(r_); continue
                     kind = "fail_point" if placeholder else ("repaired" if repaired else "cause")
                     claim = f"{kind}({g['gate']}, {t['cause']} -> {', '.join(target)})"
-                    runs = [r["log_sha256"] for r in ctrl + tr["intervention"] + tr["placebo"]]
+                    runs = [r["log_sha256"] for r in allruns]
                     for h in runs:
                         append({"kind": "edge", "premises": [], "head": f"run:{h}", "colors": ["receipt:run"]})
                     append({"kind": "admit", "claim": claim, "premises": [f"run:{h}" for h in runs], "head": claim,
                             "cites": {"gate": g["gate"], "round": rd["round"], "intervention": tr["why"], "target": target}})
                     report["admitted"].append(claim)
+            # 1-minimality of a narrowed artifact set, recomputed from the delta-debugging runs:
+            # the set alone repairs, and removing any one of its paths does not
+            nar = rd.get("narrowed") or {}
+            m = nar.get("minimal")
+            if m:
+                tests = nar["tests"]
+                key = lambda us: tuple(sorted(us))
+                ok_full = [x for x in tests if key(x["units"]) == key(m) and x["rc"] == 0 and log_ok(x["log_sha256"], 0)]
+                drops = {u: [x for x in tests if key(x["units"]) == key([v for v in m if v != u])] for u in m}
+                ok_drop = all(xs and all(x["rc"] != 0 and log_ok(x["log_sha256"], x["rc"]) for x in xs) for xs in drops.values())
+                claim = f"minimal_prerequisite({g['gate']}, {', '.join(m)})"
+                if ok_full and ok_drop:
+                    hs = [ok_full[0]["log_sha256"]] + [xs[0]["log_sha256"] for xs in drops.values()]
+                    for h in hs:
+                        append({"kind": "edge", "premises": [], "head": f"run:{h}", "colors": ["receipt:run"]})
+                    append({"kind": "admit", "claim": claim, "premises": [f"run:{h}" for h in hs], "head": claim,
+                            "cites": {"gate": g["gate"], "round": rd["round"], "units": m}})
+                    report["admitted"].append(claim)
+                else:
+                    report["refused"].append({"claim": claim, "reason": "recomputed: set does not repair alone, or some one-path removal was not shown to fail"})
 
     # ---- append only and monotone
     recs = list(old)

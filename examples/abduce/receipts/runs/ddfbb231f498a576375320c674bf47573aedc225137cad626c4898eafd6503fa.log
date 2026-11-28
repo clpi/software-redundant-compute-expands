@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "$MONO/theses/redundant-compute-expands/examples/abduce/planted/needs-producer/tools/gen.py", line 3, in <module>
+    import planted_helper
+ModuleNotFoundError: No module named 'planted_helper'
+
+==> exit 1

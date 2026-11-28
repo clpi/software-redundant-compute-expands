@@ -92,6 +92,74 @@ with tempfile.TemporaryDirectory() as w:
     rc, r = admit(os.path.join(w, "s5.jsonl"), c5, gates)
     check("A5 planted false hypothesis not refused by the kernel", neg is not None and rc == 1, neg["name"] if neg else "none")
 
+    # A8: a delta-debugging run whose recorded failure is relabeled a pass: the narrowed set's
+    # 1-minimality must no longer be admitted (its one-path removal is not shown to fail)
+    t = [json.loads(json.dumps(g)) for g in lines]
+    nm = None
+    for g in t:
+        for rd in g["rounds"]:
+            m = (rd.get("narrowed") or {}).get("minimal")
+            if m and nm is None:
+                for x in rd["narrowed"]["tests"]:
+                    if sorted(x["units"]) == sorted(m[1:]) or (len(m) == 1 and x["units"] == []):
+                        x["rc"] = 0
+                nm = f"minimal_prerequisite({g['gate']}, {', '.join(m)})"
+    p8 = os.path.join(w, "g8.jsonl"); open(p8, "w").write("\n".join(json.dumps(g) for g in t) + "\n")
+    rc, r = admit(os.path.join(w, "s8.jsonl"), certs, p8)
+    check("A8 relabeled delta-debugging run", nm and nm in admitted and nm not in r.get("admitted", []), nm or "no narrowed set")
+
+    # A9: a prerequisite step's log deleted from the run store: trials that cite it are refused
+    t = [json.loads(json.dumps(g)) for g in lines]
+    pre_h, who = None, None
+    for g in t:
+        for rd in g["rounds"]:
+            for x in rd.get("tested", []):
+                for tr in x["trials"]:
+                    for run in tr["intervention"]:
+                        if run.get("pre") and pre_h is None and tr["verdict"] in ("REPAIRED", "VERIFIED"):
+                            pre_h, who = run["pre"][0]["log_sha256"], f"{g['gate']}:{x['cause']}"
+    if pre_h:
+        src = os.path.join(runlogs, pre_h + ".log"); keep = open(src).read(); os.remove(src)
+        try:
+            rc, r = admit(os.path.join(w, "s9.jsonl"), certs, gates)
+        finally:
+            open(src, "w").write(keep)
+    check("A9 missing prerequisite-step log", pre_h and any(x.get("claim") == who and "stored log" in str(x.get("reason")) for x in r.get("refused", [])), who or "no prerequisite trial")
+
+    # A10: the narrowed set's passing run swapped for a genuine failing log, rc left at 0
+    # (the exit status is inside the hashed log, so the swap must be refused)
+    t = [json.loads(json.dumps(g)) for g in lines]
+    nm10 = None
+    for g in t:
+        for rd in g["rounds"]:
+            nar = rd.get("narrowed") or {}
+            m = nar.get("minimal")
+            if m and nm10 is None:
+                full = [x for x in nar["tests"] if sorted(x["units"]) == sorted(m) and x["rc"] == 0]
+                bad = [x for x in nar["tests"] if x["rc"] != 0]
+                if full and bad:
+                    for x in full:
+                        x["log_sha256"] = bad[0]["log_sha256"]
+                    nm10 = f"minimal_prerequisite({g['gate']}, {', '.join(m)})"
+    p10 = os.path.join(w, "g10.jsonl"); open(p10, "w").write("\n".join(json.dumps(g) for g in t) + "\n")
+    rc, r = admit(os.path.join(w, "s10.jsonl"), certs, p10)
+    check("A10 passing run swapped for a failing log", nm10 and nm10 in admitted and nm10 not in r.get("admitted", []), nm10 or "no narrowed set")
+
+    # A11: an intervention run's exit status edited from failing to 0 (log unchanged)
+    t = [json.loads(json.dumps(g)) for g in lines]
+    who11 = None
+    for g in t:
+        for rd in g["rounds"]:
+            for x in rd.get("tested", []):
+                for tr in x["trials"]:
+                    if tr["verdict"] == "REFUTED" and who11 is None and all(r_["rc"] != 0 for r_ in tr["intervention"]):
+                        for r_ in tr["intervention"]:
+                            r_["rc"] = 0; r_["symptoms"] = []
+                        tr["verdict"] = "REPAIRED"; who11 = f"{g['gate']}:{x['cause']}"
+    p11 = os.path.join(w, "g11.jsonl"); open(p11, "w").write("\n".join(json.dumps(g) for g in t) + "\n")
+    rc, r = admit(os.path.join(w, "s11.jsonl"), certs, p11)
+    check("A11 exit status edited to 0", who11 and any(x.get("claim") == who11 and "stored log" in str(x.get("reason")) for x in r.get("refused", [])), who11 or "no refuted trial")
+
     # A6: history rewrite of the store
     s6 = os.path.join(w, "s6.jsonl"); shutil.copy(os.path.join(w, "s0.jsonl"), s6)
     L = open(s6).read().splitlines()

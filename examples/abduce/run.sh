@@ -4,7 +4,9 @@
 #   2 Lean mutants of the abduction definitions (each must break a proof)
 #   3 D0 planted causes on random logs (recovery, rejection, incremental = scratch = brute)
 #   4 D1 monotone-synthesis pending artifacts, strict and raw, then Lean certificates
-#   5 D2 gates: run, abduce, test causes by intervention / placebo / control, planted faults
+#   3b the same logs through #16 (examples/abduction) and its checker: explanation sets must agree
+#   5 D2 gates: run, abduce (symptom causes and prerequisite actions read from the tree), test by
+#     intervention / placebo / control, narrow prerequisites to a 1-minimal path set, planted faults
 #   6 admission into the store (append only, monotone, verdicts re-decided) and its controls
 #   7 SUMMARY.json and SHA256SUMS.txt
 # Inputs:
@@ -32,6 +34,7 @@ echo "== 2 mutants"
 tail -1 "$OUT/mutants.txt"
 echo "== 3 planted"
 python3 d_planted.py 200 "$OUT/d0-planted.json"
+python3 crosscheck.py "$OUT/d0-planted.json" "$OUT/crosscheck.json"
 echo "== 4 synthesis"
 python3 d_synthesis.py ../monotone-synthesis/receipts/stream.jsonl strict 3 "$OUT/d1-strict.json" | head -2
 python3 d_synthesis.py ../monotone-synthesis/receipts/stream.jsonl raw 3 "$OUT/d1-raw.json" | head -2
@@ -40,10 +43,7 @@ JOBS="${JOBS:-2}" python3 certify_all.py "$OUT" "$OUT/certs" | tail -1
 echo "== 5 gates"
 if [ ! -d "$MONO" ]; then
   if [ -n "${BUNDLE:-}" ]; then git clone -q "$BUNDLE" "$MONO"
-  else  # this repository's committed tree as the only thesis
-    mkdir -p "$MONO/theses/redundant-compute-expands"
-    git -C ../.. archive HEAD | tar -x -C "$MONO/theses/redundant-compute-expands"
-    git -C "$MONO" init -q && git -C "$MONO" add -A && git -C "$MONO" -c user.email=a@b -c user.name=abduction commit -qm tree
+  else ./mkmono.sh ../.. "$MONO"  # this repository (first-parent history) as the only thesis
   fi
 fi
 git clone -q https://github.com/clpi/software-optimality "$WORK/opt" && git -C "$WORK/opt" checkout -q 3418711

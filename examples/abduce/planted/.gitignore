@@ -1,0 +1,6 @@
+.cache/
+gen/
+decoy.txt
+data/
+__pycache__/
+results/*/run-*

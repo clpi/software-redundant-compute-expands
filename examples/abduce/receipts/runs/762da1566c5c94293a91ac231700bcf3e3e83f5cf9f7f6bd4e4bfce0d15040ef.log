@@ -1,0 +1,7 @@
+kernel.id sha256 287f79bf29b5f782b32bef03f0c3e068781a0a4d35fff8fe09d3e50408ea0298
+idol sha256 822dcb048f613618b5c1791e8f66b3ced4edb1b8a135f78ac6033b09a89deeb8
+== controls
+read: cannot open path
+Aborted
+
+==> exit 134

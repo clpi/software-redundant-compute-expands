@@ -1,0 +1,20 @@
+Standing gate: every incremental engine against its from-scratch checker.
+
+usage:
+  gate.py all <reversible checkout> <prlm checkout> <hma checkout> [counts.json]
+  gate.py s1 [points.json]      system 1, candidate-space frontier (fixture ships
+                                with the candidate-space home only)
+  gate.py meta <meta.py>        system 1, the reversible repo's meta-search
+  gate.py s2 <harness/run.py>   system 2, PRLM certified decoder
+  gate.py s3 <solver dir>       system 3, HMA solver
+
+Prints one PASS/FAIL line per check and the counts behind it, then GATE:
+PASS or GATE: FAIL (exit 1). Counts are the claims; the two wall-clock
+lines are single runs on this machine and indicative only.
+
+Each engine has a mutant that breaks its cone rule in one place; the
+gate must catch every mutant (a mutant that agrees is a FAIL: the
+checks would have no teeth).
+
+
+==> exit 2

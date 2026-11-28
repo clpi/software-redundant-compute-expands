@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "$MONO/theses/redundant-compute-expands/examples/abduce/planted/stray-input/check.py", line 23, in <module>
+    check(os.path.join(base, sys.argv[1]))
+                             ~~~~~~~~^^^
+IndexError: list index out of range
+
+==> exit 1

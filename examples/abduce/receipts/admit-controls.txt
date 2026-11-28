@@ -1,9 +1,13 @@
-caught baseline admits and is append only and monotone :: admitted 44
+caught baseline admits and is append only and monotone :: admitted 66
 caught A1 relabeled verdict :: srce/monotone-synthesis:env_unset:ABDUCTION_UNREAD
 caught A2 fabricated run symptoms :: srce/monotone-synthesis:env_unset:ABDUCTION_UNREAD
 caught A3 certificate output with sorryAx :: d1-raw-front
 caught A4 claim with a different H :: d1-raw-front
 caught A5 planted false hypothesis not refused by the kernel :: d0-seed6-false-does-not-explain
+caught A8 relabeled delta-debugging run :: minimal_prerequisite(planted/needs-build, examples/abduce/planted/needs-build/gen/table.txt)
+caught A9 missing prerequisite-step log :: planted/needs-build:pre:build:.
+caught A10 passing run swapped for a failing log :: minimal_prerequisite(planted/needs-build, examples/abduce/planted/needs-build/gen/table.txt)
+caught A11 exit status edited to 0 :: srce/monotone-synthesis:env_unset:ABDUCTION_UNREAD
 caught A6 store history rewrite :: store chain broken at 3
-caught A7 re-admission appends nothing :: 2180 -> 2180
-admission controls: 8/8 caught
+caught A7 re-admission appends nothing :: 2218 -> 2218
+admission controls: 12/12 caught

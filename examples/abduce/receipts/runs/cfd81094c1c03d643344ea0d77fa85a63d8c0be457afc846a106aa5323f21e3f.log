@@ -1,0 +1,8 @@
+$ (cd theses/redundant-compute-expands/examples/abduce/planted/needs-producer && sh check.sh)
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import json,sys; d=json.load(open("data/out.json")); sys.exit(0 if d["total"]==2080 else 1)
+                                 ~~~~^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'data/out.json'
+
+==> exit 1

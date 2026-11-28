@@ -193,7 +193,8 @@ with tempfile.TemporaryDirectory() as td:
     st = json.loads(before)
     victim = st["live"][0]
     st["live"] = st["live"][1:]
-    st["seen"] = [k for k in st["seen"] if not k.startswith("offer:")]  # re-offer: forces a spec check
+    # re-offer: forces a spec check (event bindings are a key -> payload map since #14)
+    st["seen"] = {k: v for k, v in st["seen"].items() if not k.startswith("offer:")}
     json.dump(st, open(stp, "w"))
     r = subprocess.run([sys.executable, "-I", ingest, stp, evp, "--batch", batches[-1]], capture_output=True, text=True)
     check("control: a state that lost a live artifact is refused (reach would shrink)",
