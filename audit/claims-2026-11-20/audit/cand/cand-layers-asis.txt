@@ -1,0 +1,95 @@
+layer 1: 1 candidates; idol-eyes among them: 0
+  supply obs:il:jq:n:number.id:281 (for qual:il:jq:n:number.id:281) | [1, 2, 1, 1, 50, 0] | 55
+layer 2: 12 candidates; idol-eyes among them: 0
+  supply qual:il:jq:n:number.id:281 (for qual:il:jq:point:core.id:72) | [1, 1, 0, 1, 50, 0] | 53
+  supply qual:il:jq:n:number.id:281 (for qual:il:jq:value:jq.id:106) | [1, 1, 0, 1, 50, 0] | 53
+  supply qual:il:jq:n:number.id:281 (for qual:il:jq:skip:jq.id:15) | [1, 1, 0, 1, 50, 0] | 53
+  supply qual:il:jq:n:number.id:281 (for qual:il:jq:text:jq.id:24) | [1, 1, 0, 1, 50, 0] | 53
+  supply qual:il:jq:n:number.id:281 (for qual:il:jq:steps:jq.id:351) | [1, 1, 0, 1, 50, 0] | 53
+layer 3: 19 candidates; idol-eyes among them: 0
+  supply qual:il:jq:shape:value.id:11 (for qual:il:jq:truth:core.id:10) | [1, 1, 0, 1, 39, 0] | 42
+  supply qual:il:jq:shape:value.id:11 (for qual:il:jq:size:core.id:108) | [1, 1, 0, 1, 39, 0] | 42
+  supply qual:il:jq:shape:value.id:11 (for qual:il:jq:kind:core.id:133) | [1, 1, 0, 1, 39, 0] | 42
+  supply qual:il:jq:shape:value.id:11 (for qual:il:jq:copy:core.id:138) | [1, 1, 0, 1, 39, 0] | 42
+  supply qual:il:jq:shape:value.id:11 (for qual:il:jq:rank:core.id:196) | [1, 1, 0, 1, 39, 0] | 42
+layer 4: 46 candidates; idol-eyes among them: 0
+layer 5: 35 candidates; idol-eyes among them: 0
+layer 6: 23 candidates; idol-eyes among them: 0
+layer 7: 24 candidates; idol-eyes among them: 0
+layer 8: 14 candidates; idol-eyes among them: 0
+layer 9: 12 candidates; idol-eyes among them: 0
+layer 10: 13 candidates; idol-eyes among them: 0
+layer 11: 37 candidates; idol-eyes among them: 0
+layer 12: 42 candidates; idol-eyes among them: 0
+layer 13: 10 candidates; idol-eyes among them: 0
+layer 14: 9 candidates; idol-eyes among them: 0
+layer 15: 14 candidates; idol-eyes among them: 0
+layer 16: 36 candidates; idol-eyes among them: 0
+layer 17: 28 candidates; idol-eyes among them: 0
+layer 18: 29 candidates; idol-eyes among them: 0
+layer 19: 27 candidates; idol-eyes among them: 0
+layer 20: 35 candidates; idol-eyes among them: 0
+layer 21: 15 candidates; idol-eyes among them: 0
+layer 22: 35 candidates; idol-eyes among them: 0
+layer 23: 22 candidates; idol-eyes among them: 0
+layer 24: 63 candidates; idol-eyes among them: 0
+layer 25: 83 candidates; idol-eyes among them: 0
+layer 26: 78 candidates; idol-eyes among them: 1
+  eyes: supply cap:script-engine (for cap:browser) | [1, 2, 1, 1, 2, 0] | 7
+layer 27: 156 candidates; idol-eyes among them: 8
+  eyes: supply cap:solve-loop (for eyes:orchestrator) | [1, 1, 1, 1, 2, 0] | 6
+  eyes: supply cap:graph-authority (for eyes:orchestrator) | [1, 1, 1, 1, 2, 0] | 6
+  eyes: supply cap:outcome-publication (for eyes:orchestrator) | [1, 1, 1, 1, 2, 0] | 6
+  eyes: supply cap:cross-platform (for eyes:orchestrator) | [1, 1, 1, 1, 2, 0] | 6
+  eyes: supply cap:native-ui (for eyes:orchestrator) | [1, 1, 1, 1, 2, 0] | 6
+  eyes: supply cap:durable-recovery (for eyes:orchestrator) | [1, 1, 1, 1, 2, 0] | 6
+  eyes: supply cap:accessibility-discovery (for eyes:orchestrator) | [1, 1, 1, 1, 2, 0] | 6
+  eyes: supply cap:mesh-integration (for eyes:orchestrator) | [1, 1, 1, 1, 2, 0] | 6
+layer 28: 110 candidates; idol-eyes among them: 12
+  eyes: supply evidence:capture (for cap:capture) | [1, 2, 1, 0, 1, 0] | 5
+  eyes: supply evidence:grab (for cap:grab) | [1, 2, 1, 0, 1, 0] | 5
+  eyes: supply evidence:harness (for cap:harness) | [1, 2, 1, 0, 1, 0] | 5
+  eyes: supply evidence:ingress (for cap:ingress) | [1, 2, 1, 0, 1, 0] | 5
+  eyes: supply evidence:input (for cap:input) | [1, 2, 1, 0, 1, 0] | 5
+  eyes: supply evidence:observation (for cap:observation) | [1, 2, 1, 0, 1, 0] | 5
+  eyes: supply evidence:observe (for cap:observe) | [1, 2, 1, 0, 1, 0] | 5
+  eyes: supply evidence:program (for cap:program) | [1, 2, 1, 0, 1, 0] | 5
+  eyes: supply evidence:server (for cap:server) | [1, 2, 1, 0, 1, 0] | 5
+  eyes: supply evidence:stream (for cap:stream) | [1, 2, 1, 0, 1, 0] | 5
+  eyes: supply evidence:tree (for cap:tree) | [1, 2, 1, 0, 1, 0] | 5
+  eyes: supply evidence:certify (for cap:certify) | [1, 2, 1, 0, 1, 0] | 5
+layer 29: 147 candidates; idol-eyes among them: 0
+layer 30: 148 candidates; idol-eyes among them: 1
+  eyes: supply evidence:competitive-desktop (for cap:competitive-measurement) | [1, 1, 1, 0, 1, 0] | 4
+layer 31: 59 candidates; idol-eyes among them: 0
+layer 32: 14 candidates; idol-eyes among them: 14
+  eyes: supply cap:capture (for eyes:orchestrator) | [1, 1, 0, 0, 1, 0] | 3
+  eyes: supply cap:grab (for eyes:orchestrator) | [1, 1, 0, 0, 1, 0] | 3
+  eyes: supply cap:harness (for eyes:orchestrator) | [1, 1, 0, 0, 1, 0] | 3
+  eyes: supply cap:ingress (for eyes:orchestrator) | [1, 1, 0, 0, 1, 0] | 3
+  eyes: supply cap:input (for eyes:orchestrator) | [1, 1, 0, 0, 1, 0] | 3
+  eyes: supply cap:observation (for eyes:orchestrator) | [1, 1, 0, 0, 1, 0] | 3
+  eyes: supply cap:observe (for eyes:orchestrator) | [1, 1, 0, 0, 1, 0] | 3
+  eyes: supply cap:program (for eyes:orchestrator) | [1, 1, 0, 0, 1, 0] | 3
+  eyes: supply cap:server (for eyes:orchestrator) | [1, 1, 0, 0, 1, 0] | 3
+  eyes: supply cap:stream (for eyes:orchestrator) | [1, 1, 0, 0, 1, 0] | 3
+  eyes: supply cap:tree (for eyes:orchestrator) | [1, 1, 0, 0, 1, 0] | 3
+  eyes: supply cap:browser (for eyes:orchestrator) | [1, 1, 0, 0, 1, 0] | 3
+  eyes: supply cap:competitive-measurement (for eyes:orchestrator) | [1, 1, 0, 0, 1, 0] | 3
+  eyes: supply cap:certify (for cap:competitive-measurement) | [1, 1, 0, 0, 1, 0] | 3
+best idol-eyes candidate by score [1,1,1,1,1,1]: position 993 of 1396
+idol-lib adler32: 14 observe candidates, max unblocks 4
+idol-lib base64: 14 observe candidates, max unblocks 7
+idol-lib cbor: 37 observe candidates, max unblocks 19
+idol-lib crc32: 20 observe candidates, max unblocks 17
+idol-lib jq: 133 observe candidates, max unblocks 50
+idol-lib json: 34 observe candidates, max unblocks 13
+idol-lib lz4: 8 observe candidates, max unblocks 4
+idol-lib md5: 19 observe candidates, max unblocks 9
+idol-lib msgpack: 48 observe candidates, max unblocks 30
+idol-lib qoi: 11 observe candidates, max unblocks 5
+idol-lib sha1: 15 observe candidates, max unblocks 9
+idol-lib sha256: 23 observe candidates, max unblocks 14
+idol-lib snappy: 41 observe candidates, max unblocks 5
+idol-lib xxhash: 27 observe candidates, max unblocks 24
+resolve-reference candidates 89, max unblocks 31

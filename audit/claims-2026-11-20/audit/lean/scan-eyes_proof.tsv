@@ -1,0 +1,61 @@
+eyes/proof/Canon.lean	58	least	2	91		∀ a, Derives B R a → X a
+eyes/proof/Canon.lean	66	mono	2	73		∀ a, Derives B R a → Derives C S a
+eyes/proof/Canon.lean	73	roots_as_edges	3	298		Derives B R a ↔ Derives (fun _ => False) (fun ps x => R ps x ∨ (ps = [] ∧ B x)) a
+eyes/proof/Canon.lean	142	zero	2	3	DEFN	lift ch r 0 c = c
+eyes/proof/Canon.lean	145	add	2	199		∀ k c, lift ch r (j + k) c = lift ch (r + j) k (lift ch r j c)
+eyes/proof/Canon.lean	157	key_lift	2	58		key ch (r + k) t = lift ch r k (key ch r t)
+eyes/proof/Canon.lean	163	floor	2	7	DEFN	Eqv ch 0 t u ↔ t = u
+eyes/proof/Canon.lean	167	nest	3	40		Eqv ch (r + k) t u
+eyes/proof/Canon.lean	171	eqv_refl	2	3	DEFN	Eqv ch r t t
+eyes/proof/Canon.lean	172	eqv_symm	3	6		Eqv ch r u t
+eyes/proof/Canon.lean	173	eqv_trans	4	11		Eqv ch r t v
+eyes/proof/Canon.lean	181	proj_lift	4	368		proj ch (r + k) e = ((proj ch r e).1.map (lift ch r k), lift ch r k (proj ch r e).2)
+eyes/proof/Canon.lean	199	perm	4	167		viewC ch L r q = viewC ch L' r q
+eyes/proof/Canon.lean	210	grow	7	71		(viewC ch (L ++ M) r q).edges ps a
+eyes/proof/Canon.lean	216	derives_grow	6	70		derives (viewC ch (L ++ M) r q) a
+eyes/proof/Canon.lean	221	join	6	259		(viewC ch (L ++ M) r q).edges ps a ↔ (viewC ch L r q).edges ps a ∨ (viewC ch M r q).edges ps a
+eyes/proof/Canon.lean	233	absorb	5	236		viewC ch (L ++ M) r q = viewC ch L r q
+eyes/proof/Canon.lean	248	colors_grow	6	71		colorsOf ch (L ++ M) r ps a c
+eyes/proof/Canon.lean	254	filter_nest	8	65		(viewC ch L r q').edges ps a
+eyes/proof/Canon.lean	262	edge_proj	7	98		(viewC ch L (r + k) q).edges (ps.map (lift ch r k)) (lift ch r k a)
+eyes/proof/Canon.lean	272	derives_proj	6	193		derives (viewC ch L (r + k) q) (lift ch r k a)
+eyes/proof/Canon.lean	284	refine_append	7	67		(viewC ch (L ++ [e]) r q).edges (proj ch r e).1 (proj ch r e).2 ∧ ∀ ps a, (viewC ch L r q).edges ps a → (viewC
+eyes/proof/Canon.lean	298	merge	0	144		¬ Eqv chain2 0 10 11 ∧ Eqv chain2 1 10 11
+eyes/proof/Canon.lean	309	coarse_only	0	75		¬ (view chain2 [⟨0, 1, [], [], 5⟩] 0).edges [] 5
+eyes/proof/Certify.lean	79	isEmpty_false_iff	0	19		l.isEmpty = false ↔ l ≠ []
+eyes/proof/Certify.lean	82	admitB_iff	3	324		admitB log dims a c = true ↔ Admit log dims a c
+eyes/proof/Certify.lean	99	mem_scores_perm	2	160		x ∈ scores L s d ↔ x ∈ scores L' s d
+eyes/proof/Certify.lean	106	ne_nil_iff_mem	0	115		l ≠ [] ↔ ∃ x, x ∈ l
+eyes/proof/Certify.lean	111	nonempty_perm	2	48		scores L s d ≠ [] ↔ scores L' s d ≠ []
+eyes/proof/Certify.lean	116	admit_perm	3	61		Admit L dims a c ↔ Admit L' dims a c
+eyes/proof/Certify.lean	122	scores_sublist	2	109		∀ x, x ∈ scores L s d → x ∈ scores L' s d
+eyes/proof/Certify.lean	132	regression_final	8	99		¬ Admit L' dims a c
+eyes/proof/Certify.lean	139	regression_final_append	8	78		¬ Admit (L ++ more) dims a c
+eyes/proof/Certify.lean	147	admit_sublist	5	147		Admit L dims a c
+eyes/proof/Certify.lean	157	unmeasured_refuses	5	77		¬ Admit L dims a c
+eyes/proof/Certify.lean	166	reading_some	1	157		e.colors = [mtag, s, d, v]
+eyes/proof/Certify.lean	179	witness_of_mem	1	103		∃ e, e ∈ L ∧ e.colors = [mtag, s, d, x]
+eyes/proof/Certify.lean	188	admit_witness	1	250		∀ d, d ∈ dims → (∃ e, e ∈ L ∧ ∃ v, e.colors = [mtag, c, d, v]) ∧ (∃ e, e ∈ L ∧ ∃ v, e.colors = [mtag, a, d, v]
+eyes/proof/Certify.lean	203	witness_in_view	8	20		(viewC ch L r q).edges (proj ch r e).1 (proj ch r e).2
+eyes/proof/Certify.lean	211	admit_trans	2	202		Admit L dims a c
+eyes/proof/Certify.lean	229	steps_pairwise	2	375		∀ l, Steps L dims l → l.Pairwise (Admit L dims)
+eyes/proof/Certify.lean	248	steps_endpoints	5	84		Admit L dims a z
+eyes/proof/Certify.lean	254	dims_antitone	4	25		Admit L dims a c
+eyes/proof/Certify.lean	265	beat_admit	1	104		Admit L dims inc c
+eyes/proof/Certify.lean	272	tie_not_beat	4	47		¬ Beat L dims inc c
+eyes/proof/Certify.lean	279	loss_not_beat	5	47		¬ Beat L dims inc c
+eyes/proof/Certify.lean	288	beat_succ	2	214		Beat L dims inc c
+eyes/proof/Union.lean	55	meetsB_iff	3	126		meetsB L dims incs c = true ↔ MeetsUnion L dims incs c
+eyes/proof/Union.lean	64	meets_iff_admit_each	4	280		MeetsUnion L dims incs c ↔ ∀ i, i ∈ incs → Admit L dims i c
+eyes/proof/Union.lean	80	meets_iff_pooled	3	326		MeetsUnion L dims incs c ↔ ∀ d, d ∈ dims → scores L c d ≠ [] ∧ (∀ i, i ∈ incs → scores L i d ≠ []) ∧ ∀ x, x ∈ 
+eyes/proof/Union.lean	97	unmeasured_incumbent_refuses	6	32		¬ MeetsUnion L dims incs c
+eyes/proof/Union.lean	122	beatsB_iff	4	126		beatsB L dims incs cap c = true ↔ BeatsUnion L dims incs cap c
+eyes/proof/Union.lean	131	above_le	1	39		y ≤ x
+eyes/proof/Union.lean	135	ceilbeat_admit	1	100		Admit L dims inc c
+eyes/proof/Union.lean	142	beat_ceilbeat	2	98		CeilBeat L dims cap inc c
+eyes/proof/Union.lean	150	ceilbeat_strict_below	6	67		y < x
+eyes/proof/Union.lean	159	ceilbeat_beat_of_below	2	127		Beat L dims inc c
+eyes/proof/Union.lean	167	beatsUnion_each	1	96		∀ i, i ∈ incs → CeilBeat L dims cap i c
+eyes/proof/Union.lean	174	beatsUnion_meets	1	134		MeetsUnion L dims incs c
+eyes/proof/Union.lean	183	beatsUnion_succ	3	373		BeatsUnion L dims incs cap c
+eyes/proof/Union.lean	201	union_regression_final	9	108		¬ MeetsUnion L' dims incs c

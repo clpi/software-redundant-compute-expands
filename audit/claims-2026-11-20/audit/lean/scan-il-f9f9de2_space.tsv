@@ -1,0 +1,33 @@
+il-f9f9de2/space/IdolSpace/Economics.lean	30	constructed_dominance_transfers	6	179		(∀ i, i ∈ axes → mOurs i ≤ mTheirs i) ∧ ∃ i, i ∈ axes ∧ mOurs i < mTheirs i
+il-f9f9de2/space/IdolSpace/Economics.lean	40	wrong_direction_fails	0	118		let cOurs
+il-f9f9de2/space/IdolSpace/Economics.lean	53	serial_lower_bound	4	461		rest cs ≤ total new
+il-f9f9de2/space/IdolSpace/Economics.lean	73	bottleneck_bound	2	44		xs, c, h => by rcases List.mem_cons.mp h with rfl | h · simp [total] · have
+il-f9f9de2/space/IdolSpace/Economics.lean	80	money_mono	2	27		price * a ≤ price * b
+il-f9f9de2/space/IdolSpace/Economics.lean	89	lz4_measured_loss	0	9	DATA	lz4PullOurs.all (fun a => lz4PullRef.all (fun r => decide (a < r))) = true ∧ lz4PressOurs.all (fun a => lz4Pre
+il-f9f9de2/space/IdolSpace/Effects.lean	23	derived_mono	5	141		derived deps' own s e
+il-f9f9de2/space/IdolSpace/Effects.lean	32	free_iff	4	68		¬ derived deps own s e ↔ ∀ t, DepStar deps s t → ¬ own t e
+il-f9f9de2/space/IdolSpace/Effects.lean	39	fold_perm	3	93		joinList own ts e ↔ joinList own us e
+il-f9f9de2/space/IdolSpace/Host.lean	30	host_cone_spans	1	175		Reach joined (· = .host) s
+il-f9f9de2/space/IdolSpace/Host.lean	36	perLib_reach	2	84		s = .host
+il-f9f9de2/space/IdolSpace/Host.lean	47	sem_local_joined	0	218		Local joined sem
+il-f9f9de2/space/IdolSpace/Host.lean	62	per_library_graph_misses_host	0	156		(∀ s, Q s (sem old s)) ∧ (∀ s, Reach perLib (· = .host) s → Q s (sem newHost s)) ∧ ¬ Q .a (sem newHost .a) ∧ R
+il-f9f9de2/space/IdolSpace/Merge.lean	36	sem_local	0	126		Local deps sem
+il-f9f9de2/space/IdolSpace/Merge.lean	48	name_merge_unsound	0	31		Qf (sem homeA .f) ∧ ¬ Qf (sem homeB .f) ∧ homeA .f ≠ homeB .f
+il-f9f9de2/space/IdolSpace/Merge.lean	52	body_merge_unsound	0	31		homeA .f = homeC .f ∧ Qf (sem homeA .f) ∧ ¬ Qf (sem homeC .f)
+il-f9f9de2/space/IdolSpace/Merge.lean	56	closure_merge_sound	8	38		Q (sem J s)
+il-f9f9de2/space/IdolSpace/Observer.lean	29	determined_iff_factors	2	285		O → B, ∀ r, b r = f (obs r)
+il-f9f9de2/space/IdolSpace/Observer.lean	52	helper_not_determined	0	9	DATA	battery helperA = battery helperB ∧ helperA 1 ≠ helperB 1
+il-f9f9de2/space/IdolSpace/Observer.lean	55	unseen_input_not_determined	0	9	DATA	battery helperA = battery helperB ∧ root helperA 1 ≠ root helperB 1
+il-f9f9de2/space/IdolSpace/Observer.lean	59	observed_determined	0	75		Determined battery (fun h => root h 0)
+il-f9f9de2/space/IdolSpace/Temporal.lean	25	append_keeps_history	3	37		(hist ++ later)[i]? = hist[i]?
+il-f9f9de2/space/IdolSpace/Temporal.lean	29	no_monotone_verdicts	0	26		List V, hist[0]? = some .pass ∧ hist[1]? = some .fail
+il-f9f9de2/space/IdolSpace/Temporal.lean	32	carries_if_closure_unchanged	8	40		Q (sem after s)
+il-f9f9de2/space/IdolSpace/Witnessed.lean	33	chain_defs	0	9	DATA	defs.all chainOk = true
+il-f9f9de2/space/IdolSpace/Witnessed.lean	35	chain_counts	0	9	DATA	counts.all (fun c => decide (c.qualified ≤ c.observed) && decide (c.observed ≤ c.possible)) = true
+il-f9f9de2/space/IdolSpace/Witnessed.lean	42	qualified_is_observed	0	9	DATA	defs.all (fun d => d.qualified == (d.observed && gateHolds d.lib)) = true
+il-f9f9de2/space/IdolSpace/Witnessed.lean	45	observed_count	0	9	DATA	(defs.filter (·.observed)).length = 155
+il-f9f9de2/space/IdolSpace/Witnessed.lean	47	substring_observations	0	9	DATA	(defs.filter (fun d => d.observed && !d.token)).length = 9
+il-f9f9de2/space/IdolSpace/Witnessed.lean	52	jq_no_direct_observer	0	9	DATA	libs[jq]? = some "jq" ∧ (defs.filter (fun d => d.lib == jq && d.observed)).length = 0 ∧ (counts.find? (·.lib =
+il-f9f9de2/space/IdolSpace/Witnessed.lean	66	shared_count	0	9	DATA	shared.length = 56
+il-f9f9de2/space/IdolSpace/Witnessed.lean	68	shared_all_differ	0	95		shared.all (fun n => let hs
+il-f9f9de2/space/IdolSpace/Witnessed.lean	73	name_merge_leaks	0	9	DATA	leaks.length = 14

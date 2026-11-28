@@ -1,0 +1,75 @@
+{
+ "pin": "4dee231",
+ "definitions": 444,
+ "top_level": 415,
+ "nested_locals": 29,
+ "by_library": {
+  "adler32": {
+   "top": 10,
+   "nested": 4
+  },
+  "base64": {
+   "top": 14
+  },
+  "cbor": {
+   "top": 32,
+   "nested": 5
+  },
+  "crc32": {
+   "top": 20
+  },
+  "jq": {
+   "top": 132,
+   "nested": 1
+  },
+  "json": {
+   "top": 33,
+   "nested": 1
+  },
+  "lz4": {
+   "top": 8
+  },
+  "md5": {
+   "top": 17,
+   "nested": 2
+  },
+  "msgpack": {
+   "top": 44,
+   "nested": 4
+  },
+  "qoi": {
+   "top": 11
+  },
+  "sha1": {
+   "top": 14,
+   "nested": 1
+  },
+  "sha256": {
+   "top": 13,
+   "nested": 10
+  },
+  "snappy": {
+   "top": 40,
+   "nested": 1
+  },
+  "xxhash": {
+   "top": 27
+  }
+ }
+}
+NESTED	adler32	a	adler32/adler32.id	13	a = (a + s[i]) % 65521
+NESTED	adler32	b	adler32/adler32.id	14	b = (b + a) % 65521
+NESTED	adler32	a	adler32/adler32.id	44	a = (low1 + low2 + 65520) % 65521
+NESTED	adler32	b	adler32/adler32.id	45	b = (high1 + high2 + (n % 65521) * ((low1 + 65520) % 65521))
+NESTED	cbor	exp	cbor/cbor.id	148	exp = (b[1] % 128) * 2 + b[2] // 128
+NESTED	cbor	frac	cbor/cbor.id	149	frac = (b[2] % 128) * 65536 + b[3] * 256 + b[4]
+NESTED	cbor	exp	cbor/cbor.id	201	exp = (b[1] % 128) * 16 + b[2] // 16
+NESTED	cbor	v	cbor/cbor.id	218	v = (4503599627370496 + frac) * scale(exp - 1075)
+NESTED	cbor	exp	cbor/cbor.id	98	exp = (h // 1024) % 32
+NESTED	jq	n	jq/number.id	281	n: i64 = (product:byte(at) - 48) * 5 + carry
+NESTED	json	nl	json/json.id	599	nl = (10):char()
+NESTED	md5	sum	md5/md5.id	169	sum = (a + band(j, b, c, d) + ks[j + 1] + w[slot(j) + 1]) % 
+NESTED	md5	b	md5/md5.id	173	b = (b + turn(sum, shift(j))) % 4294967296
+NESTED	msgpack	exp	msgpack/msgpack.id	353	exp = (b[1] % 128) * 2 + b[2] // 128
+NESTED	msgpack	frac	msgpack/msgpack.id	354	frac = (b[2] % 128) * 65536 + b[3] * 256 + b[4]
+{"single_candidate_refs": 827, "to_nested_locals": 70, "top_nested_targets": [["jq", "n", 281, 11], ["msgpack", "v", 422, 10], ["cbor", "v", 218, 6], ["cbor", "frac", 149, 4], ["sha1", "t", 90, 4], ["md5", "b", 173, 3], ["msgpack", "frac", 354, 3], ["sha256", "a", 158, 3]]}

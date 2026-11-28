@@ -1,0 +1,361 @@
+{
+ "machine": {
+  "cpus": 4,
+  "uname": "Linux vm 6.18.44-fc-v726 #1 SMP PREEMPT_DYNAMIC @0 x86_64",
+  "chromium": "/root/.cache/puppeteer/chrome-headless-shell/linux-157.0.8103.78/chrome-headless-shell-linux64/chrome-headless-shell"
+ },
+ "cells": [
+  {
+   "driver": "python-floor",
+   "task": "login",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 11.245250999991185,
+   "wall_p95": 15.626158999964446,
+   "cpu_p50": 10.948999999999998,
+   "maxrss_kib_max": 13528,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "python-floor",
+   "task": "chain",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 11.437427000032585,
+   "wall_p95": 15.619156000013845,
+   "cpu_p50": 11.265999999999998,
+   "maxrss_kib_max": 13528,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "python-floor",
+   "task": "prefs",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 11.048110000047018,
+   "wall_p95": 21.765863000041463,
+   "cpu_p50": 10.875,
+   "maxrss_kib_max": 13528,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "python-floor",
+   "task": "table",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 11.472684000011668,
+   "wall_p95": 19.941904000006616,
+   "cpu_p50": 11.252999999999998,
+   "maxrss_kib_max": 13528,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "python-floor",
+   "task": "search",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 11.453702999972393,
+   "wall_p95": 15.962283999954252,
+   "cpu_p50": 11.207,
+   "maxrss_kib_max": 13528,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "stdlib",
+   "task": "login",
+   "n": 10,
+   "correct": 10,
+   "wall_p50": 74.85074199996689,
+   "wall_p95": 89.96934900000042,
+   "cpu_p50": 72.599,
+   "maxrss_kib_max": 21920,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "stdlib",
+   "task": "chain",
+   "n": 10,
+   "correct": 10,
+   "wall_p50": 67.30326499996409,
+   "wall_p95": 96.4055630000189,
+   "cpu_p50": 64.416,
+   "maxrss_kib_max": 21884,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "stdlib",
+   "task": "prefs",
+   "n": 10,
+   "correct": 10,
+   "wall_p50": 67.10603199996967,
+   "wall_p95": 108.45933900003502,
+   "cpu_p50": 65.705,
+   "maxrss_kib_max": 21920,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "stdlib",
+   "task": "table",
+   "n": 10,
+   "correct": 10,
+   "wall_p50": 66.21017099996607,
+   "wall_p95": 93.87102400000913,
+   "cpu_p50": 64.342,
+   "maxrss_kib_max": 21936,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "stdlib",
+   "task": "search",
+   "n": 10,
+   "correct": 10,
+   "wall_p50": 68.75696600002357,
+   "wall_p95": 117.19658899994556,
+   "cpu_p50": 66.47699999999999,
+   "maxrss_kib_max": 21896,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "pw-import",
+   "task": "login",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 103.3990410000456,
+   "wall_p95": 114.20156900004486,
+   "cpu_p50": 103.121,
+   "maxrss_kib_max": 26844,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "pw-import",
+   "task": "chain",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 89.75729499996987,
+   "wall_p95": 143.98346600000878,
+   "cpu_p50": 89.15899999999999,
+   "maxrss_kib_max": 26840,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "pw-import",
+   "task": "prefs",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 94.5076080000149,
+   "wall_p95": 125.63045699999975,
+   "cpu_p50": 93.257,
+   "maxrss_kib_max": 26888,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "pw-import",
+   "task": "table",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 90.69527799999832,
+   "wall_p95": 127.45330899997498,
+   "cpu_p50": 90.365,
+   "maxrss_kib_max": 26844,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "pw-import",
+   "task": "search",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 90.13248200000135,
+   "wall_p95": 116.56440499996279,
+   "cpu_p50": 89.859,
+   "maxrss_kib_max": 26892,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "pw-launch",
+   "task": "login",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 416.27854099999695,
+   "wall_p95": 468.75350499999513,
+   "cpu_p50": 501.807,
+   "maxrss_kib_max": 99624,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "pw-launch",
+   "task": "chain",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 414.8121300000298,
+   "wall_p95": 520.0355129999821,
+   "cpu_p50": 504.28399999999993,
+   "maxrss_kib_max": 99476,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "pw-launch",
+   "task": "prefs",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 397.73867700000665,
+   "wall_p95": 461.12516400000914,
+   "cpu_p50": 481.669,
+   "maxrss_kib_max": 99512,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "pw-launch",
+   "task": "table",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 406.49710600001754,
+   "wall_p95": 478.6515519999739,
+   "cpu_p50": 488.91799999999995,
+   "maxrss_kib_max": 99520,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "pw-launch",
+   "task": "search",
+   "n": 10,
+   "correct": 0,
+   "wall_p50": 383.0875909999918,
+   "wall_p95": 436.4058809999847,
+   "cpu_p50": 464.94399999999996,
+   "maxrss_kib_max": 99148,
+   "task_ms_p50": null
+  },
+  {
+   "driver": "pw-task",
+   "task": "login",
+   "n": 10,
+   "correct": 10,
+   "wall_p50": 632.1116309999866,
+   "wall_p95": 681.8982760000267,
+   "cpu_p50": 647.6919999999999,
+   "maxrss_kib_max": 117408,
+   "task_ms_p50": 158.20088200001692
+  },
+  {
+   "driver": "pw-task",
+   "task": "chain",
+   "n": 10,
+   "correct": 10,
+   "wall_p50": 627.6695399999994,
+   "wall_p95": 701.0755119999885,
+   "cpu_p50": 682.619,
+   "maxrss_kib_max": 117864,
+   "task_ms_p50": 185.66806899997346
+  },
+  {
+   "driver": "pw-task",
+   "task": "prefs",
+   "n": 10,
+   "correct": 10,
+   "wall_p50": 641.264289999981,
+   "wall_p95": 740.3721670000323,
+   "cpu_p50": 645.3919999999999,
+   "maxrss_kib_max": 117448,
+   "task_ms_p50": 203.3922819999816
+  },
+  {
+   "driver": "pw-task",
+   "task": "table",
+   "n": 10,
+   "correct": 10,
+   "wall_p50": 478.6826759999485,
+   "wall_p95": 596.725317999983,
+   "cpu_p50": 570.782,
+   "maxrss_kib_max": 116280,
+   "task_ms_p50": 46.94124499997088
+  },
+  {
+   "driver": "pw-task",
+   "task": "search",
+   "n": 10,
+   "correct": 10,
+   "wall_p50": 602.5316189999899,
+   "wall_p95": 674.0744540000492,
+   "cpu_p50": 638.2099999999999,
+   "maxrss_kib_max": 117596,
+   "task_ms_p50": 177.01579900000297
+  },
+  {
+   "driver": "pw-dom-warm",
+   "task": "login",
+   "correct": true,
+   "warm_p50": 38.83058799999617,
+   "warm_min": 36.07870500002264
+  },
+  {
+   "driver": "pw-dom-warm",
+   "task": "chain",
+   "correct": true,
+   "warm_p50": 65.8429270000056,
+   "warm_min": 60.91806599999927
+  },
+  {
+   "driver": "pw-dom-warm",
+   "task": "prefs",
+   "correct": true,
+   "warm_p50": 61.90682799996239,
+   "warm_min": 52.09346599997389
+  },
+  {
+   "driver": "pw-dom-warm",
+   "task": "table",
+   "correct": true,
+   "warm_p50": 24.69474999998056,
+   "warm_min": 22.361457999977574
+  },
+  {
+   "driver": "pw-dom-warm",
+   "task": "search",
+   "correct": true,
+   "warm_p50": 70.82903599996371,
+   "warm_min": 59.65274800001907
+  },
+  {
+   "driver": "pw-dom-warm",
+   "task": "spa",
+   "correct": true,
+   "warm_p50": 47.51432000000477,
+   "warm_min": 39.50145699997165
+  },
+  {
+   "driver": "pw-dom-warm",
+   "task": "todo",
+   "correct": true,
+   "warm_p50": 47.28332000001956,
+   "warm_min": 42.47105900003589
+  },
+  {
+   "driver": "pw-dom-warm",
+   "task": "counter",
+   "correct": true,
+   "warm_p50": 50.117826000018795,
+   "warm_min": 43.6903110000344
+  },
+  {
+   "driver": "pw-dom-warm",
+   "task": "visible",
+   "correct": true,
+   "warm_p50": 41.347990999952344,
+   "warm_min": 35.14890399998194
+  },
+  {
+   "driver": "pw-dom-warm",
+   "task": "nested",
+   "correct": true,
+   "warm_p50": 34.927594000009776,
+   "warm_min": 28.910549999977775
+  },
+  {
+   "driver": "pw-dom-warm",
+   "task": "styled",
+   "correct": false,
+   "warm_p50": 35.261176999995314,
+   "warm_min": 31.24532599997565
+  }
+ ]
+}

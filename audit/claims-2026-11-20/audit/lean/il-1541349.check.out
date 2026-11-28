@@ -1,0 +1,39 @@
+✔ [2/12] Built IdolSpace.Core
+✔ [3/12] Built IdolSpace.Effects
+✔ [4/12] Built IdolSpace.Economics
+✔ [5/12] Built IdolSpace.Temporal
+✔ [6/12] Built IdolSpace.Observer
+✔ [7/12] Built IdolSpace.Host
+✔ [8/12] Built IdolSpace.Merge
+✔ [9/12] Built IdolSpace.Data
+✔ [10/12] Built IdolSpace.Witnessed
+✔ [11/12] Built IdolSpace
+Build completed successfully.
+'IdolSpace.Witnessed.chain_defs' does not depend on any axioms
+'IdolSpace.Witnessed.chain_counts' does not depend on any axioms
+'IdolSpace.Witnessed.all_source' does not depend on any axioms
+'IdolSpace.Witnessed.nothing_qualified' does not depend on any axioms
+'IdolSpace.Witnessed.def_count' does not depend on any axioms
+'IdolSpace.Witnessed.jq_unmeasured' does not depend on any axioms
+'IdolSpace.Witnessed.shared_count' does not depend on any axioms
+'IdolSpace.Witnessed.shared_same_body' does not depend on any axioms
+'IdolSpace.Witnessed.shared_bodies_differ' does not depend on any axioms
+'IdolSpace.Witnessed.joined_disjoint' does not depend on any axioms
+'IdolSpace.Observer.determined_iff_factors' depends on axioms: [propext, Classical.choice, Quot.sound]
+'IdolSpace.Observer.helper_not_determined' does not depend on any axioms
+'IdolSpace.Observer.unseen_input_not_determined' does not depend on any axioms
+'IdolSpace.Host.host_cone_spans' does not depend on any axioms
+'IdolSpace.Host.per_library_graph_misses_host' depends on axioms: [propext]
+'IdolSpace.Merge.name_merge_unsound' depends on axioms: [propext]
+'IdolSpace.Merge.body_merge_unsound' depends on axioms: [propext]
+'IdolSpace.Merge.closure_merge_sound' does not depend on any axioms
+'IdolSpace.Effects.free_iff' does not depend on any axioms
+'IdolSpace.Effects.fold_perm' depends on axioms: [propext]
+'IdolSpace.Economics.constructed_dominance_transfers' depends on axioms: [propext, Classical.choice, Quot.sound]
+'IdolSpace.Economics.wrong_direction_fails' does not depend on any axioms
+'IdolSpace.Economics.serial_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'IdolSpace.Economics.bottleneck_bound' depends on axioms: [propext, Quot.sound]
+'IdolSpace.Economics.lz4_measured_loss' does not depend on any axioms
+'IdolSpace.Temporal.append_keeps_history' depends on axioms: [propext]
+'IdolSpace.Temporal.carries_if_closure_unchanged' does not depend on any axioms
+exit=0 wall=116.567230342s
