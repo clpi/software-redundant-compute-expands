@@ -303,13 +303,72 @@ def unfold_clause(cls, cl, defs):
         return None
 
 
+def problem_symbols(cls):
+    out = set()
+
+    def go(t):
+        if t[0] != "?":
+            out.add(t[0])
+            for a in t[1:]:
+                go(a)
+    for h, b in cls.values():
+        if h is not None:
+            go(h)
+        for a in b:
+            go(a)
+    return out
+
+
+def tgt_def(cls, name, cl, tgt):
+    try:
+        k = int(name[len("$tgt_"):])
+    except ValueError:
+        return "bad goal-naming step name"
+    if "syms" not in tgt:
+        tgt["syms"] = problem_symbols(cls)
+    c = f"$tgtc{k}"
+    h, b = cl
+    if b or h is None or h[0] != "=" or len(h) != 3:
+        return "a goal-naming step must be a unit equation"
+    lhs = h[1] if h[2] == (c,) else h[2] if h[1] == (c,) else None
+    if lhs is None:
+        return f"a goal-naming step must have the constant {c} on one side"
+    if c in tgt["syms"]:
+        return f"{c} occurs in the problem"
+
+    def ok(t):
+        if t[0] == "?":
+            return False
+        if t[0].startswith("$tgtc"):
+            try:
+                j = int(t[0][len("$tgtc"):])
+            except ValueError:
+                return False
+            return j < k and len(t) == 1 and t[0] in tgt["def"]
+        return t[0] in tgt["syms"] and all(ok(a) for a in t[1:])
+    if not ok(lhs) or len(lhs) == 1:
+        return "the named term must be a ground compound term over problem symbols and earlier names"
+    if tgt["def"].get(c, lhs) != lhs:
+        return f"{c} named twice"
+    tgt["def"][c] = lhs
+    return None
+
+
 def check_resolution(cls, steps):
     """steps are clauses: {"input": name} must be a variant of that problem clause; {"from": [i, j, k]}
     must be a variant of the binary resolvent of clause i's head with body literal k of clause j"""
     have = {}
+    tgt = {"def": {}}
     for n, st in enumerate(steps):
         cl = (from_json(st["head"]) if st["head"] is not None else None, [from_json(a) for a in st["body"]])
-        if "input" in st:
+        if "input" in st and st["input"].startswith("$tgt_"):
+            # goal naming: the K-th definition of the fresh constant $tgtcK by a ground term over
+            # problem symbols and earlier names (acyclic, so a conservative extension)
+            why = tgt_def(cls, st["input"], cl, tgt)
+            if why:
+                print(f"REJECTED: step {n}: {why}")
+                return 1
+        elif "input" in st:
             src = cls.get(st["input"])
             if src is not None and "unfold" in st:
                 src = unfold_clause(cls, src, st["unfold"])

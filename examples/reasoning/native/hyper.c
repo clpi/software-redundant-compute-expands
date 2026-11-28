@@ -511,7 +511,15 @@ static void gmark(int t) { if (ISVAR(t)) return; GSYM[T[t].f] = 1; for (int i = 
    different goal factors in one schedule of picks */
 static int W2ON = 0, FW2 = 10, VW2 = 10, GW2 = 1, SOSM = 0;   /* SOSM (--sos 1): goal picks and goal symbols follow the conjecture and hypotheses and every clause derived from them, as E's set of support */
 static int lwt2(int t) { int g = gcount(t); return FW2 * (T[t].w - T[t].vo - g) + GW2 * g + VW2 * T[t].vo; }
-static int lwt(int t) { if (!GW) return FW * (T[t].w - T[t].vo) + VW * T[t].vo; int g = gcount(t); return FW * (T[t].w - T[t].vo - g) + GW * g + VW * T[t].vo; }
+/* goal terms (--gt W, after Twee's goal transformation as in Vampire's tgt=ground): a ground
+   compound subterm of a goal clause weighs W, as if it had been named by a fresh constant, so
+   clauses that build the goal's own terms rank first; only the clause choice changes */
+static int GTW = 0, *GTV, NGTV, CGTV;
+static int in_gt(int t) { int lo = 0, hi = NGTV - 1; while (lo <= hi) { int m = (lo + hi) / 2; if (GTV[m] == t) return 1; if (GTV[m] < t) lo = m + 1; else hi = m - 1; } return 0; }
+static int lwt_gt(int t, int d) { if (ISVAR(t)) return VW; if (d > 0 && in_gt(t)) return GTW; int w = GW && GSYM && GSYM[T[t].f] ? GW : FW; for (int i = 0; i < T[t].n; i++) w += lwt_gt(ARG(t, i), d + 1); return w; }
+static void gt_add(int t) { if (ISVAR(t) || !T[t].n) return; if (T[t].gr) { if (NGTV == CGTV) { CGTV = CGTV ? 2 * CGTV : 64; GTV = xrealloc(GTV, CGTV * sizeof(int)); } GTV[NGTV++] = t; } for (int i = 0; i < T[t].n; i++) gt_add(ARG(t, i)); }
+static int icmp(const void *a, const void *b) { int x = *(const int *)a, y = *(const int *)b; return x < y ? -1 : x > y; }
+static int lwt(int t) { if (GTW) return lwt_gt(t, 0); if (!GW) return FW * (T[t].w - T[t].vo) + VW * T[t].vo; int g = gcount(t); return FW * (T[t].w - T[t].vo - g) + GW * g + VW * T[t].vo; }
 static int *CB; static long NCB, CCB;
 static dtree RH, RB, SH, SU, SG;   /* SH: heads of active non-units, SU: active units */   /* active: eligible heads, eligible body literals; subsumption: heads, first literal of headless */
 static int *QW, *QA, *QS2, *QW2; static long NQW, NQA, CQW, CQA, NQS, CQS, NQW2, CQW2;   /* by weight, by age, goal clauses (no head) by weight */
@@ -1092,6 +1100,8 @@ static int res_run(double ratio) {
         free(fs);
     }
     if (GW || W2ON || EW1 || EW2) { GSYM = xmalloc(NSY + 1); memset(GSYM, 0, NSY + 1); for (int r = 0; r < NR; r++) if (R[r].head < 0 || (SOSM && R[r].conj)) { for (int i = 0; i < R[r].nb; i++) gmark(R[r].body[i]); if (R[r].head >= 0) gmark(R[r].head); } }
+    NGTV = 0; if (GTW) { for (int r = 0; r < NR; r++) if (R[r].head < 0 || (SOSM && R[r].conj)) { for (int i = 0; i < R[r].nb; i++) for (int k = 0; k < T[R[r].body[i]].n; k++) gt_add(ARG(R[r].body[i], k)); if (R[r].head >= 0) for (int k = 0; k < T[R[r].head].n; k++) gt_add(ARG(R[r].head, k)); }
+        qsort(GTV, NGTV, sizeof(int), icmp); }
     for (int r = 0; r < NR && RREF < 0; r++) { int banks[MAXB]; for (int i = 0; i < R[r].nb; i++) banks[i] = 0; int c = new_clause(R[r].head, 0, R[r].body, banks, R[r].nb, -1, -1, -1, r); if (c >= 0) keep_clause(c); }
     long picks = 0;
     int ninput = NC;
@@ -1177,11 +1187,42 @@ static void put_unfold(FILE *f) {
     if (!NDEF) return;
     fputs(",\"unfold\":[", f); for (int i = 0; i < NDEF; i++) { if (i) fputc(',', f); fputc('[', f); put_str(f, SY[DEFNAME[i]].name); fprintf(f, ",%d]", DEFDIR[i]); } fputc(']', f);
 }
+static void tgt_on(void); static void tgt_off(void);
 static int attempt(double limit, int ratio, const char *base, const char *pj, int loud) {
-    int st = attempt_inner(limit, ratio, base, pj, loud);
+    tgt_on(); int st = attempt_inner(limit, ratio, base, pj, loud); tgt_off();
     if (st < 0 && HAS_EQ) { if (loud) printf("%% SZS status GaveUp for %s\n%% reason saturated without a refutation, which proves nothing with equality\n", base); return 0; }
     return st;
 }
+/* ---------------- goal naming (--tgt 1, after Twee's goal transformation, Vampire's tgt=ground).
+   Every ground compound subterm s of a goal clause gets a fresh constant c and the unit equation
+   s' = c, where s' is s with its proper ground subterms already named, so the equations are
+   acyclic definitions of fresh constants: a conservative extension. Oriented s' > c, they rewrite
+   every derived occurrence of a goal term to its name, which turns the search toward the goal.
+   Proof steps cite them as inputs named $tgt_K; the checker accepts such a step only as the K-th
+   definition of the fresh constant $tgtcK by a ground term over problem symbols and earlier names. */
+static int TGTM = 0, NTG, TGH[256], TGN[256], TGS[256], TGC[256];
+static int tg_name(int t) {   /* t ground compound: its name after naming its subterms, -1 if over the cap */
+    for (int i = 0; i < NTG; i++) if (TGS[i] == t) return TGC[i];
+    int n = T[t].n, a[64]; for (int i = 0; i < n; i++) { int x = ARG(t, i); a[i] = T[x].n ? tg_name(x) : x; if (a[i] < 0) return -1; }
+    if (NTG == 256) return -1;
+    char nm[32]; snprintf(nm, sizeof nm, "$tgtc%d", NTG); int c = mk(sym_of(nm, 0), 0, NULL);
+    int e2[2] = { mk(T[t].f, n, a), c }; if (EQ < 0) EQ = sym_of("=", 2);
+    snprintf(nm, sizeof nm, "$tgt_%d", NTG);
+    TGS[NTG] = t; TGC[NTG] = c; TGH[NTG] = mk(EQ, 2, e2); TGN[NTG] = sym_of(nm, -1); NTG++;
+    return c;
+}
+static void tg_walk(int t) { if (ISVAR(t) || !T[t].n) return; if (T[t].gr) { tg_name(t); return; } for (int i = 0; i < T[t].n; i++) tg_walk(ARG(t, i)); }
+static void tgt_prepare(void) {
+    NTG = 0;
+    for (int r = 0; r < NR; r++) if (R[r].head < 0) for (int i = 0; i < R[r].nb; i++) { int a = R[r].body[i]; for (int k = 0; k < T[a].n; k++) tg_walk(ARG(a, k)); }
+}
+static int TG_NR0 = -1, TG_EQ0;
+static void tgt_on(void) {
+    if (!TGTM || !NTG) return;
+    TG_NR0 = NR; TG_EQ0 = HAS_EQ; HAS_EQ = 1;
+    for (int i = 0; i < NTG; i++) { add_rule(TGH[i], 0, NULL, 0, TGN[i], NR, 0); R[NR - 1].conj = 1; }
+}
+static void tgt_off(void) { if (TG_NR0 < 0) return; NR = TG_NR0; HAS_EQ = TG_EQ0; TG_NR0 = -1; }
 static int attempt_inner(double limit, int ratio, const char *base, const char *pj, int loud) {
     DEADLINE = now_s() + limit;
     if (MAGIC) magic_transform();
@@ -1286,7 +1327,7 @@ static const config *SCH = SCHED; static int NSCH = sizeof SCHED / sizeof SCHED[
 static void apply_args(const char *a) {   /* a setting is a string of the command-line options */
     char buf[512]; snprintf(buf, sizeof buf, "%s", a); char *tok[32]; int n = 0;
     for (char *t = strtok(buf, " "); t && n < 32; t = strtok(NULL, " ")) tok[n++] = t;
-    MAGIC = RES = 0; MAXW = 0; FW = 2; VW = 1; HM = 1.0; LP = 0; SELMODE = 0; GW = 0; PREC = 0; KWON = 0; W2ON = 0; SOSM = 0; SATC = 0; SIMM = 0; EW1 = EW2 = 0;
+    MAGIC = RES = 0; MAXW = 0; FW = 2; VW = 1; HM = 1.0; LP = 0; SELMODE = 0; GW = 0; PREC = 0; KWON = 0; W2ON = 0; SOSM = 0; SATC = 0; SIMM = 0; EW1 = EW2 = 0; GTW = 0; TGTM = 0;
     for (int i = 0; i < n; i++) {
         if (!strcmp(tok[i], "--magic")) MAGIC = 1;
         else if (!strcmp(tok[i], "--res")) RES = 1;
@@ -1301,6 +1342,8 @@ static void apply_args(const char *a) {   /* a setting is a string of the comman
         else if (!strcmp(tok[i], "--sos") && i + 1 < n) SOSM = atoi(tok[++i]);
         else if (!strcmp(tok[i], "--satc") && i + 1 < n) SATC = atoi(tok[++i]);
         else if (!strcmp(tok[i], "--sim") && i + 1 < n) SIMM = atoi(tok[++i]);
+        else if (!strcmp(tok[i], "--tgt") && i + 1 < n) TGTM = atoi(tok[++i]);
+        else if (!strcmp(tok[i], "--gt") && i + 1 < n) GTW = atoi(tok[++i]);
         else if (!strcmp(tok[i], "--ew") && i + 1 < n) { EW1 = 1; sscanf(tok[++i], "%lf,%lf,%lf,%lf,%lf,%lf", EP1, EP1 + 1, EP1 + 2, EP1 + 3, EP1 + 4, EP1 + 5); }
         else if (!strcmp(tok[i], "--ew2") && i + 1 < n) { EW2 = 1; W2ON = 1; sscanf(tok[++i], "%lf,%lf,%lf,%lf,%lf,%lf", EP2, EP2 + 1, EP2 + 2, EP2 + 3, EP2 + 4, EP2 + 5); }
         else if (!strcmp(tok[i], "--wt2") && i + 1 < n) { W2ON = 1; sscanf(tok[++i], "%d,%d,%d", &FW2, &VW2, &GW2); }
@@ -1357,6 +1400,8 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--sos") && i + 1 < argc) SOSM = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--satc") && i + 1 < argc) SATC = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--sim") && i + 1 < argc) SIMM = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--tgt") && i + 1 < argc) TGTM = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--gt") && i + 1 < argc) GTW = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--ew") && i + 1 < argc) { EW1 = 1; sscanf(argv[++i], "%lf,%lf,%lf,%lf,%lf,%lf", EP1, EP1 + 1, EP1 + 2, EP1 + 3, EP1 + 4, EP1 + 5); }
         else if (!strcmp(argv[i], "--ew2") && i + 1 < argc) { EW2 = 1; W2ON = 1; sscanf(argv[++i], "%lf,%lf,%lf,%lf,%lf,%lf", EP2, EP2 + 1, EP2 + 2, EP2 + 3, EP2 + 4, EP2 + 5); }
         else if (!strcmp(argv[i], "--wt2") && i + 1 < argc) { W2ON = 1; sscanf(argv[++i], "%d,%d,%d", &FW2, &VW2, &GW2); }
@@ -1371,6 +1416,7 @@ int main(int argc, char **argv) {
     unfold_defs();
     const char *base = strrchr(path, '/'); base = base ? base + 1 : path;
     if (getenv("HYPER_DUMP")) for (int r = 0; r < NR; r++) { fprintf(stderr, "%s: head %d nb %d nv %d\n", SY[R[r].name].name, R[r].head, R[r].nb, R[r].nv); }
+    tgt_prepare();
     EQSYM = EQ;
     if (getenv("HYPER_CLASS")) { printf("%s eq %d defs %d out %d\n", base, HAS_EQ, NDEF, OUT_OF_CLASS); return 0; }
     if (OUT_OF_CLASS) { printf("%% SZS status GaveUp for %s\n%% reason %s\n", base, WHY); return 0; }
