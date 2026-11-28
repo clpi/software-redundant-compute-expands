@@ -820,7 +820,7 @@ static void eq_resolve(int g, int k) {   /* sides of body literal k unified in b
 /* forward demodulation by active oriented unit equations l = r (l > r in the order, so every
    instance is oriented too): each rewrite is recorded as a superposition step with that unit */
 static dtree RDEM;
-static int ORW = 1;
+static int ORW = 1, ORW0 = 1;
 static int inst_nr(int t, int b) {   /* instantiate without renaming; an unbound variable of bank MB becomes a fresh one */
     deref(&t, &b);
     if (ISVAR(t)) return b == MB ? mkvar(MAXV - 1 - VNO(t)) : t;
@@ -1382,7 +1382,7 @@ static const config *SCH = SCHED; static int NSCH = sizeof SCHED / sizeof SCHED[
 static void apply_args(const char *a) {   /* a setting is a string of the command-line options */
     char buf[512]; snprintf(buf, sizeof buf, "%s", a); char *tok[32]; int n = 0;
     for (char *t = strtok(buf, " "); t && n < 32; t = strtok(NULL, " ")) tok[n++] = t;
-    MAGIC = RES = 0; MAXW = 0; FW = 2; VW = 1; HM = 1.0; LP = 0; SELMODE = 0; GW = 0; PREC = 0; KWON = 0; W2ON = 0; SOSM = 0; SATC = 0; SIMM = 0; EW1 = EW2 = 0; GTW = 0; TGTM = 0; NEHQ = 0;
+    MAGIC = RES = 0; MAXW = 0; FW = 2; VW = 1; HM = 1.0; LP = 0; SELMODE = 0; GW = 0; PREC = 0; KWON = 0; W2ON = 0; SOSM = 0; SATC = 0; SIMM = 0; EW1 = EW2 = 0; GTW = 0; TGTM = 0; NEHQ = 0; ORW = ORW0;
     for (int i = 0; i < n; i++) {
         if (!strcmp(tok[i], "--magic")) MAGIC = 1;
         else if (!strcmp(tok[i], "--res")) RES = 1;
@@ -1397,6 +1397,7 @@ static void apply_args(const char *a) {   /* a setting is a string of the comman
         else if (!strcmp(tok[i], "--sos") && i + 1 < n) SOSM = atoi(tok[++i]);
         else if (!strcmp(tok[i], "--satc") && i + 1 < n) SATC = atoi(tok[++i]);
         else if (!strcmp(tok[i], "--sim") && i + 1 < n) SIMM = atoi(tok[++i]);
+        else if (!strcmp(tok[i], "--orw") && i + 1 < n) ORW = ORW0 && atoi(tok[++i]);
         else if (!strcmp(tok[i], "--eh") && i + 1 < n) eh_parse(tok[++i]);
         else if (!strcmp(tok[i], "--tgt") && i + 1 < n) TGTM = atoi(tok[++i]);
         else if (!strcmp(tok[i], "--gt") && i + 1 < n) GTW = atoi(tok[++i]);
@@ -1456,6 +1457,7 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--sos") && i + 1 < argc) SOSM = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--satc") && i + 1 < argc) SATC = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--sim") && i + 1 < argc) SIMM = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--orw") && i + 1 < argc) ORW = ORW0 && atoi(argv[++i]);
         else if (!strcmp(argv[i], "--eh") && i + 1 < argc) eh_parse(argv[++i]);
         else if (!strcmp(argv[i], "--tgt") && i + 1 < argc) TGTM = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--gt") && i + 1 < argc) GTW = atoi(argv[++i]);
@@ -1466,7 +1468,7 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--wt") && i + 1 < argc) { sscanf(argv[++i], "%d,%d,%lf,%d", &FW, &VW, &HM, &LP); }
         else if (!strcmp(argv[i], "--cycle") && i + 1 < argc) set_cycle(argv[++i]);
     }
-    T0 = now_s(); if (getenv("HYPER_NO_USIMP")) USIMP = 0; if (getenv("HYPER_NO_ORW")) ORW = 0; if (getenv("HYPER_NO_ESUB")) ESUB = 0; 
+    T0 = now_s(); if (getenv("HYPER_NO_USIMP")) USIMP = 0; if (getenv("HYPER_NO_ORW")) ORW = ORW0 = 0; if (getenv("HYPER_NO_ESUB")) ESUB = 0; 
     for (int b = 0; b < MAXB; b++) for (int v = 0; v < MAXV; v++) BT[b][v] = -1;
     dt_init(&KEPT); dt_init(&ACT);
     parse_file(path, root, NULL, -1);
