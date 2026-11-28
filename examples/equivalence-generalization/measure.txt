@@ -1,0 +1,90 @@
+== v0
+kind          false_bare        leak refuted_uns congruence_ tolerance_f false_quali missed_bare   true_bare        runs       valid
+Pure                  16           0          11           7           0           0           0          12        3030        True
+Stateful              14           4           0           0           0           0           0           1        1608        True
+Concurrent             3           0           0           1           0           0           0           2          25        True
+Distributed            2           0           0           0           0           0           0           1          16        True
+Float                106          21          24          53          19           0           0           8         675        True
+IO                     9           3           0           0           0           0           0           1          40        True
+UI                     9           0           0           0           0           0           0           1         270        True
+Compiler              24           0           0          12           0           0           0         132         840        True
+== v1
+kind          false_bare        leak refuted_uns congruence_ tolerance_f false_quali missed_bare   true_bare        runs       valid
+Pure                   0           0           0           0           0           0           0          10        3030        True
+Stateful               0           0           0           0           0           0           1           0        1608        True
+Concurrent             0           0           0           0           0           0           2           0          55        True
+Distributed            0           0           0           0           0           0           1           0         400        True
+Float                  0           0           0           0           0           0           4           0         675        True
+IO                     0           0           0           0           0           0           1           0         130        True
+UI                     0           0           0           0           0           0           1           0         270        True
+Compiler               0           0           0           0           0           0          66           0         840        True
+== v1+proofs
+kind          false_bare        leak refuted_uns congruence_ tolerance_f false_quali missed_bare   true_bare        runs       valid
+Pure                   0           0           0           0           0           0           0          10        3030        True
+Stateful               0           0           0           0           0           0           1           0        1608        True
+Concurrent             0           0           0           0           0           0           2           0          55        True
+Distributed            0           0           0           0           0           0           1           0         400        True
+Float                  0           0           0           0           0           0           4           0         675        True
+IO                     0           0           0           0           0           0           1           0         130        True
+UI                     0           0           0           0           0           0           1           0         270        True
+Compiler               0           0           0           0           0           0          42          48         840        True
+== v0+schedules
+kind          false_bare        leak refuted_uns congruence_ tolerance_f false_quali missed_bare   true_bare        runs       valid
+Pure                  16           0          11           7           0           0           0          12        3030        True
+Stateful              14           4           0           0           0           0           0           1        1608        True
+Concurrent             1           0           0           1           0           0           0           2          55        True
+Distributed            0           0           0           0           0           0           0           1         400        True
+Float                106          21          24          53          19           0           0           8         675        True
+IO                     5           2           0           0           0           0           0           1         130        True
+UI                     9           0           0           0           0           0           0           1         270        True
+Compiler              24           0           0          12           0           0           0         132         840        True
+== v1-no-observer
+kind          false_bare        leak refuted_uns congruence_ tolerance_f false_quali missed_bare   true_bare        runs       valid
+Pure                   0           0           0           0           0           0           0          10        3030        True
+Stateful               0           0           0           0           0          24           1           0        1608        True
+Concurrent             0           0           0           0           0           0           2           0          55        True
+Distributed            0           0           0           0           0           0           1           0         400        True
+Float                  0           0           0           0           0           0           4           0         675        True
+IO                     0           0           0           0           0          10           1           0         130        True
+UI                     0           0           0           0           0          14           1           0         270        True
+Compiler               0           0           0           0           0           0          66           0         840        True
+== v1-no-resolution
+kind          false_bare        leak refuted_uns congruence_ tolerance_f false_quali missed_bare   true_bare        runs       valid
+Pure                  16           0          11          14           0          16           0          12        3030        True
+Stateful               2           0           0           0           0           4           0           1        1608        True
+Concurrent             0           0           0           0           0           0           0           2          55        True
+Distributed            0           0           0           0           0           0           0           1         400        True
+Float                 26           0           8          26           0          36           0           8         675        True
+IO                     0           0           0           0           0           0           0           1         130        True
+UI                     2           0           0           0           0           7           0           1         270        True
+Compiler              24           0           0          24           0          36           0         132         840        True
+== v1-no-schedules
+kind          false_bare        leak refuted_uns congruence_ tolerance_f false_quali missed_bare   true_bare        runs       valid
+Pure                   0           0           0           0           0           0           0          10        3030        True
+Stateful               0           0           0           0           0           0           1           0        1608        True
+Concurrent             0           0           0           0           0           0           2           0          25        True
+Distributed            0           0           0           0           0           0           1           0          16        True
+Float                  0           0           0           0           0           0           4           0         675        True
+IO                     0           0           0           0           0           0           1           0          40        True
+UI                     0           0           0           0           0           0           1           0         270        True
+Compiler               0           0           0           0           0           0          66           0         840        True
+== v1-no-tolerance
+kind          false_bare        leak refuted_uns congruence_ tolerance_f false_quali missed_bare   true_bare        runs       valid
+Pure                   0           0           0           0           0           0           0          10        3030        True
+Stateful               0           0           0           0           0           0           1           0        1608        True
+Concurrent             0           0           0           0           0           0           2           0          55        True
+Distributed            0           0           0           0           0           0           1           0         400        True
+Float                  0           0           0           0          36          36           4           0         675        True
+IO                     0           0           0           0           0           0           1           0         130        True
+UI                     0           0           0           0           0           0           1           0         270        True
+Compiler               0           0           0           0           0           0          66           0         840        True
+== v1-no-congruence
+kind          false_bare        leak refuted_uns congruence_ tolerance_f false_quali missed_bare   true_bare        runs       valid
+Pure                   0           0           0           0           0           0           0          10        3030        True
+Stateful               0           0           0           0           0           0           1           0        1608        True
+Concurrent             0           0           0           2           0           2           2           0          55        True
+Distributed            0           0           0           0           0           0           1           0         400        True
+Float                  0           0           0           0           0           0           4           0         675        True
+IO                     0           0           0           0           0           0           1           0         130        True
+UI                     0           0           0           0           0           0           1           0         270        True
+Compiler               0           0           0           0           0           0          66           0         840        True
